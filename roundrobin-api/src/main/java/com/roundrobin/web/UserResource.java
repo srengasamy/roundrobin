@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
 import com.roundrobin.domain.User;
-import com.roundrobin.groups.CreateValidator;
+import com.roundrobin.groups.CreateProfileValidator;
+import com.roundrobin.groups.CreateSkillValidator;
+import com.roundrobin.groups.CreateUserValidator;
 import com.roundrobin.services.UserService;
 
 @RestController
@@ -25,9 +27,9 @@ public class UserResource {
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"})
-  public Response<String> create(@RequestBody @Validated(CreateValidator.class) User user) {
+  public Response<String> create(@RequestBody @Validated({CreateUserValidator.class, CreateProfileValidator.class,
+      CreateSkillValidator.class}) User user) {
     return new Response<>(service.create(user).getId());
   }
-
 
 }

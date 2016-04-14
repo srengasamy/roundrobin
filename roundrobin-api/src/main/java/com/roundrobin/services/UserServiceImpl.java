@@ -2,10 +2,10 @@ package com.roundrobin.services;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,6 @@ import com.roundrobin.common.ErrorCodes;
 import com.roundrobin.domain.User;
 import com.roundrobin.domain.UserAction;
 import com.roundrobin.domain.UserAction.UserActionType;
-import com.roundrobin.repository.ProfileRepository;
 import com.roundrobin.repository.UserActionRepository;
 import com.roundrobin.repository.UserRepository;
 
@@ -22,41 +21,47 @@ import com.roundrobin.repository.UserRepository;
 public class UserServiceImpl implements UserService {
 
   @Autowired
-  private UserRepository uRepo;
+  private UserRepository userRepo;
 
   @Autowired
-  private ProfileRepository pRepo;
-
-  @Autowired
-  private UserActionRepository uaRepo;
+  private UserActionRepository userActionRepo;
 
   @Value("${activation.duration}")
   private int duration;
 
+  @Autowired
+  private SkillService skillService;
+
+  @Autowired
+  private ProfileService profileService;
+
   @Override
   public User read(String id) {
-    Optional<User> user = uRepo.findById(id);
+    Optional<User> user = userRepo.findById(id);
     checkArgument(user.isPresent(), ErrorCodes.INVALID_USER_ID);
-    return uRepo.findOne(id);
+    return user.get();
   }
 
   @Override
   public User create(User user) {
-    user.getProfile().setCreated(LocalDateTime.now());
-    pRepo.save(user.getProfile());
-    return uRepo.save(user);
+    user.getProfile().setCreated(DateTime.now());
+    profileService.create(user.getProfile());
+    user.getSkills().stream().forEach(c -> skillService.create(c));
+    return userRepo.save(user);
   }
 
   @Override
   public User update(User user) {
-    return uRepo.save(user);
+    Optional<User> existing = userRepo.findById(user.getId());
+    checkArgument(existing.isPresent(), ErrorCodes.INVALID_USER_ID);
+    return userRepo.save(user);
   }
 
   @Override
   public void delete(String id) {
     User user = read(id);
     user.setActive(false);
-    uRepo.save(user);
+    userRepo.save(user);
   }
 
   @Override
@@ -66,7 +71,7 @@ public class UserServiceImpl implements UserService {
     // action.setExpiry(DateTime.now().plusHours(duration).toDate());
     // action.setCreated(DateTime.now().toDate());
     action.setSecret(UUID.randomUUID().toString());
-    uaRepo.save(action);
+    userActionRepo.save(action);
   }
 
 }

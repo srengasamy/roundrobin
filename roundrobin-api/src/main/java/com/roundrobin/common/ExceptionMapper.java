@@ -2,6 +2,7 @@ package com.roundrobin.common;
 
 import static net.logstash.logback.marker.Markers.append;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,11 +32,13 @@ public class ExceptionMapper {
         append(Constants.ERROR_UUID, response.getUuid()).and(append(Constants.ERROR_CODE, ErrorCodes.INVALID_FIELD))
             .and(append(Constants.ERROR_MESSAGE_NAME, "Multiple field errors")),
         "Validation errors:" + ex, ex);
-    List<Error> errors = ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof FieldError)
-        .map(e -> (FieldError) e).map(e -> {
+    List<Error> errors = new ArrayList<>();
+    errors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof ObjectError)
+        .map(e -> (ObjectError) e).map(e -> {
           String message = e.getDefaultMessage();
-          return new Error(ErrorCodes.INVALID_FIELD, e.getField() + ": " + message);
-        }).collect(Collectors.toList());
+          return new Error(ErrorCodes.INVALID_FIELD,
+              (e instanceof FieldError ? ((FieldError) e).getField() : e.getObjectName()) + ": " + message);
+        }).collect(Collectors.toList()));
     response.setErrors(errors);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }

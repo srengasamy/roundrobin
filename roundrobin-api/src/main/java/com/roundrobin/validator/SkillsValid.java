@@ -12,7 +12,7 @@ import javax.validation.Payload;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SkillsValid {
-  String message() default "Skills are not valid";
+  String message() default "Skills may not be duplicate";
 
   Class<?>[] groups() default {};
 
