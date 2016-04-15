@@ -1,48 +1,27 @@
 package com.roundrobin.domain;
 
-import java.util.Optional;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.roundrobin.domain.Skill.DeliveryType;
-import com.roundrobin.groups.CreateSkillDetailValidator;
-import com.roundrobin.groups.CreateSkillValidator;
-import com.roundrobin.groups.UpdateSkillDetailValidator;
 
 @Document(collection = "skill_detail")
 public class SkillDetail {
   @Id
-  @NotBlank(groups = {UpdateSkillDetailValidator.class, CreateSkillValidator.class})
   private String id;
 
-  @UnwrapValidatedValue
-  @NotBlank(groups = CreateSkillDetailValidator.class)
-  private Optional<String> name = Optional.empty();
+  private String name;
 
-  @UnwrapValidatedValue
-  @NotNull(groups = CreateSkillDetailValidator.class)
-  private Optional<DeliveryType> deliveryType = Optional.empty();
+  private DeliveryType deliveryType;
 
-  @Valid
   @DBRef
-  @NotNull(groups = CreateSkillDetailValidator.class)
   private SkillGroup skillGroup;
 
-  @UnwrapValidatedValue
-  @NotNull(groups = CreateSkillDetailValidator.class)
-  private Optional<Boolean> active = Optional.empty();
+  private Boolean active;
 
   @Version
-  @JsonIgnore
   private Long version;
 
   public String getId() {
@@ -53,24 +32,20 @@ public class SkillDetail {
     this.id = id;
   }
 
-  public Optional<String> getName() {
+  public String getName() {
     return name;
   }
 
-  public void setName(Optional<String> name) {
+  public void setName(String name) {
     this.name = name;
   }
 
-  public Optional<DeliveryType> getDeliveryType() {
+  public DeliveryType getDeliveryType() {
     return deliveryType;
   }
 
-  public void setDeliveryType(Optional<DeliveryType> deliveryType) {
+  public void setDeliveryType(DeliveryType deliveryType) {
     this.deliveryType = deliveryType;
-  }
-
-  public void setActive(Optional<Boolean> active) {
-    this.active = active;
   }
 
   public SkillGroup getSkillGroup() {
@@ -81,8 +56,12 @@ public class SkillDetail {
     this.skillGroup = skillGroup;
   }
 
-  public Optional<Boolean> getActive() {
+  public Boolean getActive() {
     return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
   }
 
   public Long getVersion() {

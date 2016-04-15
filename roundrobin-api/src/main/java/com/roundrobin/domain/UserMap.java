@@ -8,9 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserMap {
   @Id
   private String id;
-
-  private User user;
-
+  private UserProfile userProfile;
   private GeoJsonPoint location;
 
   public String getId() {
@@ -21,12 +19,12 @@ public class UserMap {
     this.id = id;
   }
 
-  public User getUser() {
-    return user;
+  public UserProfile getUserProfile() {
+    return userProfile;
   }
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setUserProfile(UserProfile userProfile) {
+    this.userProfile = userProfile;
   }
 
   public GeoJsonPoint getLocation() {

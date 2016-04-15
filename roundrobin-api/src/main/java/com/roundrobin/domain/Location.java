@@ -2,21 +2,16 @@ package com.roundrobin.domain;
 
 import java.util.Date;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @Document(collection = "location")
 public class Location {
   @Id
   private String id;
   private GeoJsonPoint location;
-  private User user;
-  @CreatedDate
-  @DateTimeFormat(iso = ISO.DATE_TIME)
+  private UserProfile userProfile;
   private Date created;
 
   public String getId() {
@@ -35,12 +30,12 @@ public class Location {
     this.location = location;
   }
 
-  public User getUser() {
-    return user;
+  public UserProfile getUserProfile() {
+    return userProfile;
   }
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setUserProfile(UserProfile userProfile) {
+    this.userProfile = userProfile;
   }
 
   public Date getCreated() {

@@ -1,11 +1,16 @@
 package com.roundrobin.services;
 
+import com.roundrobin.api.SkillGroupTo;
 import com.roundrobin.domain.SkillGroup;
 
 public interface SkillGroupService {
-  public SkillGroup read(String id);
+  public SkillGroup get(String id);
 
-  public SkillGroup create(SkillGroup skillGroup);
+  public SkillGroupTo read(String id);
 
-  public SkillGroup update(SkillGroup skillGroup);
+  public SkillGroupTo create(SkillGroupTo skillGroup);
+
+  public SkillGroupTo update(SkillGroupTo skillGroup);
+
+  public void delete(String id);
 }

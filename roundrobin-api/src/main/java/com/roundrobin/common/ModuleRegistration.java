@@ -17,6 +17,7 @@ public class ModuleRegistration {
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new Jdk8Module());
     mapper.registerModule(new JodaModule());
+    mapper.configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     return mapper;
   }
 

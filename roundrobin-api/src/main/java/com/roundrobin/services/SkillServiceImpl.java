@@ -3,60 +3,95 @@ package com.roundrobin.services;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
+import com.roundrobin.api.SkillTo;
 import com.roundrobin.common.ErrorCodes;
 import com.roundrobin.domain.Skill;
 import com.roundrobin.domain.SkillDetail;
-import com.roundrobin.repository.SkillDetailRepository;
+import com.roundrobin.domain.UserProfile;
 import com.roundrobin.repository.SkillRepository;
 
 @Service
 public class SkillServiceImpl implements SkillService {
   @Autowired
-  private SkillDetailRepository skillDetailsRepo;
+  private SkillDetailService skillDetailService;
 
   @Autowired
   private SkillRepository skillRepo;
 
+  @Autowired
+  private UserProfileService profileService;
+
   @Override
-  public Skill read(String id) {
-    Optional<Skill> existing = skillRepo.findById(id);
-    checkArgument(existing.isPresent(), ErrorCodes.INVALID_SKILL_ID);
-    return existing.get();
+  public Skill get(String id) {
+    Optional<Skill> skill = skillRepo.findById(id);
+    checkArgument(skill.isPresent() && skill.get().getActive(), ErrorCodes.INVALID_SKILL_ID);
+    return skill.get();
   }
 
   @Override
-  public Skill create(Skill skill) {
-    Optional<SkillDetail> skillDetails = skillDetailsRepo.findById(skill.getSkillDetails().getId());
-    checkArgument(skillDetails.isPresent(), ErrorCodes.INVALID_SKILL_DETAIL_ID);
+  public Skill save(Skill skill) {
     return skillRepo.save(skill);
   }
 
   @Override
-  public Skill update(Skill skill) {
-    checkArgument(!StringUtils.isEmpty(skill.getId()), ErrorCodes.INVALID_SKILL_DETAIL_ID);
-    Optional<Skill> existing = skillRepo.findById(skill.getId());
-    checkArgument(existing.isPresent(), ErrorCodes.INVALID_SKILL_DETAIL_ID);
-    if (skill.getActive().isPresent()) {
-      existing.get().setActive(skill.getActive());
-    }
-    if (skill.getCost().isPresent()) {
-      existing.get().setCost(skill.getCost());
-    }
-    if (skill.getMinCost().isPresent()) {
-      existing.get().setMinCost(skill.getMinCost());
-    }
-    if (skill.getMaxCost().isPresent()) {
-      existing.get().setMaxCost(skill.getMaxCost());
-    }
-    if(skill.getTimeToComplete().isPresent()){
-      existing.get().setTimeToComplete(skill.getTimeToComplete());
-    }
-    return skillRepo.save(existing.get());
+  public SkillTo read(String id) {
+    Skill skill = get(id);
+    SkillTo skillTo = new SkillTo();
+    skillTo.setId(skill.getId());
+    skillTo.setCost(Optional.ofNullable(skill.getCost()));
+    skillTo.setMinCost(Optional.ofNullable(skill.getMinCost()));
+    skillTo.setMaxCost(Optional.ofNullable(skill.getMaxCost()));
+    skillTo.setTimeToComplete(Optional.of(skill.getTimeToComplete()));
+    return skillTo;
   }
+
+  @Override
+  public SkillTo create(SkillTo skillTo) {
+    SkillDetail skillDetail = skillDetailService.get(skillTo.getSkillDetailId());
+    UserProfile userProfile = profileService.get(skillTo.getUserProfileId());
+    checkSkillExists(skillDetail.getId(), userProfile);
+    Skill skill = new Skill();
+    skill.setTimeToComplete(skillTo.getTimeToComplete().get());
+    skill.setCost(skillTo.getCost().orElse(null));
+    skill.setMinCost(skillTo.getMinCost().orElse(null));
+    skill.setMaxCost(skillTo.getMaxCost().orElse(null));
+    skill.setActive(true);
+    skill.setCreated(DateTime.now());
+    skill.setSkillDetails(skillDetail);
+    save(skill);
+    userProfile.getSkills().add(skill);
+    profileService.save(userProfile);
+    return read(skill.getId());
+  }
+
+  @Override
+  public SkillTo update(SkillTo skillTo) {
+    Skill skill = get(skillTo.getId());
+    skill.setMaxCost(skillTo.getMaxCost().orElse(skill.getMaxCost()));
+    skill.setMinCost(skillTo.getMinCost().orElse(skill.getMinCost()));
+    skill.setCost(skillTo.getCost().orElse(skill.getCost()));
+    skill.setTimeToComplete(skillTo.getTimeToComplete().orElse(skill.getTimeToComplete()));
+    return read(save(skill).getId());
+  }
+
+  @Override
+  public void delete(String id) {
+    Skill skill = get(id);
+    skill.setActive(false);
+    save(skill);
+  }
+
+  private void checkSkillExists(String skillDetailId, UserProfile userProfile) {
+    boolean exists = userProfile.getSkills().stream().map(s -> s.getSkillDetails().getId()).collect(Collectors.toList())
+        .contains(skillDetailId);
+    checkArgument(!exists, ErrorCodes.SKILL_ALREADY_EXISTS);
+  }
+
 
 }

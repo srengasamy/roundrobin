@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
-import com.roundrobin.domain.SkillGroup;
+import com.roundrobin.api.SkillGroupTo;
 import com.roundrobin.groups.CreateSkillGroupValidator;
 import com.roundrobin.groups.UpdateSkillGroupValidator;
 import com.roundrobin.services.SkillGroupService;
@@ -21,17 +21,25 @@ public class SkillGroupResource {
   private SkillGroupService service;
 
   @RequestMapping(value = "{skillGroupId}", method = RequestMethod.GET)
-  public Response<SkillGroup> read(@PathVariable String skillGroupId) {
+  public Response<SkillGroupTo> read(@PathVariable String skillGroupId) {
     return new Response<>(service.read(skillGroupId));
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"})
-  public Response<String> create(@RequestBody @Validated(CreateSkillGroupValidator.class) SkillGroup skillGroup) {
-    return new Response<>(service.create(skillGroup).getId());
+  public Response<SkillGroupTo> create(
+      @RequestBody @Validated(CreateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
+    return new Response<>(service.create(skillGroupTo));
   }
 
   @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
-  public Response<String> update(@RequestBody @Validated(UpdateSkillGroupValidator.class) SkillGroup skillGroup) {
-    return new Response<>(service.update(skillGroup).getId());
+  public Response<SkillGroupTo> update(
+      @RequestBody @Validated(UpdateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
+    return new Response<>(service.update(skillGroupTo));
+  }
+
+  @RequestMapping(value = "{skillGroupId}", method = RequestMethod.DELETE)
+  public Response<Boolean> delete(@PathVariable String skillGroupId) {
+    service.delete(skillGroupId);
+    return new Response<>(true);
   }
 }

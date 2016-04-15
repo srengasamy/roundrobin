@@ -1,11 +1,18 @@
 package com.roundrobin.services;
 
+import com.roundrobin.api.SkillTo;
 import com.roundrobin.domain.Skill;
 
 public interface SkillService {
-  public Skill read(String id);
+  public Skill get(String id);
 
-  public Skill create(Skill skill);
+  public Skill save(Skill skill);
 
-  public Skill update(Skill skill);
+  public SkillTo read(String id);
+
+  public SkillTo create(SkillTo skill);
+
+  public SkillTo update(SkillTo skill);
+
+  public void delete(String id);
 }
