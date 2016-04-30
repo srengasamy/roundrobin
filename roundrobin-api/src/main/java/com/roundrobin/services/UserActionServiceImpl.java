@@ -3,17 +3,21 @@ package com.roundrobin.services;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.UserActionTo;
-import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.common.Assert;
+import com.roundrobin.common.ErrorCode;
+import com.roundrobin.domain.Credential;
 import com.roundrobin.domain.UserAction;
 import com.roundrobin.domain.UserAction.UserActionType;
 import com.roundrobin.domain.UserProfile;
 import com.roundrobin.repository.UserActionRepository;
+
 
 @Service
 public class UserActionServiceImpl implements UserActionService {
@@ -24,26 +28,59 @@ public class UserActionServiceImpl implements UserActionService {
   @Autowired
   private UserProfileService userProfileService;
 
+  @Autowired
+  private CredentialService credentialService;
+
   @Override
   public UserAction sendActivationLink() {
     UserAction userAction = new UserAction();
-    userAction.setAction(UserActionType.ACTIVATE);
+    userAction.setAction(UserActionType.ACTIVATE_USER);
     userAction.setCreated(DateTime.now());
     userAction.setExpiry(DateTime.now().plusHours(48));
-    userAction.setSecret("secret");
+    userAction.setSecret(UUID.randomUUID().toString());
     return save(userAction);
   }
 
   @Override
-  public void activate(UserActionTo userActionTo) {
+  public UserAction sendPasswordResetLink() {
+    UserAction userAction = new UserAction();
+    userAction.setAction(UserActionType.RESET_PASSWORD);
+    userAction.setCreated(DateTime.now());
+    userAction.setExpiry(DateTime.now().plusHours(48));
+    userAction.setSecret(UUID.randomUUID().toString());
+    return save(userAction);
+  }
+
+  @Override
+  public void activateUser(UserActionTo userActionTo) {
     UserAction userAction = get(userActionTo.getId());
-    // TODO check secret
-    // TODO check expiry time
-    // TODO check active
-    // TODO change active to false and save
+    Assert.isTrue(userAction.getSecret().equals(userActionTo.getSecret()), ErrorCode.INVALID_SECRET);
+    Assert.isTrue(userAction.getExpiry().isBeforeNow(), ErrorCode.ACTION_EXPIRED);
     UserProfile userProfile = userProfileService.get(userActionTo.getUserProfileId());
     userProfile.setActive(true);
     userProfileService.save(userProfile);
+    userAction.setActive(false);
+    save(userAction);
+  }
+
+  @Override
+  public void requestResetPassword(UserActionTo userActionTo) {
+    UserAction userAction = get(userActionTo.getId());
+    Assert.isTrue(userAction.getSecret().equals(userActionTo.getSecret()), ErrorCode.INVALID_SECRET);
+    Assert.isTrue(userAction.getExpiry().isBeforeNow(), ErrorCode.ACTION_EXPIRED);
+  }
+
+  @Override
+  public void resetPassword(UserActionTo userActionTo) {
+    UserAction userAction = get(userActionTo.getId());
+    Assert.isTrue(userAction.getSecret().equals(userActionTo.getSecret()), ErrorCode.INVALID_SECRET);
+    Assert.isTrue(userAction.getExpiry().isBeforeNow(), ErrorCode.ACTION_EXPIRED);
+    UserProfile userProfile = userProfileService.get(userActionTo.getUserProfileId());
+    Credential credential = userProfile.getCredential();
+    credential.setPassword(userActionTo.getPassword());
+    credentialService.save(credential);
+    userAction.setActive(false);
+    save(userAction);
   }
 
   @Override
@@ -54,7 +91,7 @@ public class UserActionServiceImpl implements UserActionService {
   @Override
   public UserAction get(String id) {
     Optional<UserAction> userAction = userActionRepo.findById(id);
-    checkArgument(userAction.isPresent(), ErrorCodes.INVALID_USER_ACTION_ID);
+    checkArgument(userAction.isPresent(), ErrorCode.INVALID_USER_ACTION_ID);
     return userAction.get();
   }
 

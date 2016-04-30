@@ -1,5 +1,5 @@
 package com.roundrobin.groups;
 
-public interface UserActivationValidator {
+public interface UserActivationValidator extends UserActionValidator {
 
 }

@@ -1,7 +1,5 @@
 package com.roundrobin.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Optional;
 
 import org.joda.time.DateTime;
@@ -9,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.CredentialTo;
-import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.common.Assert;
+import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.Credential;
 import com.roundrobin.repository.CredentialRepository;
 
@@ -18,13 +17,10 @@ public class CredentialServiceImpl implements CredentialService {
   @Autowired
   private CredentialRepository credentialRepo;
 
-  @Autowired
-  private UserProfileService profileService;
-
   @Override
   public Credential get(String id) {
     Optional<Credential> credential = credentialRepo.findById(id);
-    checkArgument(credential.isPresent(), ErrorCodes.INVALID_CREDENTIAL_ID);
+    Assert.isTrue(credential.isPresent(), ErrorCode.INVALID_CREDENTIAL_ID);
     return credential.get();
   }
 

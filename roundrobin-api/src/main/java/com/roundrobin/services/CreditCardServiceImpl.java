@@ -1,7 +1,5 @@
 package com.roundrobin.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Optional;
 
 import org.joda.time.DateTime;
@@ -9,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.CreditCardTo;
-import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.common.Assert;
+import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.CreditCard;
 import com.roundrobin.domain.UserProfile;
 import com.roundrobin.repository.CreditCardRepository;
@@ -24,7 +23,7 @@ public class CreditCardServiceImpl implements CreditCardService {
   @Override
   public CreditCard get(String id) {
     Optional<CreditCard> creditCard = creditCardRepo.findById(id);
-    checkArgument(creditCard.isPresent() && creditCard.get().getActive(), ErrorCodes.INVALID_CREDIT_CARD_ID);
+    Assert.isTrue(creditCard.isPresent() && creditCard.get().getActive(), ErrorCode.INVALID_CREDIT_CARD_ID);
     return creditCard.get();
   }
 

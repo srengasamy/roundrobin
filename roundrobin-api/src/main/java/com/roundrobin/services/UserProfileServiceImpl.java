@@ -1,7 +1,5 @@
 package com.roundrobin.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Optional;
 
 import org.joda.time.DateTime;
@@ -10,7 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.CredentialTo;
 import com.roundrobin.api.UserProfileTo;
-import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.common.Assert;
+import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.Credential;
 import com.roundrobin.domain.UserProfile;
 import com.roundrobin.repository.UserProfileRepository;
@@ -29,7 +28,7 @@ public class UserProfileServiceImpl implements UserProfileService {
   @Override
   public UserProfile get(String id) {
     Optional<UserProfile> userProfile = profileRepo.findById(id);
-    checkArgument(userProfile.isPresent(), ErrorCodes.INVALID_PROFILE_ID);
+    Assert.isTrue(userProfile.isPresent(), ErrorCode.INVALID_PROFILE_ID);
     return userProfile.get();
   }
 

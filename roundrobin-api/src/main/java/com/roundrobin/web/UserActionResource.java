@@ -19,7 +19,7 @@ public class UserActionResource {
 
   @RequestMapping(value = "activate", method = RequestMethod.GET)
   public Response<String> read(@Validated(UserActivationValidator.class) UserActionTo userActionTo) {
-    service.activate(userActionTo);
+    service.activateUser(userActionTo);
     return new Response<>("Success");
   }
 }

@@ -29,14 +29,14 @@ public class ExceptionMapper {
     Response<String> response = new Response<>();
     response.setUuid(UUID.randomUUID().toString());
     logger.error(
-        append(Constants.ERROR_UUID, response.getUuid()).and(append(Constants.ERROR_CODE, ErrorCodes.INVALID_FIELD))
+        append(Constants.ERROR_UUID, response.getUuid()).and(append(Constants.ERROR_CODE, ErrorCode.INVALID_FIELD))
             .and(append(Constants.ERROR_MESSAGE_NAME, "Multiple field errors")),
         "Validation errors:" + ex, ex);
     List<Error> errors = new ArrayList<>();
     errors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof ObjectError)
         .map(e -> (ObjectError) e).map(e -> {
           String message = e.getDefaultMessage();
-          return new Error(ErrorCodes.INVALID_FIELD,
+          return new Error(ErrorCode.INVALID_FIELD,
               (e instanceof FieldError ? ((FieldError) e).getField() : e.getObjectName()) + ": " + message);
         }).collect(Collectors.toList()));
     response.setErrors(errors);

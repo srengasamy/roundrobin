@@ -1,14 +1,13 @@
 package com.roundrobin.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.SkillDetailTo;
-import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.common.Assert;
+import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.SkillDetail;
 import com.roundrobin.domain.SkillGroup;
 import com.roundrobin.repository.SkillDetailRepository;
@@ -25,7 +24,7 @@ public class SkillDetailServiceImpl implements SkillDetailService {
   @Override
   public SkillDetail get(String id) {
     Optional<SkillDetail> skillDetail = skillDetailRepo.findById(id);
-    checkArgument(skillDetail.isPresent() && skillDetail.get().getActive(), ErrorCodes.INVALID_SKILL_DETAIL_ID);
+    Assert.isTrue(skillDetail.isPresent() && skillDetail.get().getActive(), ErrorCode.INVALID_SKILL_DETAIL_ID);
     return skillDetail.get();
   }
 

@@ -1,14 +1,13 @@
 package com.roundrobin.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.SkillGroupTo;
-import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.common.Assert;
+import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.SkillGroup;
 import com.roundrobin.repository.SkillGroupRepository;
 
@@ -21,7 +20,7 @@ public class SkillGroupServiceImpl implements SkillGroupService {
   @Override
   public SkillGroup get(String id) {
     Optional<SkillGroup> skillGroup = skillGroupRepo.findById(id);
-    checkArgument(skillGroup.isPresent() && skillGroup.get().getActive(), ErrorCodes.INVALID_SKILL_GROUP_ID);
+    Assert.isTrue(skillGroup.isPresent() && skillGroup.get().getActive(), ErrorCode.INVALID_SKILL_GROUP_ID);
     return skillGroup.get();
   }
 

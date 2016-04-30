@@ -1,7 +1,5 @@
 package com.roundrobin.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Optional;
 
 import org.joda.time.DateTime;
@@ -9,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.BankAccountTo;
-import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.common.Assert;
+import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.BankAccount;
 import com.roundrobin.domain.UserProfile;
 import com.roundrobin.repository.BankAccountRepository;
@@ -26,7 +25,7 @@ public class BankAccountServiceImpl implements BankAccountService {
   @Override
   public BankAccount get(String id) {
     Optional<BankAccount> bankAccount = bankAccountRepo.findById(id);
-    checkArgument(bankAccount.isPresent() && bankAccount.get().getActive(), ErrorCodes.INVALID_BANK_ACCOUNT_ID);
+    Assert.isTrue(bankAccount.isPresent() && bankAccount.get().getActive(), ErrorCode.INVALID_BANK_ACCOUNT_ID);
     return bankAccount.get();
   }
 

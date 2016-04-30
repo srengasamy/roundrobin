@@ -8,7 +8,13 @@ public interface UserActionService {
 
   public UserAction sendActivationLink();
 
-  public void activate(UserActionTo userActionTo);
+  public UserAction sendPasswordResetLink();
+
+  public void activateUser(UserActionTo userActionTo);
+
+  public void requestResetPassword(UserActionTo userActionTo);
+
+  public void resetPassword(UserActionTo userActionTo);
 
   public UserAction save(UserAction userAction);
 

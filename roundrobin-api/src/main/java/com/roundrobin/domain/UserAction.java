@@ -65,7 +65,7 @@ public class UserAction {
 
 
   public static enum UserActionType {
-    ACTIVATE, PASSWORD
+    ACTIVATE_USER, RESET_PASSWORD
   }
 
 }

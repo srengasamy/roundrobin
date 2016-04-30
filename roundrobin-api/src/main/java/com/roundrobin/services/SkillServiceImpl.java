@@ -1,7 +1,5 @@
 package com.roundrobin.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -10,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.SkillTo;
-import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.common.Assert;
+import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.Skill;
 import com.roundrobin.domain.SkillDetail;
 import com.roundrobin.domain.UserProfile;
@@ -30,7 +29,7 @@ public class SkillServiceImpl implements SkillService {
   @Override
   public Skill get(String id) {
     Optional<Skill> skill = skillRepo.findById(id);
-    checkArgument(skill.isPresent() && skill.get().getActive(), ErrorCodes.INVALID_SKILL_ID);
+    Assert.isTrue(skill.isPresent() && skill.get().getActive(), ErrorCode.INVALID_SKILL_ID);
     return skill.get();
   }
 
@@ -90,7 +89,7 @@ public class SkillServiceImpl implements SkillService {
   private void checkSkillExists(String skillDetailId, UserProfile userProfile) {
     boolean exists = userProfile.getSkills().stream().map(s -> s.getSkillDetails().getId()).collect(Collectors.toList())
         .contains(skillDetailId);
-    checkArgument(!exists, ErrorCodes.SKILL_ALREADY_EXISTS);
+    Assert.isTrue(!exists, ErrorCode.SKILL_ALREADY_EXISTS);
   }
 
 
