@@ -26,15 +26,17 @@ public class SkillDetailResource {
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"})
-  public Response<SkillDetailTo> create(@RequestBody @Validated(CreateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
+  public Response<SkillDetailTo> create(
+      @RequestBody @Validated(CreateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
     return new Response<>(service.create(skillDetailTo));
   }
 
   @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
-  public Response<SkillDetailTo> update(@RequestBody @Validated(UpdateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
+  public Response<SkillDetailTo> update(
+      @RequestBody @Validated(UpdateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
     return new Response<>(service.update(skillDetailTo));
   }
-  
+
   @RequestMapping(value = "{skillDetailId}", method = RequestMethod.DELETE)
   public Response<Boolean> delete(@PathVariable String skillDetailId) {
     service.delete(skillDetailId);

@@ -1,12 +1,8 @@
 package com.roundrobin.domain;
 
-import java.util.Date;
-
-import org.springframework.data.annotation.CreatedDate;
+import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 
 @Document(collection = "credit_card")
@@ -20,11 +16,9 @@ public class CreditCard {
   private Short expiryYear;
   private String cvv;
   private String postalCode;
-  private boolean active;
-  private boolean valid;
-  @CreatedDate
-  @DateTimeFormat(iso = ISO.DATE_TIME)
-  private Date created;
+  private Boolean active;
+  private Boolean valid;
+  private DateTime created;
 
   public String getId() {
     return id;
@@ -74,27 +68,27 @@ public class CreditCard {
     this.cvv = cvv;
   }
 
-  public boolean isActive() {
+  public Boolean getActive() {
     return active;
   }
 
-  public void setActive(boolean active) {
+  public void setActive(Boolean active) {
     this.active = active;
   }
 
-  public boolean isValid() {
+  public Boolean getValid() {
     return valid;
   }
 
-  public void setValid(boolean valid) {
+  public void setValid(Boolean valid) {
     this.valid = valid;
   }
 
-  public Date getCreated() {
+  public DateTime getCreated() {
     return created;
   }
 
-  public void setCreated(Date created) {
+  public void setCreated(DateTime created) {
     this.created = created;
   }
 

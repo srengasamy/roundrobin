@@ -1,22 +1,17 @@
 package com.roundrobin.domain;
 
-import java.util.Date;
-
-import org.springframework.data.annotation.CreatedDate;
+import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-@Document(collection = "credentials")
-public class Credentials {
+@Document(collection = "credential")
+public class Credential {
   @Id
   private String id;
   private String username;
   private String password;
-  @CreatedDate
-  @DateTimeFormat(iso = ISO.DATE_TIME)
-  private Date created;
+  private DateTime created;
+  private DateTime updated;
 
   public String getId() {
     return id;
@@ -42,12 +37,19 @@ public class Credentials {
     this.password = password;
   }
 
-  public Date getCreated() {
+  public DateTime getCreated() {
     return created;
   }
 
-  public void setCreated(Date created) {
+  public void setCreated(DateTime created) {
     this.created = created;
   }
 
+  public DateTime getUpdated() {
+    return updated;
+  }
+
+  public void setUpdated(DateTime updated) {
+    this.updated = updated;
+  }
 }

@@ -1,12 +1,8 @@
 package com.roundrobin.domain;
 
-import java.util.Date;
-
-import org.springframework.data.annotation.CreatedDate;
+import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 
 @Document(collection = "user_action")
@@ -15,11 +11,9 @@ public class UserAction {
   private String id;
   private UserActionType action;
   private String secret;
-  @DateTimeFormat(iso = ISO.DATE_TIME)
-  private Date expiry;
-  @CreatedDate
-  @DateTimeFormat(iso = ISO.DATE_TIME)
-  private Date created;
+  private DateTime expiry;
+  private DateTime created;
+  private Boolean active;
 
   public String getId() {
     return id;
@@ -45,21 +39,31 @@ public class UserAction {
     this.secret = secret;
   }
 
-  public Date getExpiry() {
+  public DateTime getExpiry() {
     return expiry;
   }
 
-  public void setExpiry(Date expiry) {
+  public void setExpiry(DateTime expiry) {
     this.expiry = expiry;
   }
 
-  public Date getCreated() {
+  public DateTime getCreated() {
     return created;
   }
 
-  public void setCreated(Date created) {
+  public void setCreated(DateTime created) {
     this.created = created;
   }
+
+  public Boolean getActive() {
+    return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+
   public static enum UserActionType {
     ACTIVATE, PASSWORD
   }

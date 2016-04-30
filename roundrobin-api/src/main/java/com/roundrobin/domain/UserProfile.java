@@ -30,10 +30,14 @@ public class UserProfile {
   private GeoJsonPoint location;
 
   private Address address;
-  private Credentials credentials;
-  private List<UserAction> actions;
-  private List<CreditCard> creditCards;
-  private List<BankAccount> bankAccounts;
+  @DBRef
+  private Credential credential;
+  @DBRef
+  private List<UserAction> actions = new ArrayList<>();
+  @DBRef
+  private List<CreditCard> creditCards = new ArrayList<>();
+  @DBRef
+  private List<BankAccount> bankAccounts = new ArrayList<>();
   @DBRef
   private List<Skill> skills = new ArrayList<>();
 
@@ -157,12 +161,12 @@ public class UserProfile {
     this.skills = skills;
   }
 
-  public Credentials getCredentials() {
-    return credentials;
+  public Credential getCredential() {
+    return credential;
   }
 
-  public void setCredentials(Credentials credentials) {
-    this.credentials = credentials;
+  public void setCredential(Credential credential) {
+    this.credential = credential;
   }
 
   public Boolean getVendor() {

@@ -54,6 +54,10 @@ public class UserProfileTo {
   private Optional<String> homeNumber = Optional.empty();
 
   @UnwrapValidatedValue
+  @NotBlank(groups = CreateProfileValidator.class)
+  private Optional<String> password = Optional.empty();
+  
+  @UnwrapValidatedValue
   private Optional<SexType> sex = Optional.empty();
 
   @UnwrapValidatedValue
@@ -137,6 +141,14 @@ public class UserProfileTo {
 
   public void setLocation(Optional<GeoJsonPoint> location) {
     this.location = location;
+  }
+
+  public Optional<String> getPassword() {
+    return password;
+  }
+
+  public void setPassword(Optional<String> password) {
+    this.password = password;
   }
 
 }

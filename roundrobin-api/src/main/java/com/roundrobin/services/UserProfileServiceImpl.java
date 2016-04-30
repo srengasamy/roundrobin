@@ -8,8 +8,10 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.roundrobin.api.CredentialTo;
 import com.roundrobin.api.UserProfileTo;
 import com.roundrobin.common.ErrorCodes;
+import com.roundrobin.domain.Credential;
 import com.roundrobin.domain.UserProfile;
 import com.roundrobin.repository.UserProfileRepository;
 
@@ -18,10 +20,16 @@ public class UserProfileServiceImpl implements UserProfileService {
   @Autowired
   private UserProfileRepository profileRepo;
 
+  @Autowired
+  private CredentialService credentialService;
+
+  @Autowired
+  private UserActionService userActionService;
+
   @Override
   public UserProfile get(String id) {
     Optional<UserProfile> userProfile = profileRepo.findById(id);
-    checkArgument(userProfile.isPresent() && userProfile.get().getActive(), ErrorCodes.INVALID_PROFILE_ID);
+    checkArgument(userProfile.isPresent(), ErrorCodes.INVALID_PROFILE_ID);
     return userProfile.get();
   }
 
@@ -59,8 +67,12 @@ public class UserProfileServiceImpl implements UserProfileService {
     userProfile.setLocation(userProfileTo.getLocation().orElse(null));
     userProfile.setVendor(userProfileTo.getVendor().get());
     userProfile.setFlags(0);
-    userProfile.setActive(true);
+    userProfile.setActive(false);
     userProfile.setCreated(DateTime.now());
+    Credential credential =
+        credentialService.create(new CredentialTo(userProfileTo.getEmail().get(), userProfileTo.getPassword().get()));
+    userProfile.getActions().add(userActionService.sendActivationLink());
+    userProfile.setCredential(credential);
     return read(save(userProfile).getId());
   }
 

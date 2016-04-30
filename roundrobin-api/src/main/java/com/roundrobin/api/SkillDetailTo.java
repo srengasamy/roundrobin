@@ -6,7 +6,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -15,7 +14,6 @@ import com.roundrobin.groups.CreateSkillDetailValidator;
 import com.roundrobin.groups.UpdateSkillDetailValidator;
 @JsonInclude(Include.NON_NULL)
 public class SkillDetailTo {
-  @Id
   @NotBlank(groups = UpdateSkillDetailValidator.class)
   private String id;
 
