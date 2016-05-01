@@ -2,10 +2,14 @@ package com.roundrobin.api;
 
 import java.util.Optional;
 
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import com.roundrobin.groups.CreateSkillGroupValidator;
+import com.roundrobin.groups.SkillGroupValidator;
 import com.roundrobin.groups.UpdateSkillGroupValidator;
 
 public class SkillGroupTo {
@@ -14,6 +18,8 @@ public class SkillGroupTo {
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateSkillGroupValidator.class)
+  @Length(max = 25, groups = SkillGroupValidator.class)
+  @Pattern(regexp = "^[A-Za-z0-9]*$", groups=SkillGroupValidator.class)
   private Optional<String> groupName = Optional.empty();
 
   public String getId() {

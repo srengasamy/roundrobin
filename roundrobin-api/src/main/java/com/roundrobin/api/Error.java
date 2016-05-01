@@ -2,26 +2,24 @@ package com.roundrobin.api;
 
 import java.util.Objects;
 
-import com.roundrobin.common.ErrorCode;
-
 public class Error {
-  private ErrorCode code;
+  private int code;
   private String message;
 
   public Error() {
 
   }
 
-  public Error(ErrorCode code, String message) {
+  public Error(int code, String message) {
     this.code = code;
     this.message = message;
   }
 
-  public ErrorCode getCode() {
+  public int getCode() {
     return code;
   }
 
-  public void setCode(ErrorCode code) {
+  public void setCode(int code) {
     this.code = code;
   }
 

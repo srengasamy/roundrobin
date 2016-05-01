@@ -1,46 +1,45 @@
 package com.roundrobin.common;
 
-import static net.logstash.logback.marker.Markers.append;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
+import com.roundrobin.exception.ClientException;
 
 @ControllerAdvice
 public class ExceptionMapper {
-  private final Logger logger = LoggerFactory.getLogger(ExceptionMapper.class);
+
+  @Autowired
+  private ClientMessages messages;
+
+  @ExceptionHandler(ClientException.class)
+  public ResponseEntity<Response<String>> handleClientException(ClientException ex) {
+    Response<String> response =
+        new Response<>(new Error(ex.getCode().getCode(), messages.getErrorMessage(ex.getCode())));
+    return log(HttpStatus.BAD_REQUEST, response);
+  }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Response<String>> handleBindException(MethodArgumentNotValidException ex) {
-    Response<String> response = new Response<>();
-    response.setUuid(UUID.randomUUID().toString());
-    logger.error(
-        append(Constants.ERROR_UUID, response.getUuid()).and(append(Constants.ERROR_CODE, ErrorCode.INVALID_FIELD))
-            .and(append(Constants.ERROR_MESSAGE_NAME, "Multiple field errors")),
-        "Validation errors:" + ex, ex);
-    List<Error> errors = new ArrayList<>();
-    errors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof ObjectError)
-        .map(e -> (ObjectError) e).map(e -> {
+    List<Error> errors = ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof FieldError)
+        .map(e -> (FieldError) e).map(e -> {
           String message = e.getDefaultMessage();
-          return new Error(ErrorCode.INVALID_FIELD,
-              (e instanceof FieldError ? ((FieldError) e).getField() : e.getObjectName()) + ": " + message);
-        }).collect(Collectors.toList()));
-    response.setErrors(errors);
-    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+          return new Error(ErrorCode.INVALID_FIELD.getCode(), e.getField() + ": " + message);
+        }).collect(Collectors.toList());
+    return log(HttpStatus.BAD_REQUEST, new Response<>(errors));
+  }
+
+  private ResponseEntity<Response<String>> log(HttpStatus status, Response<String> response) {
+    return new ResponseEntity<>(response, status);
   }
 
 }

@@ -12,7 +12,9 @@ public enum ErrorCode {
   INVALID_USER_ACTION_ID(1010),
   INVALID_SECRET(1011),
   ACTION_EXPIRED(1012),
-  SKILL_ALREADY_EXISTS(1006);
+  SKILL_ALREADY_EXISTS(1006),
+  SKILL_GROUP_ALREADY_EXISTS(1013);
+  
   private int code;
 
   private ErrorCode(int code) {

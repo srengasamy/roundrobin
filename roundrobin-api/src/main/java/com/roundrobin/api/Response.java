@@ -18,6 +18,16 @@ public class Response<T> {
     timestamp = System.currentTimeMillis();
   }
 
+  public Response(List<Error> errors) {
+    this.timestamp = System.currentTimeMillis();
+    this.errors = errors;
+  }
+
+  public Response(Error error) {
+    this.timestamp = System.currentTimeMillis();
+    this.errors.add(error);
+  }
+
   public Response() {
     timestamp = System.currentTimeMillis();
   }

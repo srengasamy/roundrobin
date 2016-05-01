@@ -35,6 +35,8 @@ public class SkillGroupServiceImpl implements SkillGroupService {
 
   @Override
   public SkillGroupTo create(SkillGroupTo skillGroupTo) {
+    Optional<SkillGroup> existing = skillGroupRepo.findByGroupName(skillGroupTo.getGroupName().get());
+    Assert.isTrue(!existing.isPresent(), ErrorCode.SKILL_GROUP_ALREADY_EXISTS);
     SkillGroup skillGroup = new SkillGroup();
     skillGroup.setActive(true);
     skillGroup.setGroupName(skillGroupTo.getGroupName().get());

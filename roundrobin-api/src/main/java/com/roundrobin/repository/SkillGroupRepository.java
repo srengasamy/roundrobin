@@ -10,4 +10,5 @@ import com.roundrobin.domain.SkillGroup;
 public interface SkillGroupRepository extends MongoRepository<SkillGroup, String> {
   public Optional<SkillGroup> findById(String id);
 
+  public Optional<SkillGroup> findByGroupName(String groupName);
 }
