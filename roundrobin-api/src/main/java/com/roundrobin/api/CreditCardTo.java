@@ -5,7 +5,9 @@ import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.CreditCardNumber;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,6 +23,7 @@ public class CreditCardTo {
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateCreditCardValidator.class)
+  @Length(max = 100, groups = CreditCardValidator.class)
   private Optional<String> nameOnCard = Optional.empty();
 
   @UnwrapValidatedValue
@@ -30,21 +33,25 @@ public class CreditCardTo {
 
   @UnwrapValidatedValue
   @NotNull(groups = CreateCreditCardValidator.class)
+  @Range(min = 1, max = 12, groups = CreditCardValidator.class)
   private Optional<Byte> expiryMonth = Optional.empty();
 
   @UnwrapValidatedValue
   @NotNull(groups = CreateCreditCardValidator.class)
+  @Range(min = 16, max = 99, groups = CreditCardValidator.class)
   private Optional<Short> expiryYear = Optional.empty();
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateCreditCardValidator.class)
+  @Length(max = 5, groups = CreditCardValidator.class)
   private Optional<String> cvv = Optional.empty();
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateCreditCardValidator.class)
+  @Length(max = 7, groups = CreditCardValidator.class)
   private Optional<String> postalCode = Optional.empty();
 
-  @NotBlank(groups = CreditCardValidator.class)
+  @NotBlank(groups = CreateCreditCardValidator.class)
   private String userProfileId;
 
   public String getId() {

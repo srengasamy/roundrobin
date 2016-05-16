@@ -14,11 +14,14 @@ public class CostRequiredValidator implements ConstraintValidator<CostRequired, 
 
   @Override
   public boolean isValid(SkillTo skillTo, ConstraintValidatorContext context) {
+    if (skillTo.getCost().isPresent() && (skillTo.getMinCost().isPresent() || skillTo.getMaxCost().isPresent())) {
+      return false;
+    }
     if (skillTo.getCost().isPresent() && skillTo.getCost().get() > 0) {
       return true;
     }
     if ((skillTo.getMinCost().isPresent() && skillTo.getMaxCost().isPresent()) && skillTo.getMinCost().get() > 0
-        && skillTo.getMaxCost().get() > 0 && (skillTo.getMinCost().get() < skillTo.getMaxCost().get())) {
+            && skillTo.getMaxCost().get() > 0 && (skillTo.getMinCost().get() < skillTo.getMaxCost().get())) {
       return true;
     }
     return false;

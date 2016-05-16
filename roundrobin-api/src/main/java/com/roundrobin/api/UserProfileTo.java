@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
@@ -17,7 +18,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.roundrobin.domain.UserProfile.SexType;
 import com.roundrobin.groups.CreateProfileValidator;
 import com.roundrobin.groups.ProfileValidator;
+import com.roundrobin.groups.SkillDetailValidator;
 import com.roundrobin.groups.UpdateProfileValidator;
+
 @JsonInclude(Include.NON_ABSENT)
 public class UserProfileTo {
   @NotBlank(groups = UpdateProfileValidator.class)
@@ -25,10 +28,12 @@ public class UserProfileTo {
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateProfileValidator.class)
+  @Length(max = 35, groups = ProfileValidator.class)
   private Optional<String> firstName = Optional.empty();
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateProfileValidator.class)
+  @Length(max = 35, groups = ProfileValidator.class)
   private Optional<String> lastName = Optional.empty();
 
   @UnwrapValidatedValue
@@ -46,17 +51,17 @@ public class UserProfileTo {
   private Optional<Boolean> vendor = Optional.empty();
 
   @UnwrapValidatedValue
-  @NotNull(groups = CreateProfileValidator.class)
-  private Optional<LocalDate> dob = Optional.empty();
-
-  @UnwrapValidatedValue
   @Pattern(regexp = "(^$|[0-9]{10})", groups = ProfileValidator.class)
   private Optional<String> homeNumber = Optional.empty();
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateProfileValidator.class)
+  @Length(max = 35, groups = ProfileValidator.class)
   private Optional<String> password = Optional.empty();
-  
+
+  @UnwrapValidatedValue
+  private Optional<LocalDate> dob = Optional.empty();
+
   @UnwrapValidatedValue
   private Optional<SexType> sex = Optional.empty();
 

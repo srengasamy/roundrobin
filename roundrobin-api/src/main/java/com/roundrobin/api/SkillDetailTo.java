@@ -3,7 +3,9 @@ package com.roundrobin.api;
 import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
@@ -11,7 +13,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.roundrobin.domain.Skill.DeliveryType;
 import com.roundrobin.groups.CreateSkillDetailValidator;
+import com.roundrobin.groups.SkillDetailValidator;
+import com.roundrobin.groups.SkillGroupValidator;
 import com.roundrobin.groups.UpdateSkillDetailValidator;
+
 @JsonInclude(Include.NON_NULL)
 public class SkillDetailTo {
   @NotBlank(groups = UpdateSkillDetailValidator.class)
@@ -19,6 +24,8 @@ public class SkillDetailTo {
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateSkillDetailValidator.class)
+  @Pattern(regexp = "^[A-Za-z0-9]*$", groups = SkillDetailValidator.class)
+  @Length(max = 25, groups = SkillDetailValidator.class)
   private Optional<String> name = Optional.empty();
 
   @UnwrapValidatedValue

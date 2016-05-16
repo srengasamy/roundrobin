@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -14,7 +15,7 @@ import com.roundrobin.groups.SkillValidator;
 import com.roundrobin.groups.UpdateSkillValidator;
 import com.roundrobin.validator.CostRequired;
 
-@CostRequired(groups = SkillValidator.class)
+@CostRequired(groups = SkillValidator.class, message = "Invalid cost value")
 @JsonInclude(Include.NON_ABSENT)
 public class SkillTo {
   @NotBlank(groups = UpdateSkillValidator.class)
@@ -23,11 +24,12 @@ public class SkillTo {
   @NotBlank(groups = CreateSkillValidator.class)
   private String skillDetailId;
 
-  @NotBlank(groups = SkillValidator.class)
+  @NotBlank(groups = CreateSkillValidator.class)
   private String userProfileId;
 
   @UnwrapValidatedValue
   @NotNull(groups = CreateSkillValidator.class)
+  @Range(min = 10, max = 600, groups = SkillValidator.class)
   private Optional<Integer> timeToComplete = Optional.empty();
 
   private Optional<Double> cost = Optional.empty();

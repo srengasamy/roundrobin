@@ -13,8 +13,10 @@ public enum ErrorCode {
   INVALID_SECRET(1011),
   ACTION_EXPIRED(1012),
   SKILL_ALREADY_EXISTS(1006),
-  SKILL_GROUP_ALREADY_EXISTS(1013);
-  
+  SKILL_GROUP_ALREADY_EXISTS(1013),
+  INVALID_URL(1014),
+  UNPARSABLE_INPUT(1015);
+
   private int code;
 
   private ErrorCode(int code) {

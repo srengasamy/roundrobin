@@ -2,6 +2,7 @@ package com.roundrobin.api;
 
 import java.util.Optional;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.roundrobin.groups.BankAccountValidator;
 import com.roundrobin.groups.CreateBankAccountValidator;
+import com.roundrobin.groups.ProfileValidator;
 import com.roundrobin.groups.UpdateBankAccountValidator;
 
 @JsonInclude(Include.NON_ABSENT)
@@ -18,23 +20,29 @@ public class BankAccountTo {
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateBankAccountValidator.class)
+  @Length(max = 50, groups = BankAccountValidator.class)
   private Optional<String> bankName = Optional.empty();
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateBankAccountValidator.class)
+  @Length(max = 100, groups = BankAccountValidator.class)
   private Optional<String> nameOnAccount = Optional.empty();
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateBankAccountValidator.class)
+  @Length(max = 35, groups = BankAccountValidator.class)
   private Optional<String> accountNumber = Optional.empty();
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateBankAccountValidator.class)
+  @Length(max = 35, groups = BankAccountValidator.class)
   private Optional<String> routingNumber = Optional.empty();
 
+  @UnwrapValidatedValue
+  @Length(max = 50, groups = BankAccountValidator.class)
   private Optional<String> description = Optional.empty();
 
-  @NotBlank(groups = BankAccountValidator.class)
+  @NotBlank(groups = CreateBankAccountValidator.class)
   private String userProfileId;
 
   public String getId() {
