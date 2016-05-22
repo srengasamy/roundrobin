@@ -2,6 +2,7 @@ package com.roundrobin.services;
 
 import java.util.Optional;
 
+import org.jasypt.encryption.StringEncryptor;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.BankAccount;
 import com.roundrobin.domain.UserProfile;
 import com.roundrobin.repository.BankAccountRepository;
+import com.roundrobin.utils.StringUtils;
 
 @Service
 public class BankAccountServiceImpl implements BankAccountService {
@@ -21,6 +23,9 @@ public class BankAccountServiceImpl implements BankAccountService {
 
   @Autowired
   private UserProfileService profileService;
+
+  @Autowired
+  private StringEncryptor jasyptStringEncryptor;
 
   @Override
   public BankAccount get(String id) {
@@ -36,8 +41,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     bankAccountTo.setId(bankAccount.getId());
     bankAccountTo.setNameOnAccount(Optional.ofNullable(bankAccount.getNameOnAccount()));
     bankAccountTo.setBankName(Optional.of(bankAccount.getBankName()));
-    bankAccountTo.setAccountNumber(Optional.of(bankAccount.getAccountNumber()));
-    bankAccountTo.setRoutingNumber(Optional.of(bankAccount.getRoutingNumber()));
+    bankAccountTo.setAccountNumber(Optional.of(bankAccount.getMaskedAccountNumber()));
     bankAccountTo.setDescription(Optional.ofNullable(bankAccount.getDescription()));
     return bankAccountTo;
   }
@@ -46,8 +50,9 @@ public class BankAccountServiceImpl implements BankAccountService {
   public BankAccountTo create(BankAccountTo bankAccountTo) {
     UserProfile userProfile = profileService.get(bankAccountTo.getUserProfileId());
     BankAccount bankAccount = new BankAccount();
-    bankAccount.setAccountNumber(bankAccountTo.getAccountNumber().get());
-    bankAccount.setRoutingNumber(bankAccountTo.getRoutingNumber().get());
+    bankAccount.setAccountNumber(jasyptStringEncryptor.encrypt(bankAccountTo.getAccountNumber().get()));
+    bankAccount.setRoutingNumber(jasyptStringEncryptor.encrypt(bankAccountTo.getRoutingNumber().get()));
+    bankAccount.setMaskedAccountNumber(StringUtils.mask(bankAccountTo.getAccountNumber().get()));
     bankAccount.setBankName(bankAccountTo.getBankName().get());
     bankAccount.setNameOnAccount(bankAccountTo.getNameOnAccount().get());
     bankAccount.setDescription(bankAccountTo.getDescription().orElse(null));

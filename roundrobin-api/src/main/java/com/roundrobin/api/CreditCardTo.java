@@ -23,12 +23,7 @@ public class CreditCardTo {
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateCreditCardValidator.class)
-  @Length(max = 100, groups = CreditCardValidator.class)
-  private Optional<String> nameOnCard = Optional.empty();
-
-  @UnwrapValidatedValue
-  @NotBlank(groups = CreateCreditCardValidator.class)
-  @CreditCardNumber(groups = CreditCardValidator.class)
+  @CreditCardNumber(groups = CreateCreditCardValidator.class)
   private Optional<String> cardNumber = Optional.empty();
 
   @UnwrapValidatedValue
@@ -42,7 +37,7 @@ public class CreditCardTo {
   private Optional<Short> expiryYear = Optional.empty();
 
   @UnwrapValidatedValue
-  @NotBlank(groups = CreateCreditCardValidator.class)
+  @NotBlank(groups = CreditCardValidator.class)
   @Length(max = 5, groups = CreditCardValidator.class)
   private Optional<String> cvv = Optional.empty();
 
@@ -60,14 +55,6 @@ public class CreditCardTo {
 
   public void setId(String id) {
     this.id = id;
-  }
-
-  public Optional<String> getNameOnCard() {
-    return nameOnCard;
-  }
-
-  public void setNameOnCard(Optional<String> nameOnCard) {
-    this.nameOnCard = nameOnCard;
   }
 
   public Optional<String> getCardNumber() {

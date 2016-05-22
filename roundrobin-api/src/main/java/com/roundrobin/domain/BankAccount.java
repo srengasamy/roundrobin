@@ -11,6 +11,7 @@ public class BankAccount {
   private String bankName;
   private String nameOnAccount;
   private String accountNumber;
+  private String maskedAccountNumber;
   private String routingNumber;
   private String description;
   private Boolean active;
@@ -87,6 +88,15 @@ public class BankAccount {
 
   public void setCreated(DateTime created) {
     this.created = created;
+  }
+
+  public void setMaskedAccountNumber(String maskedAccountNumber) {
+    this.maskedAccountNumber = maskedAccountNumber;
+  }
+
+  public String getMaskedAccountNumber() {
+
+    return maskedAccountNumber;
   }
 
 }

@@ -34,7 +34,7 @@ public class BankAccountTo {
   private Optional<String> accountNumber = Optional.empty();
 
   @UnwrapValidatedValue
-  @NotBlank(groups = CreateBankAccountValidator.class)
+  @NotBlank(groups = BankAccountValidator.class)
   @Length(max = 35, groups = BankAccountValidator.class)
   private Optional<String> routingNumber = Optional.empty();
 

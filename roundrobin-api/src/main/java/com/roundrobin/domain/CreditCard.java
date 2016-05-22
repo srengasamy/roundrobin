@@ -1,5 +1,6 @@
 package com.roundrobin.domain;
 
+
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,8 +11,8 @@ public class CreditCard {
   @Id
   private String id;
 
-  private String nameOnCard;
   private String cardNumber;
+  private String maskedCardNumber;
   private Byte expiryMonth;
   private Short expiryYear;
   private String cvv;
@@ -26,14 +27,6 @@ public class CreditCard {
 
   public void setId(String id) {
     this.id = id;
-  }
-
-  public String getNameOnCard() {
-    return nameOnCard;
-  }
-
-  public void setNameOnCard(String nameOnCard) {
-    this.nameOnCard = nameOnCard;
   }
 
   public String getCardNumber() {
@@ -100,4 +93,11 @@ public class CreditCard {
     this.postalCode = postalCode;
   }
 
+  public String getMaskedCardNumber() {
+    return maskedCardNumber;
+  }
+
+  public void setMaskedCardNumber(String maskedCardNumber) {
+    this.maskedCardNumber = maskedCardNumber;
+  }
 }

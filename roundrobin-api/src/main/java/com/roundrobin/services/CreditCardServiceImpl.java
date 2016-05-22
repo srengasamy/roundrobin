@@ -2,6 +2,7 @@ package com.roundrobin.services;
 
 import java.util.Optional;
 
+import org.jasypt.encryption.StringEncryptor;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,13 +13,18 @@ import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.CreditCard;
 import com.roundrobin.domain.UserProfile;
 import com.roundrobin.repository.CreditCardRepository;
+import com.roundrobin.utils.StringUtils;
 
 @Service
 public class CreditCardServiceImpl implements CreditCardService {
   @Autowired
   private CreditCardRepository creditCardRepo;
+
   @Autowired
   private UserProfileService profileService;
+
+  @Autowired
+  private StringEncryptor encryptor;
 
   @Override
   public CreditCard get(String id) {
@@ -31,9 +37,7 @@ public class CreditCardServiceImpl implements CreditCardService {
   public CreditCardTo read(String id) {
     CreditCard creditCard = get(id);
     CreditCardTo creditCardTo = new CreditCardTo();
-    creditCardTo.setCardNumber(Optional.of(creditCard.getCardNumber()));
-    creditCardTo.setNameOnCard(Optional.of(creditCard.getNameOnCard()));
-    creditCardTo.setCvv(Optional.of(creditCard.getCvv()));
+    creditCardTo.setCardNumber(Optional.of(creditCard.getMaskedCardNumber()));
     creditCardTo.setExpiryMonth(Optional.of(creditCard.getExpiryMonth()));
     creditCardTo.setExpiryYear(Optional.of(creditCard.getExpiryYear()));
     creditCardTo.setPostalCode(Optional.of(creditCard.getPostalCode()));
@@ -45,12 +49,12 @@ public class CreditCardServiceImpl implements CreditCardService {
   public CreditCardTo create(CreditCardTo creditCardTo) {
     UserProfile userProfile = profileService.get(creditCardTo.getUserProfileId());
     CreditCard creditCard = new CreditCard();
-    creditCard.setCardNumber(creditCardTo.getCardNumber().get());
-    creditCard.setNameOnCard(creditCardTo.getNameOnCard().get());
-    creditCard.setCvv(creditCardTo.getCvv().get());
+    creditCard.setCardNumber(encryptor.encrypt(creditCardTo.getCardNumber().get()));
+    creditCard.setCvv(encryptor.encrypt(creditCardTo.getCvv().get()));
     creditCard.setExpiryMonth(creditCardTo.getExpiryMonth().get());
     creditCard.setExpiryYear(creditCardTo.getExpiryYear().get());
     creditCard.setPostalCode(creditCardTo.getPostalCode().get());
+    creditCard.setMaskedCardNumber(StringUtils.mask(creditCardTo.getCardNumber().get()));
     creditCard.setActive(true);
     creditCard.setCreated(DateTime.now());
     save(creditCard);
@@ -62,8 +66,6 @@ public class CreditCardServiceImpl implements CreditCardService {
   @Override
   public CreditCardTo update(CreditCardTo creditCardTo) {
     CreditCard creditCard = get(creditCardTo.getId());
-    creditCard.setNameOnCard(creditCardTo.getNameOnCard().orElse(creditCard.getNameOnCard()));
-    creditCard.setCardNumber(creditCardTo.getCardNumber().orElse(creditCard.getCardNumber()));
     creditCard.setCvv(creditCardTo.getCvv().orElse(creditCard.getCvv()));
     creditCard.setExpiryMonth(creditCardTo.getExpiryMonth().orElse(creditCard.getExpiryMonth()));
     creditCard.setExpiryYear(creditCardTo.getExpiryYear().orElse(creditCard.getExpiryYear()));

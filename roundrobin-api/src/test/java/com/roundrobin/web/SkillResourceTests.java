@@ -226,6 +226,29 @@ public class SkillResourceTests extends ResourceTests {
   }
 
   @Test
+  public void testDuplicateCreate() {
+    Response<UserProfileTo> profile = createUserProfile();
+    SkillDetailTo skillDetailTo = createSkillDetail();
+    SkillTo skillTo = new SkillTo();
+    skillTo.setUserProfileId(profile.getEntity().getId());
+    skillTo.setMinCost(Optional.of(1.0));
+    skillTo.setMaxCost(Optional.of(10.0));
+    skillTo.setSkillDetailId(skillDetailTo.getId());
+    skillTo.setTimeToComplete(Optional.of(10));
+    Response<SkillTo> created = helper.post(url + "skill", skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {
+    }, port).getBody();
+    Response<SkillTo> read = helper.get(url + "skill/{skillId}", new ParameterizedTypeReference<Response<SkillTo>>() {
+    }, port, created.getEntity().getId()).getBody();
+    Response<SkillTo> duplicate = helper.post(url + "skill", skillTo, new ParameterizedTypeReference<Response<SkillTo>>
+            () {
+    }, port).getBody();
+    assertThat(duplicate.getEntity(), nullValue());
+    assertThat(duplicate.getErrors(), hasItems(
+            new Error(ErrorCode.SKILL_ALREADY_EXISTS.getCode(), messages.getErrorMessage(ErrorCode.SKILL_ALREADY_EXISTS))
+    ));
+  }
+
+  @Test
   public void testUpdate() {
     Response<UserProfileTo> profile = createUserProfile();
     SkillDetailTo skillDetailTo = createSkillDetail();

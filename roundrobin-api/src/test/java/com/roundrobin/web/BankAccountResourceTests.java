@@ -30,8 +30,8 @@ public class BankAccountResourceTests extends ResourceTests {
   public void testCreate() {
     Response<UserProfileTo> profile = createUserProfile();
     BankAccountTo bankAccountTo = new BankAccountTo();
-    bankAccountTo.setAccountNumber(Optional.of("1234"));
-    bankAccountTo.setRoutingNumber(Optional.of("1234"));
+    bankAccountTo.setAccountNumber(Optional.of("234234321234"));
+    bankAccountTo.setRoutingNumber(Optional.of("2324321234"));
     bankAccountTo.setBankName(Optional.of("BoA"));
     bankAccountTo.setNameOnAccount(Optional.of("Suresh"));
     bankAccountTo.setDescription(Optional.of("Desc"));
@@ -39,8 +39,7 @@ public class BankAccountResourceTests extends ResourceTests {
     Response<BankAccountTo> created = helper.post(url + "bank-account", bankAccountTo, new ParameterizedTypeReference<Response<BankAccountTo>>() {
     }, port).getBody();
     assertThat(created.getEntity(), notNullValue());
-    assertThat(created.getEntity().getAccountNumber().get(), is(bankAccountTo.getAccountNumber().get()));
-    assertThat(created.getEntity().getRoutingNumber().get(), is(bankAccountTo.getRoutingNumber().get()));
+    assertThat(created.getEntity().getAccountNumber().get(), is("********1234"));
     assertThat(created.getEntity().getDescription().get(), is(bankAccountTo.getDescription().get()));
     assertThat(created.getEntity().getBankName().get(), is(bankAccountTo.getBankName().get()));
     assertThat(created.getEntity().getNameOnAccount().get(), is(bankAccountTo.getNameOnAccount().get()));
@@ -104,7 +103,7 @@ public class BankAccountResourceTests extends ResourceTests {
   public void testUpdate() {
     Response<UserProfileTo> profile = createUserProfile();
     BankAccountTo bankAccountTo = new BankAccountTo();
-    bankAccountTo.setAccountNumber(Optional.of("1234"));
+    bankAccountTo.setAccountNumber(Optional.of("1231231231234"));
     bankAccountTo.setRoutingNumber(Optional.of("1234"));
     bankAccountTo.setBankName(Optional.of("BoA"));
     bankAccountTo.setNameOnAccount(Optional.of("Suresh"));
@@ -124,8 +123,6 @@ public class BankAccountResourceTests extends ResourceTests {
     Response<BankAccountTo> read = helper.get(url + "bank-account/{bankAccountId}", new ParameterizedTypeReference<Response<BankAccountTo>>() {
     }, port, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), notNullValue());
-    assertThat(read.getEntity().getAccountNumber().get(), is(created.getEntity().getAccountNumber().get()));
-    assertThat(read.getEntity().getRoutingNumber().get(), is(created.getEntity().getRoutingNumber().get()));
     assertThat(read.getEntity().getDescription().get(), is(created.getEntity().getDescription().get()));
     assertThat(read.getEntity().getBankName().get(), is(created.getEntity().getBankName().get()));
     assertThat(read.getEntity().getNameOnAccount().get(), is(created.getEntity().getNameOnAccount().get()));
@@ -139,7 +136,8 @@ public class BankAccountResourceTests extends ResourceTests {
     assertThat(updated.getEntity(), nullValue());
     assertThat(updated.getErrors(), notNullValue());
     assertThat(updated.getErrors(), hasItems(
-            new Error(ErrorCode.INVALID_FIELD.getCode(), "id: may not be empty")));
+            new Error(ErrorCode.INVALID_FIELD.getCode(), "id: may not be empty"),
+            new Error(ErrorCode.INVALID_FIELD.getCode(), "routingNumber: may not be empty")));
   }
 
   @Test
@@ -167,6 +165,7 @@ public class BankAccountResourceTests extends ResourceTests {
   public void testUpdateWithInvalidBankId() {
     BankAccountTo bankAccountTo = new BankAccountTo();
     bankAccountTo.setId("testing");
+    bankAccountTo.setRoutingNumber(Optional.of("testing"));
     Response<String> updated = helper.put(url + "bank-account", bankAccountTo, new ParameterizedTypeReference<Response<String>>() {
     }, port).getBody();
     assertThat(updated.getEntity(), nullValue());
@@ -192,7 +191,6 @@ public class BankAccountResourceTests extends ResourceTests {
     }, port, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity().getAccountNumber().get(), is(created.getEntity().getAccountNumber().get()));
-    assertThat(read.getEntity().getRoutingNumber().get(), is(created.getEntity().getRoutingNumber().get()));
     assertThat(read.getEntity().getDescription().get(), is(created.getEntity().getDescription().get()));
     assertThat(read.getEntity().getBankName().get(), is(created.getEntity().getBankName().get()));
     assertThat(read.getEntity().getNameOnAccount().get(), is(created.getEntity().getNameOnAccount().get()));
