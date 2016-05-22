@@ -42,4 +42,5 @@ public class BankAccountResource {
     service.delete(bankAccountId);
     return new Response<>(true);
   }
+
 }

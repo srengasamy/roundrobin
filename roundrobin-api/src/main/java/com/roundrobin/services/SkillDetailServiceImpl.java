@@ -1,6 +1,8 @@
 package com.roundrobin.services;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,12 +32,7 @@ public class SkillDetailServiceImpl implements SkillDetailService {
 
   @Override
   public SkillDetailTo read(String id) {
-    SkillDetail skillDetail = get(id);
-    SkillDetailTo skillDetailTo = new SkillDetailTo();
-    skillDetailTo.setDeliveryType(Optional.of(skillDetail.getDeliveryType()));
-    skillDetailTo.setName(Optional.of(skillDetail.getName()));
-    skillDetailTo.setId(skillDetail.getId());
-    return skillDetailTo;
+    return convert(get(id));
   }
 
   @Override
@@ -68,4 +65,16 @@ public class SkillDetailServiceImpl implements SkillDetailService {
     skillDetailRepo.save(skillDetail);
   }
 
+  private SkillDetailTo convert(SkillDetail skillDetail) {
+    SkillDetailTo skillDetailTo = new SkillDetailTo();
+    skillDetailTo.setDeliveryType(Optional.of(skillDetail.getDeliveryType()));
+    skillDetailTo.setName(Optional.of(skillDetail.getName()));
+    skillDetailTo.setId(skillDetail.getId());
+    return skillDetailTo;
+  }
+
+  @Override
+  public List<SkillDetailTo> list() {
+    return skillDetailRepo.findAllByActive(true).stream().map(c -> convert(c)).collect(Collectors.toList());
+  }
 }

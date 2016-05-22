@@ -1,6 +1,8 @@
 package com.roundrobin.services;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jasypt.encryption.StringEncryptor;
 import org.joda.time.DateTime;
@@ -35,14 +37,7 @@ public class CreditCardServiceImpl implements CreditCardService {
 
   @Override
   public CreditCardTo read(String id) {
-    CreditCard creditCard = get(id);
-    CreditCardTo creditCardTo = new CreditCardTo();
-    creditCardTo.setCardNumber(Optional.of(creditCard.getMaskedCardNumber()));
-    creditCardTo.setExpiryMonth(Optional.of(creditCard.getExpiryMonth()));
-    creditCardTo.setExpiryYear(Optional.of(creditCard.getExpiryYear()));
-    creditCardTo.setPostalCode(Optional.of(creditCard.getPostalCode()));
-    creditCardTo.setId(creditCard.getId());
-    return creditCardTo;
+    return convert(get(id));
   }
 
   @Override
@@ -86,4 +81,20 @@ public class CreditCardServiceImpl implements CreditCardService {
     return creditCardRepo.save(creditCard);
   }
 
+  @Override
+  public List<CreditCardTo> list(String id) {
+    UserProfile profile = profileService.get(id);
+    return profile.getCreditCards().stream().filter(c -> c.getActive()).map(c -> convert(c)).collect(Collectors
+            .toList());
+  }
+
+  private CreditCardTo convert(CreditCard creditCard) {
+    CreditCardTo creditCardTo = new CreditCardTo();
+    creditCardTo.setCardNumber(Optional.of(creditCard.getMaskedCardNumber()));
+    creditCardTo.setExpiryMonth(Optional.of(creditCard.getExpiryMonth()));
+    creditCardTo.setExpiryYear(Optional.of(creditCard.getExpiryYear()));
+    creditCardTo.setPostalCode(Optional.of(creditCard.getPostalCode()));
+    creditCardTo.setId(creditCard.getId());
+    return creditCardTo;
+  }
 }

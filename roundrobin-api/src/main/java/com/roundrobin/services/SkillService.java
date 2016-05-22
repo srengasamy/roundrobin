@@ -3,6 +3,8 @@ package com.roundrobin.services;
 import com.roundrobin.api.SkillTo;
 import com.roundrobin.domain.Skill;
 
+import java.util.List;
+
 public interface SkillService {
   public Skill get(String id);
 
@@ -15,4 +17,6 @@ public interface SkillService {
   public SkillTo update(SkillTo skill);
 
   public void delete(String id);
+
+  public List<SkillTo> list(String id);
 }

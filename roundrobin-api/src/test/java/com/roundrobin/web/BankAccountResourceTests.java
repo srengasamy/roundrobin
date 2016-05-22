@@ -23,7 +23,6 @@ import static org.junit.Assert.assertThat;
 
 //TODO Dont allow delete when list has only one
 //TODO Test getAll
-//TODO Test masked values
 public class BankAccountResourceTests extends ResourceTests {
 
   @Test
@@ -260,5 +259,21 @@ public class BankAccountResourceTests extends ResourceTests {
     assertThat(deleted.getErrors(), notNullValue());
     assertThat(deleted.getErrors(), hasItems(
             new Error(ErrorCode.INVALID_BANK_ACCOUNT_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_BANK_ACCOUNT_ID))));
+  }
+
+  @Test
+  public void testList(){
+    Response<UserProfileTo> profile = createUserProfile();
+    BankAccountTo bankAccountTo = new BankAccountTo();
+    bankAccountTo.setAccountNumber(Optional.of("234234321234"));
+    bankAccountTo.setRoutingNumber(Optional.of("2324321234"));
+    bankAccountTo.setBankName(Optional.of("BoA"));
+    bankAccountTo.setNameOnAccount(Optional.of("Suresh"));
+    bankAccountTo.setDescription(Optional.of("Desc"));
+    bankAccountTo.setUserProfileId(profile.getEntity().getId());
+    Response<BankAccountTo> created = helper.post(url + "bank-account", bankAccountTo, new ParameterizedTypeReference<Response<BankAccountTo>>() {
+    }, port).getBody();
+    assertThat(created.getEntity(), notNullValue());
+
   }
 }

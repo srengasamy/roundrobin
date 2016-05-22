@@ -1,5 +1,6 @@
 package com.roundrobin.services;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,14 +41,7 @@ public class SkillServiceImpl implements SkillService {
 
   @Override
   public SkillTo read(String id) {
-    Skill skill = get(id);
-    SkillTo skillTo = new SkillTo();
-    skillTo.setId(skill.getId());
-    skillTo.setCost(Optional.ofNullable(skill.getCost()));
-    skillTo.setMinCost(Optional.ofNullable(skill.getMinCost()));
-    skillTo.setMaxCost(Optional.ofNullable(skill.getMaxCost()));
-    skillTo.setTimeToComplete(Optional.of(skill.getTimeToComplete()));
-    return skillTo;
+    return convert(get(id));
   }
 
   @Override
@@ -88,9 +82,23 @@ public class SkillServiceImpl implements SkillService {
 
   private void checkSkillExists(String skillDetailId, UserProfile userProfile) {
     boolean exists = userProfile.getSkills().stream().map(s -> s.getSkillDetails().getId()).collect(Collectors.toList())
-        .contains(skillDetailId);
+            .contains(skillDetailId);
     Assert.isTrue(!exists, ErrorCode.SKILL_ALREADY_EXISTS);
   }
 
+  @Override
+  public List<SkillTo> list(String id) {
+    UserProfile profile = profileService.get(id);
+    return profile.getSkills().stream().filter(c -> c.getActive()).map(c -> convert(c)).collect(Collectors.toList());
+  }
 
+  private SkillTo convert(Skill skill) {
+    SkillTo skillTo = new SkillTo();
+    skillTo.setId(skill.getId());
+    skillTo.setCost(Optional.ofNullable(skill.getCost()));
+    skillTo.setMinCost(Optional.ofNullable(skill.getMinCost()));
+    skillTo.setMaxCost(Optional.ofNullable(skill.getMaxCost()));
+    skillTo.setTimeToComplete(Optional.of(skill.getTimeToComplete()));
+    return skillTo;
+  }
 }

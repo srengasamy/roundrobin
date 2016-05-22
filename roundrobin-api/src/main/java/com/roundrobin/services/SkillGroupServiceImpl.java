@@ -1,11 +1,14 @@
 package com.roundrobin.services;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.roundrobin.api.SkillGroupTo;
+import com.roundrobin.api.SkillTo;
 import com.roundrobin.common.Assert;
 import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.SkillGroup;
@@ -26,11 +29,7 @@ public class SkillGroupServiceImpl implements SkillGroupService {
 
   @Override
   public SkillGroupTo read(String id) {
-    SkillGroup skillGroup = get(id);
-    SkillGroupTo skillGroupTo = new SkillGroupTo();
-    skillGroupTo.setId(id);
-    skillGroupTo.setGroupName(Optional.of(skillGroup.getGroupName()));
-    return skillGroupTo;
+    return convert(get(id));
   }
 
   @Override
@@ -59,4 +58,15 @@ public class SkillGroupServiceImpl implements SkillGroupService {
     skillGroupRepo.save(skillGroup);
   }
 
+  private SkillGroupTo convert(SkillGroup skillGroup) {
+    SkillGroupTo skillGroupTo = new SkillGroupTo();
+    skillGroupTo.setId(skillGroup.getId());
+    skillGroupTo.setGroupName(Optional.of(skillGroup.getGroupName()));
+    return skillGroupTo;
+  }
+
+  @Override
+  public List<SkillGroupTo> list() {
+    return skillGroupRepo.findAllByActive(true).stream().map(c -> convert(c)).collect(Collectors.toList());
+  }
 }
