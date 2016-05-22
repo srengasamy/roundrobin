@@ -67,6 +67,7 @@ public class SkillGroupServiceImpl implements SkillGroupService {
 
   @Override
   public List<SkillGroupTo> list() {
-    return skillGroupRepo.findAllByActive(true).stream().map(c -> convert(c)).collect(Collectors.toList());
+    return skillGroupRepo.findAllByActive(true).stream().map(c -> convert(c)).collect(Collectors
+            .toList());
   }
 }

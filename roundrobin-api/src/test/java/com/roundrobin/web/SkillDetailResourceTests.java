@@ -11,11 +11,13 @@ import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -205,10 +207,11 @@ public class SkillDetailResourceTests extends ResourceTests {
 
   @Test
   public void testReadEmptyId() {
-    Response<SkillDetailTo> read = helper.get(url + "skill-detail/{skillDetailId}", new ParameterizedTypeReference<Response<SkillDetailTo>>() {
-    }, port, " ").getBody();
-    assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), hasItems(new Error(ErrorCode.INVALID_URL.getCode(), messages.getErrorMessage(ErrorCode.INVALID_URL))));
+    Response<List<SkillDetailTo>> read = helper.get(url + "skill-detail/{skillDetailId}", new
+            ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {
+            }, port, " ").getBody();
+    assertThat(read.getEntity(), notNullValue());
+    assertThat(read.getEntity().size(), not(is(0)));
   }
 
   @Test
@@ -257,5 +260,31 @@ public class SkillDetailResourceTests extends ResourceTests {
     }, port, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
     assertThat(read.getErrors(), hasItems(new Error(ErrorCode.INVALID_SKILL_DETAIL_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
+  }
+
+  @Test
+  public void testList() {
+    Response<List<SkillDetailTo>> list = helper.get(url + "skill-detail", new
+            ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {
+            }, port).getBody();
+    assertThat(list.getEntity(), notNullValue());
+    int size = list.getEntity().size();
+    String groupName = "Testing" + System.currentTimeMillis();
+    String skillName = "Testing" + System.currentTimeMillis();
+    SkillGroupTo skillGroupTo = new SkillGroupTo();
+    skillGroupTo.setGroupName(Optional.of(groupName));
+    Response<SkillGroupTo> createdGroup = createSkillGroup(skillGroupTo);
+    SkillDetailTo skillDetailTo = new SkillDetailTo();
+    skillDetailTo.setDeliveryType(Optional.of(Skill.DeliveryType.HOME));
+    skillDetailTo.setName(Optional.of(skillName));
+    skillDetailTo.setSkillGroupId(createdGroup.getEntity().getId());
+    Response<SkillDetailTo> createdSkill = helper.post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {
+    }, port).getBody();
+    assertThat(createdSkill.getEntity(), notNullValue());
+    list = helper.get(url + "skill-detail", new
+            ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {
+            }, port).getBody();
+    assertThat(list.getEntity(), notNullValue());
+    assertThat(list.getEntity().size(), is(size + 1));
   }
 }

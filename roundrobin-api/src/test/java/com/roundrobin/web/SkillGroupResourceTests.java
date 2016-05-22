@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
@@ -223,4 +224,24 @@ public class SkillGroupResourceTests extends ResourceTests {
     assertThat(read.getErrors(), hasItems(new Error(ErrorCode.INVALID_SKILL_GROUP_ID.getCode(),
             messages.getErrorMessage(ErrorCode.INVALID_SKILL_GROUP_ID))));
   }
+
+  @Test
+  public void testList() {
+    Response<List<SkillGroupTo>> list = helper.get(url + "skill-group", new
+            ParameterizedTypeReference<Response<List<SkillGroupTo>>>() {
+            }, port).getBody();
+    assertThat(list.getEntity(), notNullValue());
+    int size = list.getEntity().size();
+    String groupName = "Testing" + System.currentTimeMillis();
+    SkillGroupTo skillGroupTo = new SkillGroupTo();
+    skillGroupTo.setGroupName(Optional.of(groupName));
+    Response<SkillGroupTo> created = createSkillGroup(skillGroupTo);
+    assertThat(created.getEntity(), notNullValue());
+    list = helper.get(url + "skill-group", new
+            ParameterizedTypeReference<Response<List<SkillGroupTo>>>() {
+            }, port).getBody();
+    assertThat(list.getEntity(), notNullValue());
+    assertThat(list.getEntity().size(), is(size + 1));
+  }
+
 }

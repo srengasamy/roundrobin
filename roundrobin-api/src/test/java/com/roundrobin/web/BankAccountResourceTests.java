@@ -9,6 +9,7 @@ import com.roundrobin.common.ErrorCode;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasItems;
@@ -262,7 +263,7 @@ public class BankAccountResourceTests extends ResourceTests {
   }
 
   @Test
-  public void testList(){
+  public void testList() {
     Response<UserProfileTo> profile = createUserProfile();
     BankAccountTo bankAccountTo = new BankAccountTo();
     bankAccountTo.setAccountNumber(Optional.of("234234321234"));
@@ -275,5 +276,43 @@ public class BankAccountResourceTests extends ResourceTests {
     }, port).getBody();
     assertThat(created.getEntity(), notNullValue());
 
+    Response<List<BankAccountTo>> list = helper.get(url + "bank-account?profileId={profileId}", new
+            ParameterizedTypeReference<Response<List<BankAccountTo>>>() {
+            }, port, profile.getEntity().getId()).getBody();
+    assertThat(list.getEntity(), notNullValue());
+    assertThat(list.getEntity().size(), is(1));
+  }
+
+  @Test
+  public void testListWithEmptyId() {
+    Response<List<BankAccountTo>> list = helper.get(url + "bank-account", new
+            ParameterizedTypeReference<Response<List<BankAccountTo>>>() {
+            }, port, "").getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), notNullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_URL.getCode(), messages.getErrorMessage(ErrorCode.INVALID_URL))));
+  }
+
+  @Test
+  public void testListWithEmptyProfileId() {
+    Response<List<BankAccountTo>> list = helper.get(url + "bank-account?profileId={profileId}", new
+            ParameterizedTypeReference<Response<List<BankAccountTo>>>() {
+            }, port, "").getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), notNullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_PROFILE_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
+  }
+
+  @Test
+  public void testListWithInvalidProfileId() {
+    Response<List<BankAccountTo>> list = helper.get(url + "bank-account?profileId={profileId}", new
+            ParameterizedTypeReference<Response<List<BankAccountTo>>>() {
+            }, port, "testing").getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), notNullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_PROFILE_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
   }
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.CreditCardTo;
@@ -13,6 +14,8 @@ import com.roundrobin.api.Response;
 import com.roundrobin.groups.CreateCreditCardValidator;
 import com.roundrobin.groups.UpdateCreditCardValidator;
 import com.roundrobin.services.CreditCardService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "credit-card", produces = {"application/json"})
@@ -27,19 +30,24 @@ public class CreditCardResource {
 
   @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"})
   public Response<CreditCardTo> create(
-      @RequestBody @Validated(CreateCreditCardValidator.class) CreditCardTo creditCardTo) {
+          @RequestBody @Validated(CreateCreditCardValidator.class) CreditCardTo creditCardTo) {
     return new Response<>(service.create(creditCardTo));
   }
-  
+
   @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
   public Response<CreditCardTo> update(
-      @RequestBody @Validated(UpdateCreditCardValidator.class) CreditCardTo creditCardTo) {
+          @RequestBody @Validated(UpdateCreditCardValidator.class) CreditCardTo creditCardTo) {
     return new Response<>(service.update(creditCardTo));
   }
-  
+
   @RequestMapping(value = "{creditCardId}", method = RequestMethod.DELETE)
   public Response<Boolean> delete(@PathVariable String creditCardId) {
     service.delete(creditCardId);
     return new Response<>(true);
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public Response<List<CreditCardTo>> list(@RequestParam("profileId") String profileId) {
+    return new Response<>(service.list(profileId));
   }
 }

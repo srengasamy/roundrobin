@@ -11,6 +11,7 @@ import com.roundrobin.common.ErrorCode;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasItems;
@@ -523,6 +524,66 @@ public class SkillResourceTests extends ResourceTests {
     assertThat(read.getEntity(), nullValue());
     assertThat(read.getErrors(), hasItems(
             new Error(ErrorCode.INVALID_SKILL_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_SKILL_ID))
+    ));
+  }
+
+  @Test
+  public void testList() {
+    Response<UserProfileTo> profile = createUserProfile();
+    SkillDetailTo skillDetailTo = createSkillDetail();
+    SkillTo skillTo = new SkillTo();
+    skillTo.setUserProfileId(profile.getEntity().getId());
+    skillTo.setMinCost(Optional.of(1.0));
+    skillTo.setMaxCost(Optional.of(10.0));
+    skillTo.setSkillDetailId(skillDetailTo.getId());
+    skillTo.setTimeToComplete(Optional.of(10));
+    Response<SkillTo> created = helper.post(url + "skill", skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {
+    }, port).getBody();
+    assertThat(created.getEntity(), notNullValue());
+    Response<List<SkillTo>> list = helper.get(url + "skill?profileId={profileId}", new
+            ParameterizedTypeReference<Response<List<SkillTo>>>
+                    () {
+            }, port, profile.getEntity().getId()).getBody();
+    assertThat(list.getEntity(), notNullValue());
+    assertThat(list.getEntity().size(), is(1));
+  }
+
+  @Test
+  public void testListWithEmptyId() {
+    Response<List<SkillTo>> list = helper.get(url + "skill", new
+            ParameterizedTypeReference<Response<List<SkillTo>>>
+                    () {
+            }, port).getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_URL.getCode(), messages.getErrorMessage(ErrorCode.INVALID_URL))
+    ));
+  }
+
+  @Test
+  public void testListWithEmptyProfileId() {
+    Response<List<SkillTo>> list = helper.get(url + "skill?profileId={profileId}", new
+            ParameterizedTypeReference<Response<List<SkillTo>>>
+                    () {
+            }, port, "").getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_PROFILE_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))
+    ));
+  }
+
+  @Test
+  public void testListWithInvalidProfileId() {
+    Response<List<SkillTo>> list = helper.get(url + "skill?profileId={profileId}", new
+            ParameterizedTypeReference<Response<List<SkillTo>>>
+                    () {
+            }, port, "testing").getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_PROFILE_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))
     ));
   }
 }

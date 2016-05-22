@@ -14,6 +14,8 @@ import com.roundrobin.groups.CreateSkillDetailValidator;
 import com.roundrobin.groups.UpdateSkillDetailValidator;
 import com.roundrobin.services.SkillDetailService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "skill-detail", produces = {"application/json"})
 public class SkillDetailResource {
@@ -27,13 +29,13 @@ public class SkillDetailResource {
 
   @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"})
   public Response<SkillDetailTo> create(
-      @RequestBody @Validated(CreateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
+          @RequestBody @Validated(CreateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
     return new Response<>(service.create(skillDetailTo));
   }
 
   @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
   public Response<SkillDetailTo> update(
-      @RequestBody @Validated(UpdateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
+          @RequestBody @Validated(UpdateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
     return new Response<>(service.update(skillDetailTo));
   }
 
@@ -41,5 +43,10 @@ public class SkillDetailResource {
   public Response<Boolean> delete(@PathVariable String skillDetailId) {
     service.delete(skillDetailId);
     return new Response<>(true);
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public Response<List<SkillDetailTo>> list() {
+    return new Response<>(service.list());
   }
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
@@ -13,6 +14,8 @@ import com.roundrobin.api.SkillTo;
 import com.roundrobin.groups.CreateSkillValidator;
 import com.roundrobin.groups.UpdateSkillValidator;
 import com.roundrobin.services.SkillService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "skill", produces = {"application/json"})
@@ -39,5 +42,10 @@ public class SkillResource {
   public Response<Boolean> delete(@PathVariable String skillId) {
     service.delete(skillId);
     return new Response<>(true);
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public Response<List<SkillTo>> list(@RequestParam("profileId") String profileId) {
+    return new Response<>(service.list(profileId));
   }
 }

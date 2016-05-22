@@ -12,6 +12,7 @@ import com.roundrobin.domain.CreditCard;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasItems;
@@ -269,5 +270,58 @@ public class CreditCardResourceTests extends ResourceTests {
     assertThat(deleted.getErrors(), hasItems(
             new Error(ErrorCode.INVALID_CREDIT_CARD_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_CREDIT_CARD_ID))
     ));
+  }
+
+  @Test
+  public void testList() {
+    Response<UserProfileTo> profile = createUserProfile();
+    CreditCardTo creditCardTo = new CreditCardTo();
+    creditCardTo.setCardNumber(Optional.of("4015260001266035"));
+    creditCardTo.setCvv(Optional.of("124"));
+    creditCardTo.setExpiryMonth(Optional.of((byte) 6));
+    creditCardTo.setExpiryYear(Optional.of((short) 17));
+    creditCardTo.setPostalCode(Optional.of("87878"));
+    creditCardTo.setUserProfileId(profile.getEntity().getId());
+    Response<CreditCardTo> created = helper.post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {
+    }, port).getBody();
+    assertThat(created.getEntity(), notNullValue());
+    Response<List<CreditCardTo>> list = helper.get(url + "credit-card?profileId={creditCardId}", new
+            ParameterizedTypeReference<Response<List<CreditCardTo>>>() {
+            }, port, profile.getEntity().getId()).getBody();
+    assertThat(list.getEntity(), notNullValue());
+    assertThat(list.getEntity().size(), is(1));
+  }
+
+  @Test
+  public void testListWithEmptyId() {
+    Response<List<CreditCardTo>> list = helper.get(url + "credit-card", new
+            ParameterizedTypeReference<Response<List<CreditCardTo>>>() {
+            }, port).getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), notNullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_URL.getCode(), messages.getErrorMessage(ErrorCode.INVALID_URL))));
+  }
+
+  @Test
+  public void testListWithEmptyProfileId() {
+    Response<List<CreditCardTo>> list = helper.get(url + "credit-card?profileId={creditCardId}", new
+            ParameterizedTypeReference<Response<List<CreditCardTo>>>() {
+            }, port, "").getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), notNullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_PROFILE_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
+  }
+
+  @Test
+  public void testListWithInvalidProfileId() {
+    Response<List<CreditCardTo>> list = helper.get(url + "credit-card?profileId={creditCardId}", new
+            ParameterizedTypeReference<Response<List<CreditCardTo>>>() {
+            }, port, "testing").getBody();
+    assertThat(list.getEntity(), nullValue());
+    assertThat(list.getErrors(), notNullValue());
+    assertThat(list.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_PROFILE_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
   }
 }

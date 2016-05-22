@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
+import com.roundrobin.api.SkillDetailTo;
 import com.roundrobin.api.SkillGroupTo;
 import com.roundrobin.groups.CreateSkillGroupValidator;
 import com.roundrobin.groups.UpdateSkillGroupValidator;
 import com.roundrobin.services.SkillGroupService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "skill-group", produces = {"application/json"})
@@ -27,13 +30,13 @@ public class SkillGroupResource {
 
   @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"})
   public Response<SkillGroupTo> create(
-      @RequestBody @Validated(CreateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
+          @RequestBody @Validated(CreateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
     return new Response<>(service.create(skillGroupTo));
   }
 
   @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
   public Response<SkillGroupTo> update(
-      @RequestBody @Validated(UpdateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
+          @RequestBody @Validated(UpdateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
     return new Response<>(service.update(skillGroupTo));
   }
 
@@ -41,5 +44,10 @@ public class SkillGroupResource {
   public Response<Boolean> delete(@PathVariable String skillGroupId) {
     service.delete(skillGroupId);
     return new Response<>(true);
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public Response<List<SkillGroupTo>> list() {
+    return new Response<>(service.list());
   }
 }
