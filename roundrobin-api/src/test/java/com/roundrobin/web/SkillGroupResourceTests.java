@@ -2,15 +2,14 @@ package com.roundrobin.web;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -167,12 +166,11 @@ public class SkillGroupResourceTests extends ResourceTests {
 
   @Test
   public void testReadWithEmptyId() {
-    Response<String> read = helper.get(url + "skill-group/{skillGroupId}", new ParameterizedTypeReference<Response<String>>() {
-    }, port, " ").getBody();
-    assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(), hasItems(new Error(ErrorCode.INVALID_URL.getCode(),
-            messages.getErrorMessage(ErrorCode.INVALID_URL))));
+    Response<List<SkillGroupTo>> read = helper.get(url + "skill-group/{skillGroupId}", new
+            ParameterizedTypeReference<Response<List<SkillGroupTo>>>() {
+            }, port, " ").getBody();
+    assertThat(read.getEntity(), notNullValue());
+    assertThat(read.getEntity().size(), not(is(0)));
   }
 
   @Test
