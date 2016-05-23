@@ -240,6 +240,7 @@ public class SkillResourceTests extends ResourceTests {
     }, port).getBody();
     Response<SkillTo> read = helper.get(url + "skill/{skillId}", new ParameterizedTypeReference<Response<SkillTo>>() {
     }, port, created.getEntity().getId()).getBody();
+    assertThat(read.getEntity(), notNullValue());
     Response<SkillTo> duplicate = helper.post(url + "skill", skillTo, new ParameterizedTypeReference<Response<SkillTo>>
             () {
     }, port).getBody();

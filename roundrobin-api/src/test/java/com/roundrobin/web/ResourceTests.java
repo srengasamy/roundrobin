@@ -45,10 +45,14 @@ public class ResourceTests {
   }
 
   protected Response<UserProfileTo> createUserProfile() {
+    return createUserProfile("testing@testing.com");
+  }
+
+  protected Response<UserProfileTo> createUserProfile(String email) {
     UserProfileTo userProfileTo = new UserProfileTo();
     userProfileTo.setFirstName(Optional.of("Suresh"));
     userProfileTo.setLastName(Optional.of("Rengasamy"));
-    userProfileTo.setEmail(Optional.of("testing@testing.com"));
+    userProfileTo.setEmail(Optional.of(email));
     userProfileTo.setMobileNumber(Optional.of("5555555555"));
     userProfileTo.setHomeNumber(Optional.of("5555555555"));
     userProfileTo.setVendor(Optional.of(false));

@@ -33,6 +33,13 @@ public class UserProfileServiceImpl implements UserProfileService {
   }
 
   @Override
+  public UserProfile getByEmail(String email) {
+    Optional<UserProfile> userProfile = profileRepo.findByEmail(email);
+    Assert.isTrue(userProfile.isPresent(), ErrorCode.UNKNOWN_PROFILE);
+    return userProfile.get();
+  }
+
+  @Override
   public UserProfile save(UserProfile userProfile) {
     return profileRepo.save(userProfile);
   }
@@ -69,7 +76,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     userProfile.setActive(false);
     userProfile.setCreated(DateTime.now());
     Credential credential =
-        credentialService.create(new CredentialTo(userProfileTo.getEmail().get(), userProfileTo.getPassword().get()));
+            credentialService.create(new CredentialTo(userProfileTo.getEmail().get(), userProfileTo.getPassword().get()));
     userProfile.getActions().add(userActionService.sendActivationLink());
     userProfile.setCredential(credential);
     return read(save(userProfile).getId());

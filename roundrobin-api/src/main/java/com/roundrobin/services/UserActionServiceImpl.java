@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,10 @@ public class UserActionServiceImpl implements UserActionService {
   public void activateUser(UserActionTo userActionTo) {
     UserAction userAction = get(userActionTo.getId());
     Assert.isTrue(userAction.getSecret().equals(userActionTo.getSecret()), ErrorCode.INVALID_SECRET);
-    Assert.isTrue(userAction.getExpiry().isBeforeNow(), ErrorCode.ACTION_EXPIRED);
+    Assert.isTrue(userAction.getExpiry().isAfterNow(), ErrorCode.ACTION_EXPIRED);
     UserProfile userProfile = userProfileService.get(userActionTo.getUserProfileId());
+    Assert.isTrue(userProfile.getActions().stream().map(c -> c.getId()).collect(Collectors.toList()).contains(userActionTo
+            .getId()), ErrorCode.INVALID_PROFILE_ID);
     userProfile.setActive(true);
     userProfileService.save(userProfile);
     userAction.setActive(false);
@@ -65,17 +68,19 @@ public class UserActionServiceImpl implements UserActionService {
 
   @Override
   public void requestResetPassword(UserActionTo userActionTo) {
-    UserAction userAction = get(userActionTo.getId());
-    Assert.isTrue(userAction.getSecret().equals(userActionTo.getSecret()), ErrorCode.INVALID_SECRET);
-    Assert.isTrue(userAction.getExpiry().isBeforeNow(), ErrorCode.ACTION_EXPIRED);
+    UserProfile userProfile = userProfileService.getByEmail(userActionTo.getEmail());
+    userProfile.getActions().add(sendPasswordResetLink());
+    userProfileService.save(userProfile);
   }
 
   @Override
   public void resetPassword(UserActionTo userActionTo) {
     UserAction userAction = get(userActionTo.getId());
     Assert.isTrue(userAction.getSecret().equals(userActionTo.getSecret()), ErrorCode.INVALID_SECRET);
-    Assert.isTrue(userAction.getExpiry().isBeforeNow(), ErrorCode.ACTION_EXPIRED);
+    Assert.isTrue(userAction.getExpiry().isAfterNow(), ErrorCode.ACTION_EXPIRED);
     UserProfile userProfile = userProfileService.get(userActionTo.getUserProfileId());
+    Assert.isTrue(userProfile.getActions().stream().map(c -> c.getId()).collect(Collectors.toList()).contains(userActionTo
+            .getId()), ErrorCode.INVALID_PROFILE_ID);
     Credential credential = userProfile.getCredential();
     credential.setPassword(userActionTo.getPassword());
     credentialService.save(credential);
@@ -91,7 +96,7 @@ public class UserActionServiceImpl implements UserActionService {
   @Override
   public UserAction get(String id) {
     Optional<UserAction> userAction = userActionRepo.findById(id);
-    checkArgument(userAction.isPresent(), ErrorCode.INVALID_USER_ACTION_ID);
+    Assert.isTrue(userAction.isPresent(), ErrorCode.INVALID_USER_ACTION_ID);
     return userAction.get();
   }
 

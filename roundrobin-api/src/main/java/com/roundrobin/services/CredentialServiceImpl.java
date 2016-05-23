@@ -2,6 +2,7 @@ package com.roundrobin.services;
 
 import java.util.Optional;
 
+import org.jasypt.encryption.StringEncryptor;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,9 @@ public class CredentialServiceImpl implements CredentialService {
   @Autowired
   private CredentialRepository credentialRepo;
 
+  @Autowired
+  private StringEncryptor jasyptStringEncryptor;
+
   @Override
   public Credential get(String id) {
     Optional<Credential> credential = credentialRepo.findById(id);
@@ -28,8 +32,8 @@ public class CredentialServiceImpl implements CredentialService {
   public CredentialTo read(String id) {
     Credential credential = get(id);
     CredentialTo credentialTo = new CredentialTo();
-    credentialTo.setUsername(credential.getUsername());
-    credentialTo.setPassword(credential.getPassword());
+    credentialTo.setUsername(jasyptStringEncryptor.decrypt(credential.getUsername()));
+    credentialTo.setPassword(jasyptStringEncryptor.decrypt(credential.getPassword()));
     credentialTo.setId(credential.getId());
     return credentialTo;
   }
@@ -37,8 +41,8 @@ public class CredentialServiceImpl implements CredentialService {
   @Override
   public Credential create(CredentialTo credentialTo) {
     Credential credential = new Credential();
-    credential.setUsername(credentialTo.getUsername());
-    credential.setPassword(credentialTo.getPassword());
+    credential.setUsername(jasyptStringEncryptor.encrypt(credentialTo.getUsername()));
+    credential.setPassword(jasyptStringEncryptor.encrypt(credentialTo.getPassword()));
     credential.setCreated(DateTime.now());
     return save(credential);
   }
@@ -46,7 +50,7 @@ public class CredentialServiceImpl implements CredentialService {
   @Override
   public CredentialTo update(CredentialTo credentialTo) {
     Credential credential = get(credentialTo.getId());
-    credential.setPassword(credentialTo.getPassword());
+    credential.setPassword(jasyptStringEncryptor.encrypt(credentialTo.getPassword()));
     return read(save(credential).getId());
   }
 

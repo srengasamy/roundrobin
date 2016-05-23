@@ -7,6 +7,8 @@ public interface UserProfileService {
 
   public UserProfile get(String id);
 
+  public UserProfile getByEmail(String email);
+
   public UserProfile save(UserProfile userProfile);
 
   public UserProfileTo read(String id);
