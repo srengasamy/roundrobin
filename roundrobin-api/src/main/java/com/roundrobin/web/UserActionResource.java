@@ -26,6 +26,13 @@ public class UserActionResource {
     return new Response<>(true);
   }
 
+  @RequestMapping(value = "request-activate", method = RequestMethod.POST)
+  public Response<Boolean> requestActivate(@RequestBody @Validated(RequestResetPasswordValidator.class) UserActionTo
+                                                   userActionTo) {
+    service.requestActivate(userActionTo);
+    return new Response<>(true);
+  }
+
   @RequestMapping(value = "request-reset-password", method = RequestMethod.POST)
   public Response<Boolean> requestResetPassword(@RequestBody @Validated(RequestResetPasswordValidator.class) UserActionTo
                                                         userActionTo) {

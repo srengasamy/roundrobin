@@ -22,9 +22,6 @@ public class UserProfileServiceImpl implements UserProfileService {
   @Autowired
   private CredentialService credentialService;
 
-  @Autowired
-  private UserActionService userActionService;
-
   @Override
   public UserProfile get(String id) {
     Optional<UserProfile> userProfile = profileRepo.findById(id);
@@ -77,7 +74,6 @@ public class UserProfileServiceImpl implements UserProfileService {
     userProfile.setCreated(DateTime.now());
     Credential credential =
             credentialService.create(new CredentialTo(userProfileTo.getEmail().get(), userProfileTo.getPassword().get()));
-    userProfile.getActions().add(userActionService.sendActivationLink());
     userProfile.setCredential(credential);
     return read(save(userProfile).getId());
   }

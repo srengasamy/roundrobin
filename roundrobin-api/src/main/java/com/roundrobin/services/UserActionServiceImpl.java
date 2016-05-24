@@ -32,7 +32,6 @@ public class UserActionServiceImpl implements UserActionService {
   @Autowired
   private CredentialService credentialService;
 
-  @Override
   public UserAction sendActivationLink() {
     UserAction userAction = new UserAction();
     userAction.setAction(UserActionType.ACTIVATE_USER);
@@ -42,7 +41,6 @@ public class UserActionServiceImpl implements UserActionService {
     return save(userAction);
   }
 
-  @Override
   public UserAction sendPasswordResetLink() {
     UserAction userAction = new UserAction();
     userAction.setAction(UserActionType.RESET_PASSWORD);
@@ -60,6 +58,7 @@ public class UserActionServiceImpl implements UserActionService {
     UserProfile userProfile = userProfileService.get(userActionTo.getUserProfileId());
     Assert.isTrue(userProfile.getActions().stream().map(c -> c.getId()).collect(Collectors.toList()).contains(userActionTo
             .getId()), ErrorCode.INVALID_PROFILE_ID);
+    Assert.isTrue(!userProfile.getActive(), ErrorCode.USER_ALREADY_ACTIVE);
     userProfile.setActive(true);
     userProfileService.save(userProfile);
     userAction.setActive(false);
@@ -70,6 +69,18 @@ public class UserActionServiceImpl implements UserActionService {
   public void requestResetPassword(UserActionTo userActionTo) {
     UserProfile userProfile = userProfileService.getByEmail(userActionTo.getEmail());
     userProfile.getActions().add(sendPasswordResetLink());
+    userProfileService.save(userProfile);
+  }
+
+  @Override
+  public void requestActivate(UserActionTo userActionTo) {
+    requestActivate(userProfileService.getByEmail(userActionTo.getEmail()));
+  }
+
+  @Override
+  public void requestActivate(UserProfile userProfile) {
+    Assert.isTrue(!userProfile.getActive(), ErrorCode.USER_ALREADY_ACTIVE);
+    userProfile.getActions().add(sendActivationLink());
     userProfileService.save(userProfile);
   }
 

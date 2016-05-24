@@ -12,6 +12,7 @@ import com.roundrobin.api.Response;
 import com.roundrobin.api.UserProfileTo;
 import com.roundrobin.groups.CreateProfileValidator;
 import com.roundrobin.groups.UpdateProfileValidator;
+import com.roundrobin.services.UserActionService;
 import com.roundrobin.services.UserProfileService;
 
 @RestController
@@ -20,6 +21,9 @@ public class UserProfileResource {
   @Autowired
   private UserProfileService service;
 
+  @Autowired
+  private UserActionService userActionService;
+
   @RequestMapping(value = "{userProfileId}", method = RequestMethod.GET)
   public Response<UserProfileTo> read(@PathVariable String userProfileId) {
     return new Response<>(service.read(userProfileId));
@@ -27,13 +31,15 @@ public class UserProfileResource {
 
   @RequestMapping(consumes = {"application/json"}, method = RequestMethod.POST)
   public Response<UserProfileTo> create(
-      @RequestBody @Validated(CreateProfileValidator.class) UserProfileTo userProfileTo) {
-    return new Response<>(service.create(userProfileTo));
+          @RequestBody @Validated(CreateProfileValidator.class) UserProfileTo userProfileTo) {
+    UserProfileTo response = service.create(userProfileTo);
+    userActionService.requestActivate(service.get(response.getId()));
+    return new Response<>(response);
   }
 
   @RequestMapping(consumes = {"application/json"}, method = RequestMethod.PUT)
   public Response<UserProfileTo> update(
-      @RequestBody @Validated(UpdateProfileValidator.class) UserProfileTo userProfileTo) {
+          @RequestBody @Validated(UpdateProfileValidator.class) UserProfileTo userProfileTo) {
     return new Response<>(service.update(userProfileTo));
   }
 

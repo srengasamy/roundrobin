@@ -44,6 +44,31 @@ public class UserActionResourceTests extends ResourceTests {
   }
 
   @Test
+  public void testDuplicateActivate() {
+    Response<UserProfileTo> userProfile = createUserProfile();
+    UserProfile profile = userProfileService.get(userProfile.getEntity().getId());
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setId(profile.getActions().get(0).getId());
+    userActionTo.setUserProfileId(profile.getId());
+    userActionTo.setSecret(profile.getActions().get(0).getSecret());
+    Response<Boolean> activate = helper.post(url +
+                    "user-action/activate", userActionTo,
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }, port).getBody();
+    assertThat(activate.getEntity(), notNullValue());
+    assertThat(activate.getEntity(), is(true));
+    activate = helper.post(url +
+                    "user-action/activate", userActionTo,
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }, port).getBody();
+    assertThat(activate.getEntity(), nullValue());
+    assertThat(activate.getErrors(), notNullValue());
+    assertThat(activate.getErrors(), hasItems(
+            new Error(ErrorCode.USER_ALREADY_ACTIVE.getCode(), messages.getErrorMessage(ErrorCode.USER_ALREADY_ACTIVE))
+    ));
+  }
+
+  @Test
   public void testActivateWithEmptyValues() {
     Response<String> activate = helper.post(url +
                     "user-action/activate", new UserActionTo(),
@@ -129,6 +154,92 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(activate.getErrors(), notNullValue());
     assertThat(activate.getErrors(), hasItems(
             new Error(ErrorCode.INVALID_PROFILE_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))
+    ));
+  }
+
+  @Test
+  public void testRequestActivate() {
+    String email = System.currentTimeMillis() + "@testing.com";
+    createUserProfile(email);
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail(email);
+    Response<Boolean> reset = helper.post(url +
+                    "user-action/request-activate", userActionTo,
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }, port).getBody();
+    assertThat(reset.getEntity(), notNullValue());
+    assertThat(reset.getEntity(), is(true));
+  }
+
+  @Test
+  public void testRequestActivateWithEmptyValues() {
+    Response<Boolean> reset = helper.post(url +
+                    "user-action/request-activate", new UserActionTo(),
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_FIELD.getCode(), "email: may not be empty")
+    ));
+  }
+
+  @Test
+  public void testRequestActivateWithInvalidValues() {
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail("testing");
+    Response<Boolean> reset = helper.post(url +
+                    "user-action/request-activate", userActionTo,
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(), hasItems(
+            new Error(ErrorCode.INVALID_FIELD.getCode(), "email: not a well-formed email address")
+    ));
+  }
+
+  @Test
+  public void testRequestActivateWithUnknownEmail() {
+    String email = System.currentTimeMillis() + "@testing.com";
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail(email);
+    Response<Boolean> reset = helper.post(url +
+                    "user-action/request-activate", userActionTo,
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(), hasItems(
+            new Error(ErrorCode.UNKNOWN_PROFILE.getCode(), messages.getErrorMessage(ErrorCode.UNKNOWN_PROFILE))
+    ));
+  }
+
+  @Test
+  public void testRequestActivateForActiveProfile() {
+    String email = System.currentTimeMillis() + "@testing.com";
+    Response<UserProfileTo> userProfile = createUserProfile(email);
+    UserProfile profile = userProfileService.get(userProfile.getEntity().getId());
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setId(profile.getActions().get(0).getId());
+    userActionTo.setUserProfileId(profile.getId());
+    userActionTo.setSecret(profile.getActions().get(0).getSecret());
+    Response<Boolean> activate = helper.post(url +
+                    "user-action/activate", userActionTo,
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }, port).getBody();
+    assertThat(activate.getEntity(), notNullValue());
+    assertThat(activate.getEntity(), is(true));
+    userActionTo = new UserActionTo();
+    userActionTo.setEmail(profile.getEmail());
+    Response<Boolean> reset = helper.post(url +
+                    "user-action/request-activate", userActionTo,
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(), hasItems(
+            new Error(ErrorCode.USER_ALREADY_ACTIVE.getCode(), messages.getErrorMessage(ErrorCode.USER_ALREADY_ACTIVE))
     ));
   }
 
@@ -356,4 +467,5 @@ public class UserActionResourceTests extends ResourceTests {
             new Error(ErrorCode.INVALID_PROFILE_ID.getCode(), messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))
     ));
   }
+
 }
