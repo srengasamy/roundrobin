@@ -9,22 +9,28 @@ import com.roundrobin.domain.User;
 import com.roundrobin.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 
 import java.util.Arrays;
 
+
 @Configuration
+@EnableWebSecurity
 @EnableAuthorizationServer
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
   @Autowired
   private AuthenticationManager authenticationManager;
@@ -49,11 +55,12 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
             .withClient("my-client-with-registered-redirect").authorizedGrantTypes("authorization_code")
             .authorities("ROLE_CLIENT").scopes("read", "trust").resourceIds("oauth2-resource")
             .redirectUris("http://anywhere?key=value").and().withClient("my-client-with-secret")
-            .authorizedGrantTypes("client_credentials", "password").authorities("ROLE_CLIENT").scopes("read")
+            .authorizedGrantTypes("client_credentials", "password").authorities("USER").scopes("read")
             .resourceIds("oauth2-resource").secret("secret");
     // @formatter:on
   }
 
+  @Bean
   @Autowired
   public void authenticationManager(AuthenticationManagerBuilder builder, UserRepository repository) throws Exception {
     if (repository.count() == 0) {

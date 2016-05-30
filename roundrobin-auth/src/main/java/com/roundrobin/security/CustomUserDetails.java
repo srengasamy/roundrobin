@@ -32,9 +32,6 @@ public class CustomUserDetails implements UserDetails {
     List<GrantedAuthority> authorities = new ArrayList<>();
     for (Role role : roles) {
       String name = role.getName().toUpperCase();
-      if (!name.startsWith("ROLE_")) {
-        name = "ROLE_" + name;
-      }
       authorities.add(new SimpleGrantedAuthority(name));
     }
     return authorities;
