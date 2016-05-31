@@ -1,17 +1,18 @@
 package com.roundrobin.domain;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.List;
 
-/**
- * Created by rengasu on 5/25/16.
- */
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 @Document(collection = "user")
 public class User {
+  @Id
   private String id;
   private String username;
   private String password;
+  @DBRef
   private List<Role> roles;
 
   public User() {
