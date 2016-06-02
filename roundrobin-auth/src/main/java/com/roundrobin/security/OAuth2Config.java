@@ -28,15 +28,11 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
     // @formatter:off
-    clients.inMemory().withClient("my-trusted-client")
-        .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
-        .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT").scopes("read", "write", "trust")
-        .resourceIds("oauth2-resource").accessTokenValiditySeconds(600).and()
-        .withClient("my-client-with-registered-redirect").authorizedGrantTypes("authorization_code")
-        .authorities("ROLE_CLIENT").scopes("read", "trust").resourceIds("oauth2-resource")
-        .redirectUris("http://anywhere?key=value").and().withClient("my-client-with-secret")
-        .authorizedGrantTypes("client_credentials", "password").authorities("ROLE_CLIENT").scopes("read")
-        .resourceIds("oauth2-resource").secret("secret");
+    clients.inMemory().withClient("internal").authorizedGrantTypes("password").authorities("ROLE_SERVICE")
+        .resourceIds("vault").secret("secret").and().withClient("mobile").authorizedGrantTypes("password")
+        .authorities("ROLE_USER").resourceIds("vault").secret("secret").and().withClient("web")
+        .authorizedGrantTypes("password").authorities("ROLE_USER").resourceIds("vault", "oauth2/admin").secret("secret")
+        .scopes("read", "write");
     // @formatter:on
   }
 }

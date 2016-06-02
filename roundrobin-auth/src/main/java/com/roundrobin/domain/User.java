@@ -1,5 +1,6 @@
 package com.roundrobin.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -12,8 +13,14 @@ public class User {
   private String id;
   private String username;
   private String password;
+  private Boolean vendor;
+  private Boolean verified;
+  private Boolean active;
+
   @DBRef
-  private List<Role> roles;
+  private List<Role> roles = new ArrayList<>();
+  @DBRef
+  private List<UserAction> actions = new ArrayList<>();
 
   public User() {
 
@@ -56,4 +63,38 @@ public class User {
   public void setRoles(List<Role> roles) {
     this.roles = roles;
   }
+
+  public Boolean getActive() {
+    return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+  public List<UserAction> getActions() {
+    return actions;
+  }
+
+  public void setActions(List<UserAction> actions) {
+    this.actions = actions;
+  }
+
+  public Boolean getVendor() {
+    return vendor;
+  }
+
+  public void setVendor(Boolean vendor) {
+    this.vendor = vendor;
+  }
+
+  public Boolean getVerified() {
+    return verified;
+  }
+
+  public void setVerified(Boolean verified) {
+    this.verified = verified;
+  }
+
+
 }
