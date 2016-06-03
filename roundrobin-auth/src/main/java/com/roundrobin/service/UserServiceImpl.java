@@ -123,6 +123,7 @@ public class UserServiceImpl implements UserService {
         && a.getSecret().equals(userActionTo.getSecret()) && a.getExpiry().isAfterNow()));
     Assert.isTrue(found, ErrorCode.INVALID_SECRET);
     user.setPassword(userActionTo.getPassword());
+    user.setVerified(true);
     save(user);
   }
 

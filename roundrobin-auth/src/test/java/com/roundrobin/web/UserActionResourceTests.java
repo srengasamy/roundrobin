@@ -21,6 +21,7 @@ import com.roundrobin.api.UserTo;
 import com.roundrobin.common.CommonErrorCode;
 import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.User;
+import com.roundrobin.domain.UserAction;
 import com.roundrobin.service.UserService;
 
 /**
@@ -35,7 +36,7 @@ public class UserActionResourceTests extends ResourceTests {
   // TODO Add indexes to columns
   // TODO Store token in db
   // TODO Handle 404 error
-
+  // TODo encrypt password
   @Autowired
   private UserService userService;
 
@@ -274,5 +275,163 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(requestVerify.getErrors(), notNullValue());
     assertThat(requestVerify.getErrors(), hasItems(
         new Error(ErrorCode.USER_ALREADY_VERIFIED, messages.getErrorMessage(ErrorCode.USER_ALREADY_VERIFIED))));
+  }
+
+  @Test
+  public void testRequestResetPassword() {
+    String username = createUser();
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail(username);
+    Response<Boolean> reset = helper.post(url + "user-action/request-reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), notNullValue());
+    assertThat(reset.getEntity(), is(true));
+  }
+
+  @Test
+  public void testRequestResetPasswordWithEmptyValues() {
+    UserActionTo userActionTo = new UserActionTo();
+    Response<Boolean> reset = helper.post(url + "user-action/request-reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(), hasItems(new Error(CommonErrorCode.INVALID_FIELD, "email: may not be empty")));
+  }
+
+  @Test
+  public void testRequestResetPasswordWithInvalidValues() {
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail("testing");
+    Response<Boolean> reset = helper.post(url + "user-action/request-reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(),
+        hasItems(new Error(CommonErrorCode.INVALID_FIELD, "email: not a well-formed email address")));
+  }
+
+  @Test
+  public void testRequestResetPasswordWithUnknownEmail() {
+    String email = System.currentTimeMillis() + "@testing.com";
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail(email);
+    Response<Boolean> reset = helper.post(url + "user-action/request-reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(),
+        hasItems(new Error(ErrorCode.INVALID_USERNAME, messages.getErrorMessage(ErrorCode.INVALID_USERNAME))));
+  }
+
+  @Test
+  public void testResetPassword() {
+    String username = createUser();
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail(username);
+    Response<Boolean> reset = helper.post(url + "user-action/request-reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), notNullValue());
+    assertThat(reset.getEntity(), is(true));
+    User user = userService.getByUsername(username);
+    UserAction userAction = null;
+    for (UserAction action : user.getActions()) {
+      if (action.getAction() == UserAction.UserActionType.RESET_PASSWORD) {
+        userAction = action;
+        break;
+      }
+    }
+    userActionTo = new UserActionTo();
+    userActionTo.setUserId(user.getId());
+    userActionTo.setSecret(userAction.getSecret());
+    userActionTo.setPassword("newpassword");
+    reset = helper.post(url + "user-action/reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), notNullValue());
+    assertThat(reset.getEntity(), is(true));
+  }
+
+  @Test
+  public void testResetPasswordWithEmptyValues() {
+    UserActionTo userActionTo = new UserActionTo();
+    Response<Boolean> reset = helper.post(url + "user-action/reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(),
+        hasItems(new Error(CommonErrorCode.INVALID_FIELD, "secret: may not be empty"),
+            new Error(CommonErrorCode.INVALID_FIELD, "userId: may not be empty"),
+            new Error(CommonErrorCode.INVALID_FIELD, "password: may not be empty")));
+  }
+
+  @Test
+  public void testResetPasswordWithInvalidSecret() {
+    String username = createUser();
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail(username);
+    Response<Boolean> reset = helper.post(url + "user-action/request-reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), notNullValue());
+    assertThat(reset.getEntity(), is(true));
+    User user = userService.getByUsername(username);
+    userActionTo = new UserActionTo();
+    userActionTo.setUserId(user.getId());
+    userActionTo.setSecret("testing");
+    userActionTo.setPassword("newpassword");
+    reset = helper.post(url + "user-action/reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(),
+        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
+  }
+
+  @Test
+  public void testResetPasswordWithInvalidUserId() {
+    String username = createUser();
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail(username);
+    Response<Boolean> reset = helper.post(url + "user-action/request-reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), notNullValue());
+    assertThat(reset.getEntity(), is(true));
+    userActionTo = new UserActionTo();
+    userActionTo.setUserId("testing");
+    userActionTo.setSecret("testing");
+    userActionTo.setPassword("newpassword");
+    reset = helper.post(url + "user-action/reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(),
+        hasItems(new Error(ErrorCode.INVALID_USER_ID, messages.getErrorMessage(ErrorCode.INVALID_USER_ID))));
+  }
+
+  @Test
+  public void testResetPasswordWithWrongUserId() {
+    String username = createUser();
+    UserActionTo userActionTo = new UserActionTo();
+    userActionTo.setEmail(username);
+    Response<Boolean> reset = helper.post(url + "user-action/request-reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), notNullValue());
+    assertThat(reset.getEntity(), is(true));
+    userActionTo = new UserActionTo();
+    User user = userService.getByUsername(username);
+    UserAction userAction = null;
+    for (UserAction action : user.getActions()) {
+      if (action.getAction() == UserAction.UserActionType.RESET_PASSWORD) {
+        userAction = action;
+        break;
+      }
+    }
+    userActionTo.setUserId(userService.getByUsername(createUser()).getId());
+    userActionTo.setSecret(userAction.getSecret());
+    userActionTo.setPassword("newpassword");
+    reset = helper.post(url + "user-action/reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    assertThat(reset.getEntity(), nullValue());
+    assertThat(reset.getErrors(), notNullValue());
+    assertThat(reset.getErrors(),
+        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
   }
 }
