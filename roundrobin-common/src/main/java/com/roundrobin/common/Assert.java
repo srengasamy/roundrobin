@@ -9,13 +9,9 @@ import com.roundrobin.exception.ClientException;
 @Scope("singleton")
 public class Assert {
 
-  public static void isTrue(boolean expression, Object errorCode) {
-    isTrue(expression, errorCode.toString());
-  }
-
-  public static void isTrue(boolean expression, String errorCode) {
+  public static void isTrue(boolean expression, Integer errorCode) {
     if (!expression) {
-      throw new ClientException(errorCode, errorCode);
+      throw new ClientException(errorCode, errorCode.toString());
     }
   }
 }

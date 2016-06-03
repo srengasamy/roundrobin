@@ -1,5 +1,7 @@
 package com.roundrobin.api;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
@@ -12,13 +14,11 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.roundrobin.groups.CreateUserValidator;
-import com.roundrobin.groups.UpdateUserValidator;
 import com.roundrobin.groups.UserValidator;
 
 @JsonInclude(Include.NON_ABSENT)
 public class UserTo {
-  @NotBlank(groups = UpdateUserValidator.class)
-  private String id;
+  private String userId;
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateUserValidator.class)
@@ -34,12 +34,15 @@ public class UserTo {
   @NotNull(groups = CreateUserValidator.class)
   private Optional<Boolean> vendor = Optional.empty();
 
-  public String getId() {
-    return id;
+  private List<String> roles = new ArrayList<>();
+  private boolean verified;
+
+  public String getUserId() {
+    return userId;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setUserId(String userId) {
+    this.userId = userId;
   }
 
   public Optional<String> getUsername() {
@@ -64,6 +67,22 @@ public class UserTo {
 
   public void setVendor(Optional<Boolean> vendor) {
     this.vendor = vendor;
+  }
+
+  public List<String> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(List<String> roles) {
+    this.roles = roles;
+  }
+
+  public boolean isVerified() {
+    return verified;
+  }
+
+  public void setVerified(boolean verified) {
+    this.verified = verified;
   }
 
 

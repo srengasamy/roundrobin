@@ -19,7 +19,7 @@ public class User {
 
   @DBRef
   private List<Role> roles = new ArrayList<>();
-  @DBRef
+
   private List<UserAction> actions = new ArrayList<>();
 
   public User() {

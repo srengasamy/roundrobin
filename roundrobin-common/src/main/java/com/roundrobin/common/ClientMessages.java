@@ -11,7 +11,7 @@ public class ClientMessages {
   @Autowired
   Environment env;
 
-  public String getErrorMessage(ErrorCode errorCode) {
+  public String getErrorMessage(Integer errorCode) {
     return env.getProperty(errorCode.toString());
   }
 }

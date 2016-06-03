@@ -9,8 +9,6 @@ import com.roundrobin.groups.UserActionValidator;
 
 
 public class UserActionTo {
-  @NotBlank(groups = UserActionValidator.class)
-  private String id;
 
   @NotBlank(groups = UserActionValidator.class)
   private String userId;
@@ -24,14 +22,6 @@ public class UserActionTo {
   @NotBlank(groups = RequestUserActionValidator.class)
   @Email(groups = RequestUserActionValidator.class)
   private String email;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public String getSecret() {
     return secret;

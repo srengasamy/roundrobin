@@ -10,52 +10,49 @@ import org.springframework.web.bind.annotation.RestController;
 import com.roundrobin.api.Response;
 import com.roundrobin.api.UserActionTo;
 import com.roundrobin.api.UserTo;
-import com.roundrobin.groups.ActivationValidator;
 import com.roundrobin.groups.CreateUserValidator;
 import com.roundrobin.groups.RequestUserActionValidator;
 import com.roundrobin.groups.ResetPasswordValidator;
-import com.roundrobin.service.UserActionService;
+import com.roundrobin.groups.VerifyValidator;
 import com.roundrobin.service.UserService;
 
 @RestController
 @RequestMapping(value = "user-action", produces = {"application/json"})
 public class UserActionResource {
-  @Autowired
-  private UserActionService service;
 
   @Autowired
   private UserService userService;
 
-  @RequestMapping(method = RequestMethod.POST)
+  @RequestMapping(value = "create-user", method = RequestMethod.POST)
   public Response<Boolean> create(@RequestBody @Validated(CreateUserValidator.class) UserTo userTo) {
     userService.create(userTo);
     return new Response<>(true);
   }
 
-  @RequestMapping(value = "request-activate", method = RequestMethod.POST)
-  public Response<Boolean> requestActivate(
+  @RequestMapping(value = "request-verify", method = RequestMethod.POST)
+  public Response<Boolean> requestVerify(
       @RequestBody @Validated(RequestUserActionValidator.class) UserActionTo userActionTo) {
-    service.requestActivate(userActionTo);
+    userService.requestVerify(userActionTo);
     return new Response<>(true);
   }
 
-  @RequestMapping(value = "activate", method = RequestMethod.POST)
-  public Response<Boolean> activate(@RequestBody @Validated(ActivationValidator.class) UserActionTo userActionTo) {
-    service.activateUser(userActionTo);
+  @RequestMapping(value = "verify", method = RequestMethod.POST)
+  public Response<Boolean> verify(@RequestBody @Validated(VerifyValidator.class) UserActionTo userActionTo) {
+    userService.verifyUser(userActionTo);
     return new Response<>(true);
   }
 
   @RequestMapping(value = "request-reset-password", method = RequestMethod.POST)
   public Response<Boolean> requestResetPassword(
       @RequestBody @Validated(RequestUserActionValidator.class) UserActionTo userActionTo) {
-    service.requestResetPassword(userActionTo);
+    userService.requestResetPassword(userActionTo);
     return new Response<>(true);
   }
 
   @RequestMapping(value = "reset-password", method = RequestMethod.POST)
   public Response<Boolean> resetPassword(
       @RequestBody @Validated(ResetPasswordValidator.class) UserActionTo userActionTo) {
-    service.resetPassword(userActionTo);
+    userService.resetPassword(userActionTo);
     return new Response<>(true);
   }
 }

@@ -1,27 +1,13 @@
 package com.roundrobin.domain;
 
 import org.joda.time.DateTime;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 
-@Document(collection = "user_action")
 public class UserAction {
-  @Id
-  private String id;
   private UserActionType action;
   private String secret;
   private DateTime expiry;
   private DateTime created;
-  private Boolean active;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public UserActionType getAction() {
     return action;
@@ -55,17 +41,8 @@ public class UserAction {
     this.created = created;
   }
 
-  public Boolean getActive() {
-    return active;
-  }
-
-  public void setActive(Boolean active) {
-    this.active = active;
-  }
-
-
   public static enum UserActionType {
-    ACTIVATE_USER, RESET_PASSWORD
+    VERIFY_USER, RESET_PASSWORD
   }
 
 }

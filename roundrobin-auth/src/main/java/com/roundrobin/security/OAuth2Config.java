@@ -31,8 +31,8 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
     clients.inMemory().withClient("internal").authorizedGrantTypes("password").authorities("ROLE_SERVICE")
         .resourceIds("vault").secret("secret").and().withClient("mobile").authorizedGrantTypes("password")
         .authorities("ROLE_USER").resourceIds("vault").secret("secret").and().withClient("web")
-        .authorizedGrantTypes("password").authorities("ROLE_USER").resourceIds("vault", "oauth2/admin").secret("secret")
-        .scopes("read", "write");
+        .authorizedGrantTypes("password").authorities("USER", "VENDOR")
+        .resourceIds("roundrobin-vault", "roundrobin-auth").secret("secret").scopes("read", "write");
     // @formatter:on
   }
 }
