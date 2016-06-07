@@ -7,6 +7,7 @@ public class UserAction {
   private UserActionType action;
   private String secret;
   private DateTime expiry;
+  private Boolean active;
   private DateTime created;
 
   public UserActionType getAction() {
@@ -39,6 +40,14 @@ public class UserAction {
 
   public void setCreated(DateTime created) {
     this.created = created;
+  }
+
+  public Boolean getActive() {
+    return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
   }
 
   public static enum UserActionType {

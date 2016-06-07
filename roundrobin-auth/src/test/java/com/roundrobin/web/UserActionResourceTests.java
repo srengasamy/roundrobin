@@ -36,7 +36,10 @@ public class UserActionResourceTests extends ResourceTests {
   // TODO Add indexes to columns
   // TODO Store token in db
   // TODO Handle 404 error
-  // TODo encrypt password
+  // TODO encrypt password
+  // TODO Change to jwt token
+  // TODO Verify test cases
+
   @Autowired
   private UserService userService;
 

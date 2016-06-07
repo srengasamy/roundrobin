@@ -2,6 +2,7 @@ package com.roundrobin;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
@@ -15,6 +16,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfiguration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
@@ -23,6 +26,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.roundrobin.domain.User;
 import com.roundrobin.repository.UserRepository;
 import com.roundrobin.security.CustomUserDetails;
 
@@ -36,15 +40,20 @@ public class RoundRobin {
   }
 
   @Autowired
-  public void authenticationManager(AuthenticationManagerBuilder builder, UserRepository repository) throws Exception {
-    builder.userDetailsService(userDetailsService(repository));
+  public void authenticationManager(AuthenticationManagerBuilder builder, UserRepository repository,
+      PasswordEncoder passwordEncoder) throws Exception {
+    builder.userDetailsService(userDetailsService(repository)).passwordEncoder(passwordEncoder);
   }
 
   private UserDetailsService userDetailsService(final UserRepository repository) {
     return new UserDetailsService() {
       @Override
       public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new CustomUserDetails(repository.findByUsername(username));
+        Optional<User> user = repository.findByUsername(username);
+        if (user.isPresent()) {
+          return new CustomUserDetails(user.get());
+        }
+        throw new UsernameNotFoundException("User not found");
       }
     };
   }
@@ -117,4 +126,8 @@ public class RoundRobin {
     return mapper;
   }
 
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(11);
+  }
 }

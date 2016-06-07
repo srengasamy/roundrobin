@@ -9,8 +9,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.roundrobin.domain.Role;
 import com.roundrobin.domain.User;
+import com.roundrobin.domain.User.Role;
 
 
 public class CustomUserDetails implements UserDetails {
@@ -38,7 +38,7 @@ public class CustomUserDetails implements UserDetails {
   private Collection<? extends GrantedAuthority> translate(List<Role> roles) {
     List<GrantedAuthority> authorities = new ArrayList<>();
     for (Role role : roles) {
-      String name = role.getName();
+      String name = role.toString();
       authorities.add(new SimpleGrantedAuthority(name));
     }
     return authorities;
@@ -81,6 +81,7 @@ public class CustomUserDetails implements UserDetails {
     return enabled;
   }
 
+  @JsonIgnore
   public String getUserId() {
     return userId;
   }
