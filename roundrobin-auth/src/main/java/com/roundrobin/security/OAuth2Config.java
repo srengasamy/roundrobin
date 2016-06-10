@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 
 import com.roundrobin.service.ClientDetailService;
+import com.roundrobin.service.TokenStoreService;
 
 @Configuration
 @EnableAuthorizationServer
@@ -20,9 +21,12 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
   @Autowired
   private ClientDetailService clientService;
 
+  @Autowired
+  private TokenStoreService tokenStore;
+
   @Override
   public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-    endpoints.authenticationManager(authenticationManager);
+    endpoints.tokenStore(tokenStore).authenticationManager(authenticationManager);
   }
 
   @Override

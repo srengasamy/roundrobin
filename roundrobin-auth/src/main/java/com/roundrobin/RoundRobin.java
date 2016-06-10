@@ -1,5 +1,6 @@
 package com.roundrobin;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +29,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.roundrobin.config.CustomMongoDBConvertor;
 import com.roundrobin.domain.User;
 import com.roundrobin.repository.UserRepository;
 import com.roundrobin.security.CustomUserDetails;
@@ -129,5 +133,12 @@ public class RoundRobin {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder(11);
+  }
+
+  @Bean
+  public CustomConversions customConversions(CustomMongoDBConvertor convertor) {
+    List<Converter<?, ?>> converterList = new ArrayList<>();
+    converterList.add(convertor);
+    return new CustomConversions(converterList);
   }
 }
