@@ -3,18 +3,21 @@
  */
 package com.roundrobin.config;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.mongodb.core.convert.CustomConversions;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 
@@ -48,39 +51,36 @@ public class CustomMongoDBConvertor implements Converter<DBObject, OAuth2Authent
         (String) storedRequest.get("clientId"), null, true, new HashSet((List) storedRequest.get("scope")), null, null,
         null, null);
     DBObject userAuthorization = (DBObject) source.get("userAuthentication");
-    if (null != userAuthorization) { // its a user
-      Object prinObj = userAuthorization.get("principal");
-      Optional<User> u = Optional.empty();
-      if ((null != prinObj) && prinObj instanceof String) {
-        u = userRepo.findByUsername((String) prinObj);
-      } else if (null != prinObj) {
-        DBObject principalDBO = (DBObject) prinObj;
-        String email = (String) principalDBO.get("username");
-        u = userRepo.findByUsername(email);
-      }
-      if (!u.isPresent()) {
-        return null;
-      }
+    Object principal = getPrincipalObject(userAuthorization.get("principal"));
+    Authentication userAuthentication = new UsernamePasswordAuthenticationToken(principal,
+        (String) userAuthorization.get("credentials"), getAuthorities((List) userAuthorization.get("authorities")));
+    OAuth2Authentication authentication = new OAuth2Authentication(oAuth2Request, userAuthentication);
+    return authentication;
+  }
 
-      Authentication userAuthentication = new UserAuthenticationToken(u.get().getUsername(),
-          (String) userAuthorization.get("credentials"),
-          u.get().getRoles().stream().map(s -> new SimpleGrantedAuthority(s.toString())).collect(Collectors.toList()));
-      OAuth2Authentication authentication = new OAuth2Authentication(oAuth2Request, userAuthentication);
-      return authentication;
-    } else { // its a client
-      String clientId = (String) storedRequest.get("clientId");
-      ClientDetails client = null;
-      if ((null != clientId) && clientId instanceof String) {
-        client = clientDetailService.loadClientByClientId(clientId);
-      }
-      if (null == client) {
-        return null;
-      }
-      Authentication userAuthentication =
-          new ClientAuthenticationToken(client.getClientId(), null, client.getAuthorities());
-      return new OAuth2Authentication(oAuth2Request, userAuthentication);
+  private Object getPrincipalObject(Object principal) {
+    if (principal instanceof DBObject) {
+      DBObject principalDBObject = (DBObject) principal;
+      User user = new User(principalDBObject);
+      return user;
+    } else {
+      return principal;
     }
   }
 
+  private Collection<GrantedAuthority> getAuthorities(List<Map<String, String>> authorities) {
+    Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>(authorities.size());
+    for (Map<String, String> authority : authorities) {
+      grantedAuthorities.add(new SimpleGrantedAuthority(authority.get("role")));
+    }
+    return grantedAuthorities;
+  }
+
+  @Bean
+  public CustomConversions customConversions() {
+    List<Converter<?, ?>> converterList = new ArrayList<>();
+    converterList.add(this);
+    return new CustomConversions(converterList);
+  }
 
 }

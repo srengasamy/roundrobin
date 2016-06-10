@@ -2,8 +2,11 @@ package com.roundrobin.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.mongodb.DBObject;
 
 @Document(collection = "user")
 public class User extends Generic {
@@ -14,6 +17,22 @@ public class User extends Generic {
 
   private List<Role> roles = new ArrayList<>();
   private List<UserAction> actions = new ArrayList<>();
+
+  public User() {
+
+  }
+
+  public User(DBObject dbObject) {
+    setId((String) dbObject.get("_id"));
+    this.username = (String) dbObject.get("username");
+    this.password = (String) dbObject.get("password");
+    this.vendor = (Boolean) dbObject.get("vendor");
+    this.verified = (Boolean) dbObject.get("verified");
+    List<String> roles = (List<String>) dbObject.get("roles");
+    if (roles != null) {
+      this.roles = roles.stream().map(r -> Role.valueOf(r)).collect(Collectors.toList());
+    }
+  }
 
   public String getUsername() {
     return username;
