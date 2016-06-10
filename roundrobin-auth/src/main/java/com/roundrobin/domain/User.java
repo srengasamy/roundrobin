@@ -1,15 +1,20 @@
 package com.roundrobin.domain;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.mongodb.DBObject;
 
 @Document(collection = "user")
-public class User extends Generic {
+public class User extends Generic implements UserDetails {
+  private static final long serialVersionUID = 1L;
   private String username;
   private String password;
   private Boolean vendor;
@@ -22,16 +27,23 @@ public class User extends Generic {
 
   }
 
+  @SuppressWarnings("unchecked")
   public User(DBObject dbObject) {
-    setId((String) dbObject.get("_id"));
+    this.id = dbObject.get("_id").toString();
     this.username = (String) dbObject.get("username");
     this.password = (String) dbObject.get("password");
     this.vendor = (Boolean) dbObject.get("vendor");
     this.verified = (Boolean) dbObject.get("verified");
-    List<String> roles = (List<String>) dbObject.get("roles");
-    if (roles != null) {
-      this.roles = roles.stream().map(r -> Role.valueOf(r)).collect(Collectors.toList());
-    }
+    this.roles = (List<Role>) dbObject.get("roles");
+  }
+
+  public User(User user) {
+    this.id = user.getId();
+    this.username = user.getUsername();
+    this.password = user.getPassword();
+    this.active = user.getActive();
+    this.verified = user.getVerified();
+    this.roles = user.getRoles();
   }
 
   public String getUsername() {
@@ -85,4 +97,31 @@ public class User extends Generic {
   public static enum Role {
     USER, VENDOR, CLIENT, ADMIN;
   }
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return roles.stream().map(s -> new SimpleGrantedAuthority(s.toString())).collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return active;
+  }
+
+
 }

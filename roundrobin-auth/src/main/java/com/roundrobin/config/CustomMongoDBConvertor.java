@@ -23,9 +23,6 @@ import org.springframework.security.oauth2.provider.OAuth2Request;
 
 import com.mongodb.DBObject;
 import com.roundrobin.domain.User;
-import com.roundrobin.repository.UserRepository;
-import com.roundrobin.service.ClientDetailService;
-import com.roundrobin.service.UserService;
 
 /**
  * 
@@ -34,15 +31,6 @@ import com.roundrobin.service.UserService;
  */
 @Configuration
 public class CustomMongoDBConvertor implements Converter<DBObject, OAuth2Authentication> {
-
-  // @Autowired
-  private UserService authConfigService;
-  // @Autowired
-  private ClientDetailService clientDetailService;
-
-  // @Autowired
-  private UserRepository userRepo;
-
 
   @Override
   public OAuth2Authentication convert(DBObject source) {

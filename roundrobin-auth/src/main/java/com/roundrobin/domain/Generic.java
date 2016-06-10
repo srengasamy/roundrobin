@@ -7,12 +7,12 @@ import org.springframework.data.annotation.Id;
 
 public class Generic {
   @Id
-  private String id;
+  protected String id;
 
   @CreatedDate
   private Date created;
 
-  private Boolean active;
+  protected Boolean active;
 
   public String getId() {
     return id;

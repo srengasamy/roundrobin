@@ -21,6 +21,7 @@ public class CustomUserDetails implements UserDetails {
   private String userId;
   private Boolean enabled;
   private Boolean verified;
+  private List<Role> roles = new ArrayList<>();
 
   public CustomUserDetails() {
 
@@ -33,6 +34,7 @@ public class CustomUserDetails implements UserDetails {
     this.authorities = translate(user.getRoles());
     this.enabled = user.getActive();
     this.verified = user.getVerified();
+    this.roles = user.getRoles();
   }
 
   private Collection<? extends GrantedAuthority> translate(List<Role> roles) {
@@ -96,6 +98,14 @@ public class CustomUserDetails implements UserDetails {
 
   public void setVerified(Boolean verified) {
     this.verified = verified;
+  }
+
+  public List<Role> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(List<Role> roles) {
+    this.roles = roles;
   }
 
 }

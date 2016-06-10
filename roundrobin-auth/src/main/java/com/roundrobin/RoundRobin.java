@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,13 +28,11 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.roundrobin.domain.User;
 import com.roundrobin.repository.UserRepository;
-import com.roundrobin.security.CustomUserDetails;
 
 /**
  * Created by rengasu on 5/24/16.
  */
 @SpringBootApplication
-@EnableMongoRepositories(basePackages="com.roundrobin.repository")
 public class RoundRobin {
 
   public static void main(String[] args) {
@@ -54,7 +51,7 @@ public class RoundRobin {
       public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = repository.findByUsername(username);
         if (user.isPresent()) {
-          return new CustomUserDetails(user.get());
+          return new User(user.get());
         }
         throw new UsernameNotFoundException("User not found");
       }
