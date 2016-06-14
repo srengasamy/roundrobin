@@ -23,8 +23,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
+import com.roundrobin.exception.AbstractException;
 import com.roundrobin.exception.ClientException;
-import com.roundrobin.exception.GeneralException;
+import com.roundrobin.exception.ServerException;
 
 @ControllerAdvice
 public class ExceptionMapper {
@@ -35,8 +36,8 @@ public class ExceptionMapper {
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<Response<String>> handleMessageNotReadableException(HttpMessageNotReadableException e) {
-    Response<String> response = new Response<>(
-        new Error(CommonErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(CommonErrorCode.UNPARSABLE_INPUT)));
+    Response<String> response =
+        new Response<>(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT)));
     return log(HttpStatus.BAD_REQUEST, response, e);
   }
 
@@ -45,9 +46,9 @@ public class ExceptionMapper {
     List<Error> errors = ex.getBindingResult().getAllErrors().stream().map(e -> {
       String message = e.getDefaultMessage();
       if (e instanceof FieldError) {
-        return new Error(CommonErrorCode.INVALID_FIELD, ((FieldError) e).getField() + ": " + message);
+        return new Error(ErrorCode.INVALID_FIELD, ((FieldError) e).getField() + ": " + message);
       } else {
-        return new Error(CommonErrorCode.INVALID_FIELD, message);
+        return new Error(ErrorCode.INVALID_FIELD, message);
       }
     }).collect(Collectors.toList());
     for (ObjectError oe : ex.getBindingResult().getAllErrors()) {
@@ -57,30 +58,36 @@ public class ExceptionMapper {
   }
 
   @ExceptionHandler(ClientException.class)
-  public ResponseEntity<Response<String>> handleClientException(ClientException ex) {
-    Response<String> response = new Response<>(new Error(ex.getCode(), messages.getErrorMessage(ex.getCode())));
-    return log(HttpStatus.BAD_REQUEST, response, ex);
+  public ResponseEntity<Response<String>> handleClientException(ClientException e) {
+    Response<String> response = new Response<>(new Error(e.getCode(), messages.getErrorMessage(e.getCode())));
+    return log(HttpStatus.BAD_REQUEST, response, e);
+  }
+
+  @ExceptionHandler(ServerException.class)
+  public ResponseEntity<Response<String>> handleServerException(ServerException e) {
+    Response<String> response = new Response<>(new Error(e.getCode(), messages.getErrorMessage(e.getCode())));
+    return log(HttpStatus.INTERNAL_SERVER_ERROR, response, e);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Response<String>> handleException(Exception e) {
-    Response<String> response = new Response<>(
-        new Error(CommonErrorCode.INTERNAL_ERROR, messages.getErrorMessage(CommonErrorCode.INTERNAL_ERROR)));
+    Response<String> response =
+        new Response<>(new Error(ErrorCode.INTERNAL_ERROR, messages.getErrorMessage(ErrorCode.INTERNAL_ERROR)));
     return log(HttpStatus.INTERNAL_SERVER_ERROR, response, e);
   }
 
   @ExceptionHandler({HttpRequestMethodNotSupportedException.class, NoHandlerFoundException.class})
   public ResponseEntity<Response<String>> handleMethodNotSupported(Exception e) {
     Response<String> response =
-        new Response<>(new Error(CommonErrorCode.INVALID_URL, messages.getErrorMessage(CommonErrorCode.INVALID_URL)));
+        new Response<>(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL)));
     return log(HttpStatus.NOT_FOUND, response, e);
   }
 
   private ResponseEntity<Response<String>> log(HttpStatus status, Response<String> response, Exception e) {
     response.setUuid(UUID.randomUUID().toString());
     response.setTimestamp(System.currentTimeMillis());
-    if (e instanceof GeneralException) {
-      GeneralException ge = (GeneralException) e;
+    if (e instanceof AbstractException) {
+      AbstractException ge = (AbstractException) e;
       logger.error(
           append(Constants.ERROR_CODE, ge.getCode() + "") + "," + append(Constants.ERROR_MESSAGE, ge.getMessage()) + ","
               + append(Constants.ERROR_UUID, response.getUuid()) + ",Exception:" + ge,

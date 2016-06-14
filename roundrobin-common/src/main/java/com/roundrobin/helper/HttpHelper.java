@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 public class HttpHelper {
   protected RestTemplate template;
   protected MediaType mediaType;
-
+ 
   public HttpHelper() {
     template = new RestTemplate();
     mediaType = MediaType.APPLICATION_JSON;

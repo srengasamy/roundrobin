@@ -1,21 +1,20 @@
 package com.roundrobin.exception;
 
-public class ClientException extends AbstractException {
-
+public class ServerException extends AbstractException {
   private static final long serialVersionUID = 1L;
   private Integer code;
 
-  public ClientException(Integer code) {
+  public ServerException(Integer code) {
     super(code.toString());
     this.code = code;
   }
 
-  public ClientException(Integer code, String message) {
+  public ServerException(Integer code, String message) {
     super(message);
     this.code = code;
   }
 
-  public ClientException(int code, String message, Throwable t) {
+  public ServerException(int code, String message, Throwable t) {
     super(message, t);
     this.code = code;
   }
@@ -24,5 +23,4 @@ public class ClientException extends AbstractException {
   public int getCode() {
     return code.intValue();
   }
-
 }
