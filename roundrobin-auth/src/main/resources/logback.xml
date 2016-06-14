@@ -12,7 +12,7 @@
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>./logs/application.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>/srv/logs/application_%d{yyyy-MM-dd}.%i.log
+			<fileNamePattern>./logs/roundrobin_auth_%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
 
 			<timeBasedFileNamingAndTriggeringPolicy
@@ -29,7 +29,7 @@
 		</encoder>
 	</appender>
 
-	<root level="DEBUG">
+	<root level="INFO">
 		<appender-ref ref="consoleAppender" />
 		<appender-ref ref="FILE" />
 	</root>

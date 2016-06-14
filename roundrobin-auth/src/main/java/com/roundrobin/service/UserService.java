@@ -133,6 +133,7 @@ public class UserService {
     userAction.setCreated(DateTime.now());
     userAction.setExpiry(DateTime.now().plusHours(48));
     userAction.setSecret(UUID.randomUUID().toString());
+    userAction.setActive(true);
     return userAction;
   }
 
@@ -142,6 +143,7 @@ public class UserService {
     userAction.setCreated(DateTime.now());
     userAction.setExpiry(DateTime.now().plusHours(48));
     userAction.setSecret(UUID.randomUUID().toString());
+    userAction.setActive(true);
     return userAction;
   }
 

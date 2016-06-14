@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
 import com.roundrobin.api.UserTo;
+import com.roundrobin.domain.User;
 import com.roundrobin.groups.UpdateUserValidator;
-import com.roundrobin.security.CustomUserDetails;
 import com.roundrobin.service.UserService;
 
 @RestController
@@ -24,26 +24,26 @@ public class UserResource {
 
   @RequestMapping(value = "user", method = RequestMethod.GET)
   public Response<UserTo> user(Authentication authentication) {
+    User user = (User) authentication.getPrincipal();
     UserTo userTo = new UserTo();
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    userTo.setRoles(userDetails.getAuthorities().stream().map(c -> c.getAuthority()).collect(Collectors.toList()));
-    userTo.setUserId(userDetails.getUserId());
+    userTo.setRoles(user.getRoles().stream().map(r -> r.toString()).collect(Collectors.toList()));
+    userTo.setUserId(user.getId());
     return new Response<>(userTo);
   }
 
   @RequestMapping(value = "user", consumes = {"application/json"}, method = RequestMethod.PUT)
   public Response<Boolean> update(@RequestBody @Validated(UpdateUserValidator.class) UserTo userTo,
       Authentication authentication) {
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    userTo.setUserId(userDetails.getUserId());
+    User user = (User) authentication.getPrincipal();
+    userTo.setUserId(user.getId());
     service.update(userTo);
     return new Response<>(true);
   }
 
   @RequestMapping(value = "user", method = RequestMethod.DELETE)
   public Response<Boolean> delete(Authentication authentication) {
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    service.delete(userDetails.getUserId());
+    User user = (User) authentication.getPrincipal();
+    service.delete(user.getId());
     return new Response<>(true);
   }
 

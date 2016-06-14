@@ -4,9 +4,11 @@ import java.util.Date;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 public class Generic {
   @Id
+  @Indexed
   protected String id;
 
   @CreatedDate

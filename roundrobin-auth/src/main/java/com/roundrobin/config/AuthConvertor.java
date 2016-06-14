@@ -1,6 +1,3 @@
-/*
- * To change this template, choose Tools | Templates and open the template in the editor.
- */
 package com.roundrobin.config;
 
 import java.util.ArrayList;
@@ -24,14 +21,11 @@ import org.springframework.security.oauth2.provider.OAuth2Request;
 import com.mongodb.DBObject;
 import com.roundrobin.domain.User;
 
-/**
- * 
- *
- * @author malike_st
- */
-@Configuration
-public class CustomMongoDBConvertor implements Converter<DBObject, OAuth2Authentication> {
 
+@Configuration
+public class AuthConvertor implements Converter<DBObject, OAuth2Authentication> {
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public OAuth2Authentication convert(DBObject source) {
     DBObject storedRequest = (DBObject) source.get("storedRequest");

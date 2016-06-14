@@ -73,7 +73,7 @@ public class ResourceTests {
     return new HttpHeaders() {
       private static final long serialVersionUID = 2987123839863076324L;
       {
-        String auth = "web:secret";
+        String auth = "web2:secret";
         byte[] encodedAuth = Base64.encode(auth.getBytes(Charset.forName("US-ASCII")));
         String authHeader = "Basic " + new String(encodedAuth);
         set("Authorization", authHeader);

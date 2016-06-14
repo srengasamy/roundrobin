@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,6 +16,7 @@ import com.mongodb.DBObject;
 @Document(collection = "user")
 public class User extends Generic implements UserDetails {
   private static final long serialVersionUID = 1L;
+  @Indexed
   private String username;
   private String password;
   private Boolean vendor;
@@ -34,7 +36,7 @@ public class User extends Generic implements UserDetails {
     this.password = (String) dbObject.get("password");
     this.vendor = (Boolean) dbObject.get("vendor");
     this.verified = (Boolean) dbObject.get("verified");
-    this.roles = (List<Role>) dbObject.get("roles");
+    this.roles = ((List<String>) dbObject.get("roles")).stream().map(r -> Role.valueOf(r)).collect(Collectors.toList());
   }
 
   public User(User user) {

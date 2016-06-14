@@ -5,6 +5,11 @@ public class ClientException extends GeneralException {
   private static final long serialVersionUID = 4665827751058454341L;
   private int code;
 
+  public ClientException(int code) {
+    super(code + "");
+    this.code = code;
+  }
+
   public ClientException(int code, String message) {
     super(message);
     this.code = code;
@@ -15,12 +20,9 @@ public class ClientException extends GeneralException {
     this.code = code;
   }
 
+  @Override
   public int getCode() {
     return code;
-  }
-
-  public void setCode(int code) {
-    this.code = code;
   }
 
 }
