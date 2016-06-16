@@ -1,10 +1,20 @@
 package com.roundrobin.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Token {
+  @JsonProperty("access_token")
   private String accessToken;
+
+  @JsonProperty("refresg_token")
   private String refreshToken;
+
+  @JsonProperty("token_type")
   private String tokenType;
+
+  @JsonProperty("expires_in")
   private long expiresIn;
+
   private String scope;
 
   public String getAccessToken() {

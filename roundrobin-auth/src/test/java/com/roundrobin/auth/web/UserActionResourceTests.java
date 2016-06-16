@@ -18,11 +18,10 @@ import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.auth.api.UserActionTo;
 import com.roundrobin.auth.api.UserTo;
-import com.roundrobin.auth.common.AuthErrorCode;
+import com.roundrobin.auth.common.ErrorCode;
 import com.roundrobin.auth.domain.User;
 import com.roundrobin.auth.domain.UserAction;
 import com.roundrobin.auth.service.UserService;
-import com.roundrobin.common.ErrorCode;
 
 /**
  * Created by rengasu on 5/12/16.
@@ -34,10 +33,7 @@ public class UserActionResourceTests extends ResourceTests {
   // TODO Handle all other api failures like 404/400
   // TODO Complete pom file
   // TODO Add indexes to columns
-  // TODO Store token in db
   // TODO Handle 404 error
-  // TODO encrypt password
-  // TODO Change to jwt token
   // TODO Verify test cases
 
   @Autowired
@@ -107,8 +103,8 @@ public class UserActionResourceTests extends ResourceTests {
         .post(url + "user-action/create-user", userTo, new ParameterizedTypeReference<Response<String>>() {}, port)
         .getBody();
     assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(), hasItems(
-        new Error(AuthErrorCode.USER_ALREADY_EXIST, messages.getErrorMessage(AuthErrorCode.USER_ALREADY_EXIST))));
+    assertThat(created.getErrors(),
+        hasItems(new Error(ErrorCode.USER_ALREADY_EXIST, messages.getErrorMessage(ErrorCode.USER_ALREADY_EXIST))));
   }
 
   @Test
@@ -153,7 +149,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getErrors(), notNullValue());
     assertThat(verify.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_SECRET, messages.getErrorMessage(AuthErrorCode.INVALID_SECRET))));
+        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
   }
 
   @Test
@@ -177,7 +173,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getErrors(), notNullValue());
     assertThat(verify.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_USER_ID, messages.getErrorMessage(AuthErrorCode.INVALID_USER_ID))));
+        hasItems(new Error(ErrorCode.INVALID_USER_ID, messages.getErrorMessage(ErrorCode.INVALID_USER_ID))));
   }
 
   @Test
@@ -193,7 +189,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getErrors(), notNullValue());
     assertThat(verify.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_SECRET, messages.getErrorMessage(AuthErrorCode.INVALID_SECRET))));
+        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
   }
 
   @Test
@@ -209,7 +205,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getErrors(), notNullValue());
     assertThat(verify.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_SECRET, messages.getErrorMessage(AuthErrorCode.INVALID_SECRET))));
+        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
   }
 
   @Test
@@ -255,7 +251,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getErrors(), notNullValue());
     assertThat(verify.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_USERNAME, messages.getErrorMessage(AuthErrorCode.INVALID_USERNAME))));
+        hasItems(new Error(ErrorCode.INVALID_USERNAME, messages.getErrorMessage(ErrorCode.INVALID_USERNAME))));
   }
 
   @Test
@@ -277,7 +273,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(requestVerify.getEntity(), nullValue());
     assertThat(requestVerify.getErrors(), notNullValue());
     assertThat(requestVerify.getErrors(), hasItems(
-        new Error(AuthErrorCode.USER_ALREADY_VERIFIED, messages.getErrorMessage(AuthErrorCode.USER_ALREADY_VERIFIED))));
+        new Error(ErrorCode.USER_ALREADY_VERIFIED, messages.getErrorMessage(ErrorCode.USER_ALREADY_VERIFIED))));
   }
 
   @Test
@@ -323,7 +319,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(reset.getEntity(), nullValue());
     assertThat(reset.getErrors(), notNullValue());
     assertThat(reset.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_USERNAME, messages.getErrorMessage(AuthErrorCode.INVALID_USERNAME))));
+        hasItems(new Error(ErrorCode.INVALID_USERNAME, messages.getErrorMessage(ErrorCode.INVALID_USERNAME))));
   }
 
   @Test
@@ -385,7 +381,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(reset.getEntity(), nullValue());
     assertThat(reset.getErrors(), notNullValue());
     assertThat(reset.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_SECRET, messages.getErrorMessage(AuthErrorCode.INVALID_SECRET))));
+        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
   }
 
   @Test
@@ -406,7 +402,7 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(reset.getEntity(), nullValue());
     assertThat(reset.getErrors(), notNullValue());
     assertThat(reset.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_USER_ID, messages.getErrorMessage(AuthErrorCode.INVALID_USER_ID))));
+        hasItems(new Error(ErrorCode.INVALID_USER_ID, messages.getErrorMessage(ErrorCode.INVALID_USER_ID))));
   }
 
   @Test
@@ -435,6 +431,6 @@ public class UserActionResourceTests extends ResourceTests {
     assertThat(reset.getEntity(), nullValue());
     assertThat(reset.getErrors(), notNullValue());
     assertThat(reset.getErrors(),
-        hasItems(new Error(AuthErrorCode.INVALID_SECRET, messages.getErrorMessage(AuthErrorCode.INVALID_SECRET))));
+        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
   }
 }

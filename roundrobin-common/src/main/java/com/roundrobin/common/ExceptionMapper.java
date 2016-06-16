@@ -69,11 +69,11 @@ public class ExceptionMapper {
     return log(HttpStatus.INTERNAL_SERVER_ERROR, response, e);
   }
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<Response<String>> handleException(Exception e) {
+  @ExceptionHandler(Throwable.class)
+  public ResponseEntity<Response<String>> handleException(Throwable t) {
     Response<String> response =
         new Response<>(new Error(ErrorCode.INTERNAL_ERROR, messages.getErrorMessage(ErrorCode.INTERNAL_ERROR)));
-    return log(HttpStatus.INTERNAL_SERVER_ERROR, response, e);
+    return log(HttpStatus.INTERNAL_SERVER_ERROR, response, t);
   }
 
   @ExceptionHandler({HttpRequestMethodNotSupportedException.class, NoHandlerFoundException.class})
@@ -83,19 +83,21 @@ public class ExceptionMapper {
     return log(HttpStatus.NOT_FOUND, response, e);
   }
 
-  private ResponseEntity<Response<String>> log(HttpStatus status, Response<String> response, Exception e) {
+
+  private ResponseEntity<Response<String>> log(HttpStatus status, Response<String> response, Throwable t) {
     response.setUuid(UUID.randomUUID().toString());
     response.setTimestamp(System.currentTimeMillis());
-    if (e instanceof AbstractException) {
-      AbstractException ge = (AbstractException) e;
+    if (t instanceof AbstractException) {
+      AbstractException ge = (AbstractException) t;
       logger.error(
           append(Constants.ERROR_CODE, ge.getCode() + "") + "," + append(Constants.ERROR_MESSAGE, ge.getMessage()) + ","
               + append(Constants.ERROR_UUID, response.getUuid()) + ",Exception:" + ge,
           ge);
     } else {
-      logger.error("Exception:" + e, e);
+      logger.error("Exception:" + t, t);
     }
 
     return new ResponseEntity<>(response, status);
   }
+
 }

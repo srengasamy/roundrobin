@@ -11,6 +11,7 @@ import com.roundrobin.exception.ServerException;
 
 @Configuration
 @PropertySource("classpath:common.properties")
+@PropertySource(value = "classpath:messages.properties", ignoreResourceNotFound = true)
 public class ClientMessages {
   @Autowired
   Environment env;

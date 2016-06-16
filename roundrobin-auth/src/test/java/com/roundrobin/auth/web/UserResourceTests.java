@@ -1,8 +1,6 @@
 package com.roundrobin.auth.web;
 
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -28,11 +26,6 @@ public class UserResourceTests extends ResourceTests {
         new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
     assertThat(updated.getEntity(), notNullValue());
     assertThat(updated.getEntity(), is(true));
-    token = getToken(username);
-    Response<UserTo> read = helper.get(url + "admin/user", createBearerHeaders(token.getAccessToken()),
-        new ParameterizedTypeReference<Response<UserTo>>() {}, port).getBody();
-    assertThat(read.getEntity(), notNullValue());
-    assertThat(read.getEntity().getRoles(), hasItems("VENDOR"));
   }
 
   @Test
@@ -45,11 +38,6 @@ public class UserResourceTests extends ResourceTests {
         new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
     assertThat(updated.getEntity(), notNullValue());
     assertThat(updated.getEntity(), is(true));
-    token = getToken(username);
-    Response<UserTo> read = helper.get(url + "admin/user", createBearerHeaders(token.getAccessToken()),
-        new ParameterizedTypeReference<Response<UserTo>>() {}, port).getBody();
-    assertThat(read.getEntity(), notNullValue());
-    assertThat(read.getEntity().getRoles(), not(hasItems("VENDOR")));
   }
 
   @Test

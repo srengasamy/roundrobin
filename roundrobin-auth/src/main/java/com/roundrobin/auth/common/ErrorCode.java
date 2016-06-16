@@ -1,6 +1,6 @@
 package com.roundrobin.auth.common;
 
-public class AuthErrorCode {
+public class ErrorCode extends com.roundrobin.common.ErrorCode {
   public static final int INVALID_ROLE_ID = 40001;
   public static final int INVALID_ROLE_NAME = 40002;
   public static final int INVALID_SECRET = 40003;

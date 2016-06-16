@@ -11,6 +11,7 @@ public class AccessToken {
 
   @Indexed
   private String id;
+  @Indexed
   private String tokenId;
   private OAuth2AccessToken oAuth2AccessToken;
   private String authenticationId;
@@ -29,7 +30,7 @@ public class AccessToken {
     this.username = authentication.getName();
     this.clientId = authentication.getOAuth2Request().getClientId();
     this.authentication = authentication;
-    if(oAuth2AccessToken.getRefreshToken() != null){
+    if (oAuth2AccessToken.getRefreshToken() != null) {
       this.refreshToken = oAuth2AccessToken.getRefreshToken().getValue();
     }
   }

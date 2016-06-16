@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,12 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.roundrobin.auth.domain.User;
 import com.roundrobin.auth.repository.UserRepository;
-import com.roundrobin.helper.HttpHelper;
 
 /**
  * Created by rengasu on 5/24/16.
  */
 @SpringBootApplication
+@ComponentScan("com.roundrobin")
 public class RoundRobin {
 
   public static void main(String[] args) {
@@ -43,6 +44,5 @@ public class RoundRobin {
       }
     };
   }
-  @Autowired
-  protected HttpHelper helper;
+
 }

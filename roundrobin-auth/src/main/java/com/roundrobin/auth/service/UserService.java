@@ -11,16 +11,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import static com.roundrobin.common.Assert.isTrue;
 
 import com.roundrobin.auth.api.UserActionTo;
 import com.roundrobin.auth.api.UserTo;
-import com.roundrobin.auth.common.AuthErrorCode;
+import com.roundrobin.auth.common.ErrorCode;
 import com.roundrobin.auth.domain.User;
-import com.roundrobin.auth.domain.UserAction;
 import com.roundrobin.auth.domain.User.Role;
+import com.roundrobin.auth.domain.UserAction;
 import com.roundrobin.auth.domain.UserAction.UserActionType;
 import com.roundrobin.auth.repository.UserRepository;
-import com.roundrobin.common.Assert;
 
 @Service
 public class UserService {
@@ -32,13 +32,13 @@ public class UserService {
 
   public User get(String id) {
     Optional<User> userAction = userRepo.findById(id);
-    Assert.isTrue(userAction.isPresent(), AuthErrorCode.INVALID_USER_ID);
+    isTrue(userAction.isPresent(), ErrorCode.INVALID_USER_ID);
     return userAction.get();
   }
 
   public User getByUsername(String username) {
     Optional<User> userAction = userRepo.findByUsername(username);
-    Assert.isTrue(userAction.isPresent(), AuthErrorCode.INVALID_USERNAME);
+    isTrue(userAction.isPresent(), ErrorCode.INVALID_USERNAME);
     return userAction.get();
   }
 
@@ -48,7 +48,7 @@ public class UserService {
 
   public void create(UserTo userTo) {
     Optional<User> existing = userRepo.findByUsername(userTo.getUsername().get());
-    Assert.isTrue(!existing.isPresent(), AuthErrorCode.USER_ALREADY_EXIST);
+    isTrue(!existing.isPresent(), ErrorCode.USER_ALREADY_EXIST);
     User user = new User();
     user.setUsername(userTo.getUsername().get());
     user.setPassword(passwordEncoder.encode(userTo.getPassword().get()));
@@ -84,7 +84,7 @@ public class UserService {
 
   public void requestVerify(UserActionTo userActionTo) {
     User user = getByUsername(userActionTo.getEmail());
-    Assert.isTrue(!user.getVerified(), AuthErrorCode.USER_ALREADY_VERIFIED);
+    isTrue(!user.getVerified(), ErrorCode.USER_ALREADY_VERIFIED);
     user.getActions().add(createVerifyLink());
     save(user);
   }
@@ -100,8 +100,8 @@ public class UserService {
     boolean found =
         user.getActions().stream().anyMatch(a -> (a.getActive() && a.getAction() == UserActionType.VERIFY_USER
             && a.getSecret().equals(userActionTo.getSecret()) && a.getExpiry().isAfterNow()));
-    Assert.isTrue(found, AuthErrorCode.INVALID_SECRET);
-    Assert.isTrue(!user.getVerified(), AuthErrorCode.USER_ALREADY_VERIFIED);
+    isTrue(found, ErrorCode.INVALID_SECRET);
+    isTrue(!user.getVerified(), ErrorCode.USER_ALREADY_VERIFIED);
     user.setVerified(true);
     user.getActions().forEach(a -> {
       if (a.getAction() == UserActionType.VERIFY_USER && a.getSecret().equals(userActionTo.getSecret())) {
@@ -116,7 +116,7 @@ public class UserService {
     boolean found =
         user.getActions().stream().anyMatch(a -> (a.getActive() && a.getAction() == UserActionType.RESET_PASSWORD
             && a.getSecret().equals(userActionTo.getSecret()) && a.getExpiry().isAfterNow()));
-    Assert.isTrue(found, AuthErrorCode.INVALID_SECRET);
+    isTrue(found, ErrorCode.INVALID_SECRET);
     user.setPassword(passwordEncoder.encode(userActionTo.getPassword()));
     user.setVerified(true);
     user.getActions().forEach(a -> {

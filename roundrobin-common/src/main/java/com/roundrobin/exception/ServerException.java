@@ -14,13 +14,13 @@ public class ServerException extends AbstractException {
     this.code = code;
   }
 
-  public ServerException(int code, String message, Throwable t) {
+  public ServerException(Integer code, String message, Throwable t) {
     super(message, t);
     this.code = code;
   }
 
   @Override
   public int getCode() {
-    return code.intValue();
+    return code;
   }
 }

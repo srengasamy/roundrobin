@@ -15,14 +15,14 @@ public class ClientException extends AbstractException {
     this.code = code;
   }
 
-  public ClientException(int code, String message, Throwable t) {
+  public ClientException(Integer code, String message, Throwable t) {
     super(message, t);
     this.code = code;
   }
 
   @Override
   public int getCode() {
-    return code.intValue();
+    return code;
   }
 
 }

@@ -10,7 +10,7 @@
 
 	<appender name="FILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>./logs/application.log</file>
+		<file>./logs/roundrobin.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>./logs/roundrobin_%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
@@ -28,7 +28,7 @@
 		</encoder>
 	</appender>
 
-	<root level="INFO">
+	<root level="DEBUG">
 		<appender-ref ref="consoleAppender" />
 		<appender-ref ref="FILE" />
 	</root>
