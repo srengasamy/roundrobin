@@ -9,7 +9,7 @@ import com.roundrobin.helper.HttpHelper;
 @Component
 @Scope("singleton")
 public class TestHttpHelper extends HttpHelper {
-
+ 
   public TestHttpHelper() {
     super(new TestRestTemplate());
   }

@@ -1,5 +1,7 @@
 package com.roundrobin.web;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,13 +11,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
-import com.roundrobin.api.SkillDetailTo;
 import com.roundrobin.api.SkillGroupTo;
 import com.roundrobin.groups.CreateSkillGroupValidator;
 import com.roundrobin.groups.UpdateSkillGroupValidator;
 import com.roundrobin.services.SkillGroupService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "skill-group", produces = {"application/json"})

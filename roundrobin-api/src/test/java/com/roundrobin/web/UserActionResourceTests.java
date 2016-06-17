@@ -1,5 +1,15 @@
 package com.roundrobin.web;
 
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+
 import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.api.UserActionTo;
@@ -8,16 +18,6 @@ import com.roundrobin.common.ErrorCode;
 import com.roundrobin.domain.UserAction;
 import com.roundrobin.domain.UserProfile;
 import com.roundrobin.services.UserProfileService;
-
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * Created by rengasu on 5/23/16.

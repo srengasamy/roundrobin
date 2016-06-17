@@ -1,7 +1,5 @@
 package com.roundrobin.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
