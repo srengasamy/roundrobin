@@ -28,13 +28,10 @@ import com.roundrobin.auth.service.UserService;
  */
 public class UserActionResourceTests extends ResourceTests {
   // TODO Include all test cases
-  // TODO Generate UUID
   // TODO Messages for all error code
   // TODO Handle all other api failures like 404/400
   // TODO Complete pom file
   // TODO Add indexes to columns
-  // TODO Handle 404 error
-  // TODO Verify test cases
 
   @Autowired
   private UserService userService;
