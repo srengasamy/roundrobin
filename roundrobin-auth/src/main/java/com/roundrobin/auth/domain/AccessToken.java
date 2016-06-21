@@ -2,8 +2,8 @@ package com.roundrobin.auth.domain;
 
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.common.DefaultExpiringOAuth2RefreshToken;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 
 
 @Document(collection = "access_token")
@@ -13,27 +13,12 @@ public class AccessToken {
   private String id;
   @Indexed
   private String tokenId;
-  private OAuth2AccessToken oAuth2AccessToken;
+  private DefaultOAuth2AccessToken accessToken;
+  private DefaultExpiringOAuth2RefreshToken refreshToken;
   private String authenticationId;
   private String username;
   private String clientId;
-  private OAuth2Authentication authentication;
-  private String refreshToken;
-
-  public AccessToken() {}
-
-  public AccessToken(final OAuth2AccessToken oAuth2AccessToken, final OAuth2Authentication authentication,
-      final String authenticationId) {
-    this.tokenId = oAuth2AccessToken.getValue();
-    this.oAuth2AccessToken = oAuth2AccessToken;
-    this.authenticationId = authenticationId;
-    this.username = authentication.getName();
-    this.clientId = authentication.getOAuth2Request().getClientId();
-    this.authentication = authentication;
-    if (oAuth2AccessToken.getRefreshToken() != null) {
-      this.refreshToken = oAuth2AccessToken.getRefreshToken().getValue();
-    }
-  }
+  private String authentication;
 
   public String getId() {
     return id;
@@ -47,27 +32,56 @@ public class AccessToken {
     return tokenId;
   }
 
-  public OAuth2AccessToken getoAuth2AccessToken() {
-    return oAuth2AccessToken;
+  public void setTokenId(String tokenId) {
+    this.tokenId = tokenId;
+  }
+
+  public DefaultOAuth2AccessToken getAccessToken() {
+    return accessToken;
+  }
+
+  public void setAccessToken(DefaultOAuth2AccessToken accessToken) {
+    this.accessToken = accessToken;
+  }
+
+  public DefaultExpiringOAuth2RefreshToken getRefreshToken() {
+    return refreshToken;
+  }
+
+  public void setRefreshToken(DefaultExpiringOAuth2RefreshToken refreshToken) {
+    this.refreshToken = refreshToken;
   }
 
   public String getAuthenticationId() {
     return authenticationId;
   }
 
+  public void setAuthenticationId(String authenticationId) {
+    this.authenticationId = authenticationId;
+  }
+
   public String getUsername() {
     return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public String getClientId() {
     return clientId;
   }
 
-  public OAuth2Authentication getAuthentication() {
+  public void setClientId(String clientId) {
+    this.clientId = clientId;
+  }
+
+  public String getAuthentication() {
     return authentication;
   }
 
-  public String getRefreshToken() {
-    return refreshToken;
+  public void setAuthentication(String authentication) {
+    this.authentication = authentication;
   }
+
 }

@@ -2,8 +2,7 @@ package com.roundrobin.auth.domain;
 
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.oauth2.common.OAuth2RefreshToken;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.common.DefaultExpiringOAuth2RefreshToken;
 
 
 @Document(collection = "refresh_token")
@@ -11,15 +10,8 @@ public class RefreshToken {
 
   @Indexed
   private String id;
-  private final String tokenId;
-  private final OAuth2RefreshToken oAuth2RefreshToken;
-  private final OAuth2Authentication authentication;
-
-  public RefreshToken(OAuth2RefreshToken oAuth2RefreshToken, OAuth2Authentication authentication) {
-    this.oAuth2RefreshToken = oAuth2RefreshToken;
-    this.authentication = authentication;
-    this.tokenId = oAuth2RefreshToken.getValue();
-  }
+  private String tokenId;
+  private DefaultExpiringOAuth2RefreshToken refreshToken;
 
   public String getId() {
     return id;
@@ -33,11 +25,16 @@ public class RefreshToken {
     return tokenId;
   }
 
-  public OAuth2RefreshToken getoAuth2RefreshToken() {
-    return oAuth2RefreshToken;
+  public void setTokenId(String tokenId) {
+    this.tokenId = tokenId;
   }
 
-  public OAuth2Authentication getAuthentication() {
-    return authentication;
+  public DefaultExpiringOAuth2RefreshToken getRefreshToken() {
+    return refreshToken;
   }
+
+  public void setRefreshToken(DefaultExpiringOAuth2RefreshToken refreshToken) {
+    this.refreshToken = refreshToken;
+  }
+
 }
