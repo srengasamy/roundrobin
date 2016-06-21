@@ -18,11 +18,12 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 
 import com.roundrobin.auth.config.CustomTokenEnhancer;
+import com.roundrobin.auth.config.MongoTokenConverter;
+import com.roundrobin.auth.config.MongoTokenStore;
 import com.roundrobin.auth.service.ClientDetailService;
-import com.roundrobin.auth.service.TokenStoreService;
 
 @Configuration
 @EnableAuthorizationServer
@@ -34,17 +35,22 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
   private ClientDetailService clientService;
 
   @Autowired
-  private TokenStoreService tokenStore;
-
-  @Autowired
   private CustomTokenEnhancer tokenEnhancer;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
 
+  @Autowired
+  private MongoTokenConverter tokenConverter;
+
+  @Autowired
+  private MongoTokenStore tokenStore;
+
   @Override
   public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-    endpoints.tokenServices(tokenServices()).authenticationManager(authenticationManager);
+    TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer, tokenConverter));
+    endpoints.tokenStore(tokenStore).tokenEnhancer(tokenEnhancerChain).authenticationManager(authenticationManager);
   }
 
   @Override
@@ -55,15 +61,6 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
   @Override
   public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
     security.passwordEncoder(passwordEncoder);
-  }
-
-  @Bean
-  public DefaultTokenServices tokenServices() {
-    DefaultTokenServices tokenServices = new DefaultTokenServices();
-    tokenServices.setTokenEnhancer(tokenEnhancer);
-    tokenServices.setTokenStore(tokenStore);
-    tokenServices.setSupportRefreshToken(true);
-    return tokenServices;
   }
 
   @Bean

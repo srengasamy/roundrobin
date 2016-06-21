@@ -14,6 +14,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 @Configuration
 public class RegisterBeans {
+
   @Bean(name = "jasyptStringEncryptor")
   public StringEncryptor stringEncryptor() {
     PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
