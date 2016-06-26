@@ -1,17 +1,15 @@
 package com.roundrobin.auth.service;
 
-import java.util.List;
+import static com.roundrobin.common.Assert.isTrue;
+
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import static com.roundrobin.common.Assert.isTrue;
 
 import com.roundrobin.auth.api.UserActionTo;
 import com.roundrobin.auth.api.UserTo;
@@ -31,19 +29,23 @@ public class UserService {
   private PasswordEncoder passwordEncoder;
 
   public User get(String id) {
-    Optional<User> userAction = userRepo.findById(id);
-    isTrue(userAction.isPresent(), ErrorCode.INVALID_USER_ID);
-    return userAction.get();
+    Optional<User> user = userRepo.findById(id);
+    isTrue(user.isPresent(), ErrorCode.INVALID_USER_ID);
+    return user.get();
   }
 
   public User getByUsername(String username) {
-    Optional<User> userAction = userRepo.findByUsername(username);
-    isTrue(userAction.isPresent(), ErrorCode.INVALID_USERNAME);
-    return userAction.get();
+    Optional<User> user = userRepo.findByUsername(username);
+    isTrue(user.isPresent(), ErrorCode.INVALID_USERNAME);
+    return user.get();
   }
 
   public User save(User user) {
     return userRepo.save(user);
+  }
+
+  public UserTo readByUsername(String username) {
+    return convert(getByUsername(username));
   }
 
   public void create(UserTo userTo) {
@@ -64,7 +66,7 @@ public class UserService {
   }
 
   public void update(UserTo userTo) {
-    User user = get(userTo.getUserId());
+    User user = getByUsername(userTo.getUsername().get());
     user.setVendor(userTo.getVendor().orElse(user.getVendor()));
     if (user.getVendor()) {
       if (!user.getRoles().stream().collect(Collectors.toList()).contains(Role.VENDOR)) {
@@ -76,8 +78,8 @@ public class UserService {
     save(user);
   }
 
-  public void delete(String userId) {
-    User user = get(userId);
+  public void delete(String username) {
+    User user = getByUsername(username);
     user.setActive(false);
     save(user);
   }
@@ -147,7 +149,13 @@ public class UserService {
     return userAction;
   }
 
-  public List<GrantedAuthority> getRights(User user) {
-    return user.getRoles().stream().map(s -> new SimpleGrantedAuthority(s.toString())).collect(Collectors.toList());
+  private UserTo convert(User user) {
+    UserTo userTo = new UserTo();
+    userTo.setUserId(user.getId());
+    userTo.setUsername(Optional.of(user.getUsername()));
+    userTo.setRoles(user.getRoles().stream().map(r -> r.toString()).collect(Collectors.toList()));
+    userTo.setVerified(user.getVerified());
+    userTo.setVendor(Optional.of(user.getVendor()));
+    return userTo;
   }
 }

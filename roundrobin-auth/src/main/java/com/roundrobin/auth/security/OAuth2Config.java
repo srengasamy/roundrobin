@@ -35,10 +35,10 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
   private ClientDetailService clientService;
 
   @Autowired
-  private CustomTokenEnhancer tokenEnhancer;
+  private PasswordEncoder passwordEncoder;
 
   @Autowired
-  private PasswordEncoder passwordEncoder;
+  private CustomTokenEnhancer tokenEnhancer;
 
   @Autowired
   private MongoTokenConverter tokenConverter;
@@ -60,6 +60,7 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 
   @Override
   public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    security.checkTokenAccess("isAuthenticated()");
     security.passwordEncoder(passwordEncoder);
   }
 

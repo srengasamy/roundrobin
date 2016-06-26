@@ -1,21 +1,19 @@
 package com.roundrobin.auth.domain;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import com.mongodb.DBObject;
 
 @Document(collection = "user")
-public class User extends Generic implements UserDetails {
-  private static final long serialVersionUID = 1L;
+public class User {
+  @Id
+  @Indexed
+  private String id;
   @Indexed
   private String username;
   private String password;
@@ -24,29 +22,10 @@ public class User extends Generic implements UserDetails {
 
   private List<Role> roles = new ArrayList<>();
   private List<UserAction> actions = new ArrayList<>();
+  @CreatedDate
+  private Date created;
 
-  public User() {
-
-  }
-
-  @SuppressWarnings("unchecked")
-  public User(DBObject dbObject) {
-    this.id = dbObject.get("_id").toString();
-    this.username = (String) dbObject.get("username");
-    this.password = (String) dbObject.get("password");
-    this.vendor = (Boolean) dbObject.get("vendor");
-    this.verified = (Boolean) dbObject.get("verified");
-    this.roles = ((List<String>) dbObject.get("roles")).stream().map(r -> Role.valueOf(r)).collect(Collectors.toList());
-  }
-
-  public User(User user) {
-    this.id = user.getId();
-    this.username = user.getUsername();
-    this.password = user.getPassword();
-    this.active = user.getActive();
-    this.verified = user.getVerified();
-    this.roles = user.getRoles();
-  }
+  private Boolean active;
 
   public String getUsername() {
     return username;
@@ -96,34 +75,31 @@ public class User extends Generic implements UserDetails {
     this.actions = actions;
   }
 
-  public static enum Role {
-    USER, VENDOR, CLIENT, ADMIN;
+  public String getId() {
+    return id;
   }
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return roles.stream().map(s -> new SimpleGrantedAuthority(s.toString())).collect(Collectors.toList());
+  public void setId(String id) {
+    this.id = id;
   }
 
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
+  public Date getCreated() {
+    return created;
   }
 
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
+  public void setCreated(Date created) {
+    this.created = created;
   }
 
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isEnabled() {
+  public Boolean getActive() {
     return active;
   }
 
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
 
+  public static enum Role {
+    USER, VENDOR, CLIENT, ADMIN;
+  }
 }

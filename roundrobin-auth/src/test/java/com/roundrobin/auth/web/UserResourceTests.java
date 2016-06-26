@@ -22,8 +22,8 @@ public class UserResourceTests extends ResourceTests {
     Token token = getToken(username);
     UserTo userTo = new UserTo();
     userTo.setVendor(Optional.of(true));
-    Response<Boolean> updated = helper.put(url + "admin/user", createBearerHeaders(token.getAccessToken()), userTo,
-        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    Response<Boolean> updated = helper.put(authUrl + "admin/user", createBearerHeaders(token.getAccessToken()), userTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(updated.getEntity(), notNullValue());
     assertThat(updated.getEntity(), is(true));
   }
@@ -34,8 +34,8 @@ public class UserResourceTests extends ResourceTests {
     Token token = getToken(username);
     UserTo userTo = new UserTo();
     userTo.setVendor(Optional.of(false));
-    Response<Boolean> updated = helper.put(url + "admin/user", createBearerHeaders(token.getAccessToken()), userTo,
-        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    Response<Boolean> updated = helper.put(authUrl + "admin/user", createBearerHeaders(token.getAccessToken()), userTo,
+        new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(updated.getEntity(), notNullValue());
     assertThat(updated.getEntity(), is(true));
   }
@@ -45,7 +45,7 @@ public class UserResourceTests extends ResourceTests {
     UserTo userTo = new UserTo();
     userTo.setVendor(Optional.of(true));
     UnauthorizedError updated =
-        helper.put(url + "admin/user", userTo, new ParameterizedTypeReference<UnauthorizedError>() {}, port).getBody();
+        helper.put(authUrl + "admin/user", userTo, new ParameterizedTypeReference<UnauthorizedError>() {}).getBody();
     assertThat(updated.getError(), is("unauthorized"));
   }
 
@@ -53,8 +53,8 @@ public class UserResourceTests extends ResourceTests {
   public void testUpdateWithInvalidToken() {
     UserTo userTo = new UserTo();
     userTo.setVendor(Optional.of(true));
-    UnauthorizedError updated = helper.put(url + "admin/user", createBearerHeaders("testing"), userTo,
-        new ParameterizedTypeReference<UnauthorizedError>() {}, port).getBody();
+    UnauthorizedError updated = helper.put(authUrl + "admin/user", createBearerHeaders("testing"), userTo,
+        new ParameterizedTypeReference<UnauthorizedError>() {}).getBody();
     assertThat(updated.getError(), is("invalid_token"));
   }
 
@@ -62,8 +62,8 @@ public class UserResourceTests extends ResourceTests {
   public void testDelete() {
     String username = createUser();
     Token token = getToken(username);
-    Response<Boolean> read = helper.delete(url + "admin/user", createBearerHeaders(token.getAccessToken()),
-        new ParameterizedTypeReference<Response<Boolean>>() {}, port).getBody();
+    Response<Boolean> read = helper.delete(authUrl + "admin/user", createBearerHeaders(token.getAccessToken()),
+        new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity(), is(true));
     token = getToken(username);
@@ -73,14 +73,14 @@ public class UserResourceTests extends ResourceTests {
   @Test
   public void testDeleteWithEmptyToken() {
     UnauthorizedError read =
-        helper.delete(url + "admin/user", new ParameterizedTypeReference<UnauthorizedError>() {}, port).getBody();
+        helper.delete(authUrl + "admin/user", new ParameterizedTypeReference<UnauthorizedError>() {}).getBody();
     assertThat(read.getError(), is("unauthorized"));
   }
 
   @Test
   public void testDeleteWithInvalidToken() {
-    UnauthorizedError read = helper.delete(url + "admin/user", createBearerHeaders("testing"),
-        new ParameterizedTypeReference<UnauthorizedError>() {}, port).getBody();
+    UnauthorizedError read = helper.delete(authUrl + "admin/user", createBearerHeaders("testing"),
+        new ParameterizedTypeReference<UnauthorizedError>() {}).getBody();
     assertThat(read.getError(), is("invalid_token"));
   }
 }

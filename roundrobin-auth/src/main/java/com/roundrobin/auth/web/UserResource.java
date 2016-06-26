@@ -1,6 +1,6 @@
 package com.roundrobin.auth.web;
 
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
 import com.roundrobin.auth.api.UserTo;
-import com.roundrobin.auth.domain.User;
 import com.roundrobin.auth.groups.UpdateUserValidator;
 import com.roundrobin.auth.service.UserService;
 
@@ -24,26 +23,23 @@ public class UserResource {
 
   @RequestMapping(value = "user", method = RequestMethod.GET)
   public Response<UserTo> user(Authentication authentication) {
-    User user = (User) authentication.getPrincipal();
-    UserTo userTo = new UserTo();
-    userTo.setRoles(user.getRoles().stream().map(r -> r.toString()).collect(Collectors.toList()));
-    userTo.setUserId(user.getId());
-    return new Response<>(userTo);
+    String username = (String) authentication.getPrincipal();
+    return new Response<>(service.readByUsername(username));
   }
 
   @RequestMapping(value = "user", consumes = {"application/json"}, method = RequestMethod.PUT)
   public Response<Boolean> update(@RequestBody @Validated(UpdateUserValidator.class) UserTo userTo,
       Authentication authentication) {
-    User user = (User) authentication.getPrincipal();
-    userTo.setUserId(user.getId());
+    String username = (String) authentication.getPrincipal();
+    userTo.setUsername(Optional.of(username));
     service.update(userTo);
     return new Response<>(true);
   }
 
   @RequestMapping(value = "user", method = RequestMethod.DELETE)
   public Response<Boolean> delete(Authentication authentication) {
-    User user = (User) authentication.getPrincipal();
-    service.delete(user.getId());
+    String username = (String) authentication.getPrincipal();
+    service.delete(username);
     return new Response<>(true);
   }
 

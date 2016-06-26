@@ -14,16 +14,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
-import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
-import com.roundrobin.auth.config.CustomTokenEnhancer;
 import com.roundrobin.auth.config.MongoTokenConverter;
 import com.roundrobin.auth.config.MongoTokenStore;
 import com.roundrobin.auth.domain.User;
+import com.roundrobin.auth.domain.UserDetail;
 import com.roundrobin.auth.repository.AccessTokenRepository;
 import com.roundrobin.auth.repository.RefreshTokenRepository;
 import com.roundrobin.auth.repository.UserRepository;
@@ -36,9 +33,6 @@ import com.roundrobin.auth.repository.UserRepository;
 public class RoundRobin {
   @Value(value = "${keystore.password}")
   private String keystorePassword;
-
-  @Autowired
-  private CustomTokenEnhancer tokenEnhancer;
 
   @Autowired
   private AccessTokenRepository accessTokenRepo;
@@ -65,18 +59,11 @@ public class RoundRobin {
       public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
-          return new User(user.get());
+          return new UserDetail(user.get());
         }
         throw new UsernameNotFoundException("User not found");
       }
     };
-  }
-
-  @Bean
-  public UserAuthenticationConverter userAuthenticationConverter() {
-    DefaultUserAuthenticationConverter defaultUserAuthenticationConverter = new DefaultUserAuthenticationConverter();
-    defaultUserAuthenticationConverter.setUserDetailsService(userDetailsService());
-    return defaultUserAuthenticationConverter;
   }
 
   @Bean
@@ -85,8 +72,6 @@ public class RoundRobin {
         new KeyStoreKeyFactory(new ClassPathResource("roundrobin-auth.jks"), keystorePassword.toCharArray());
     MongoTokenConverter converter = new MongoTokenConverter();
     converter.setKeyPair(keyStoreKeyFactory.getKeyPair("roundrobin-auth"));
-    ((DefaultAccessTokenConverter) converter.getAccessTokenConverter())
-        .setUserTokenConverter(userAuthenticationConverter());
     return converter;
   }
 
@@ -98,7 +83,6 @@ public class RoundRobin {
   @Bean
   public DefaultTokenServices tokenServices() {
     DefaultTokenServices tokenServices = new DefaultTokenServices();
-    tokenServices.setTokenEnhancer(tokenEnhancer);
     tokenServices.setTokenStore(tokenStore());
     tokenServices.setSupportRefreshToken(true);
     return tokenServices;

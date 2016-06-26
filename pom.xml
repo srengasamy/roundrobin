@@ -28,6 +28,6 @@
 	<modules>
 		<module>roundrobin-common</module>
 		<module>roundrobin-auth</module>
-		<module>roundrobin-api</module>
+		<module>roundrobin-vault</module>
 	</modules>
 </project>
