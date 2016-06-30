@@ -1,5 +1,9 @@
 package com.roundrobin.web;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import java.util.Optional;
 
 import org.joda.time.LocalDate;
@@ -26,16 +30,21 @@ import com.roundrobin.vault.domain.UserProfile;
 public class ResourceTests extends AbstractResourceTests {
 
   protected Response<SkillGroupTo> createSkillGroup(SkillGroupTo skillGroupTo) {
-    return helper
-        .post(vaultUrl + "skill-group", skillGroupTo, new ParameterizedTypeReference<Response<SkillGroupTo>>() {})
-        .getBody();
+    Response<SkillGroupTo> response = helper.post(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
+        new ParameterizedTypeReference<Response<SkillGroupTo>>() {}).getBody();
+    assertThat(response.getEntity(), notNullValue());
+    assertThat(response.getErrors().size(), is(0));
+    return response;
   }
 
-  protected Response<UserProfileTo> createUserProfile() {
-    return createUserProfile("testing@testing.com");
+  protected String createUserProfile() {
+    String email = "testing" + System.currentTimeMillis() + "@testing.com";
+    createUser(email);
+    createUserProfile(email);
+    return email;
   }
 
-  protected Response<UserProfileTo> createUserProfile(String email) {
+  private void createUserProfile(String email) {
     UserProfileTo userProfileTo = new UserProfileTo();
     userProfileTo.setFirstName(Optional.of("Suresh"));
     userProfileTo.setLastName(Optional.of("Rengasamy"));
@@ -46,8 +55,11 @@ public class ResourceTests extends AbstractResourceTests {
     userProfileTo.setPassword(Optional.of("testing"));
     userProfileTo.setDob(Optional.of(LocalDate.now()));
     userProfileTo.setSex(Optional.of(UserProfile.SexType.MALE));
-    return helper.post(vaultUrl + "user-profile", createBearerHeaders(getToken(email).getAccessToken()), userProfileTo,
-        new ParameterizedTypeReference<Response<UserProfileTo>>() {}).getBody();
+    Response<UserProfileTo> response =
+        helper.post(vaultUrl + "user-profile", createBearerHeaders(getAccessToken(email)), userProfileTo,
+            new ParameterizedTypeReference<Response<UserProfileTo>>() {}).getBody();
+    assertThat(response.getEntity(), notNullValue());
+    assertThat(response.getErrors().size(), is(0));
   }
 
   protected SkillGroupTo createSkillGroup() {
@@ -55,6 +67,8 @@ public class ResourceTests extends AbstractResourceTests {
     SkillGroupTo skillGroupTo = new SkillGroupTo();
     skillGroupTo.setGroupName(Optional.of(groupName));
     Response<SkillGroupTo> created = createSkillGroup(skillGroupTo);
+    assertThat(created.getEntity(), notNullValue());
+    assertThat(created.getErrors().size(), is(0));
     return created.getEntity();
   }
 
@@ -65,9 +79,8 @@ public class ResourceTests extends AbstractResourceTests {
     skillDetailTo.setDeliveryType(Optional.of(Skill.DeliveryType.HOME));
     skillDetailTo.setName(Optional.of(skillName));
     skillDetailTo.setSkillGroupId(skillGroupTo.getId());
-    Response<SkillDetailTo> createdSkill = helper
-        .post(vaultUrl + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {})
-        .getBody();
+    Response<SkillDetailTo> createdSkill = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     return createdSkill.getEntity();
   }
 }

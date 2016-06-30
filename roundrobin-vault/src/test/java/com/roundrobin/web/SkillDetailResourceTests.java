@@ -37,9 +37,8 @@ public class SkillDetailResourceTests extends ResourceTests {
     skillDetailTo.setDeliveryType(Optional.of(Skill.DeliveryType.HOME));
     skillDetailTo.setName(Optional.of(skillName));
     skillDetailTo.setSkillGroupId(createdGroup.getEntity().getId());
-    Response<SkillDetailTo> createdSkill = helper
-        .post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> createdSkill = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(createdSkill.getEntity(), notNullValue());
     assertThat(createdSkill.getEntity().getName().get(), is(skillName));
     assertThat(createdSkill.getEntity().getId(), notNullValue());
@@ -49,9 +48,8 @@ public class SkillDetailResourceTests extends ResourceTests {
   @Test
   public void testCreateWithNullValues() {
     SkillDetailTo skillDetailTo = new SkillDetailTo();
-    Response<String> created =
-        helper.post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<String>>() {}, port)
-            .getBody();
+    Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(),
         hasItems(new Error(ErrorCode.INVALID_FIELD, "name: may not be empty"),
@@ -63,9 +61,8 @@ public class SkillDetailResourceTests extends ResourceTests {
   public void testCreateWithInvalidDeliveryType() {
     Map<String, String> skillDetailTo = new HashMap<>();
     skillDetailTo.put("deliveryType", "a");
-    Response<String> created =
-        helper.post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<String>>() {}, port)
-            .getBody();
+    Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(),
         hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
@@ -76,9 +73,8 @@ public class SkillDetailResourceTests extends ResourceTests {
     SkillDetailTo skillDetailTo = new SkillDetailTo();
     skillDetailTo.setSkillGroupId(" ");
     skillDetailTo.setName(Optional.of(" "));
-    Response<String> created =
-        helper.post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<String>>() {}, port)
-            .getBody();
+    Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(),
         hasItems(new Error(ErrorCode.INVALID_FIELD, "name: may not be empty"),
@@ -90,9 +86,8 @@ public class SkillDetailResourceTests extends ResourceTests {
   public void testCreateWithInvalidValues() {
     SkillDetailTo skillDetailTo = new SkillDetailTo();
     skillDetailTo.setName(Optional.of(":"));
-    Response<String> created =
-        helper.post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<String>>() {}, port)
-            .getBody();
+    Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(),
         hasItems(new Error(ErrorCode.INVALID_FIELD, "name: must match \"^[A-Za-z0-9]*$\""),
@@ -105,9 +100,8 @@ public class SkillDetailResourceTests extends ResourceTests {
     SkillDetailTo skillDetailTo = new SkillDetailTo();
     skillDetailTo
         .setName(Optional.of("sadasldasldhajshdkasjhdkashdjkashdkjashkjdhasjkdhkjashdkjashdkjashkjdhaskdhakjsdhkjas"));
-    Response<String> created =
-        helper.post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<String>>() {}, port)
-            .getBody();
+    Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(),
         hasItems(new Error(ErrorCode.INVALID_FIELD, "name: length must be between 0 and 25"),
@@ -121,9 +115,8 @@ public class SkillDetailResourceTests extends ResourceTests {
     skillDetailTo.setName(Optional.of("testing"));
     skillDetailTo.setDeliveryType(Optional.of(Skill.DeliveryType.HOME));
     skillDetailTo.setSkillGroupId("testing");
-    Response<String> created =
-        helper.post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<String>>() {}, port)
-            .getBody();
+    Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(), hasItems(
         new Error(ErrorCode.INVALID_SKILL_GROUP_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_GROUP_ID))));
@@ -140,16 +133,18 @@ public class SkillDetailResourceTests extends ResourceTests {
     skillDetailTo.setDeliveryType(Optional.of(Skill.DeliveryType.HOME));
     skillDetailTo.setName(Optional.of(skillName));
     skillDetailTo.setSkillGroupId(createdGroup.getEntity().getId());
-    Response<SkillDetailTo> createdSkill = helper
-        .post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> createdSkill = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(createdSkill.getEntity(), notNullValue());
     createdSkill.getEntity().setName(Optional.of("newname"));
-    Response<SkillDetailTo> updatedSkill = helper.put(url + "skill-detail", createdSkill.getEntity(),
-        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port).getBody();
+    Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(),
+        createdSkill.getEntity(), new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), notNullValue());
-    Response<SkillDetailTo> read = helper.get(url + "skill-detail/{skillDetailId}",
-        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port, updatedSkill.getEntity().getId()).getBody();
+    Response<SkillDetailTo> read =
+        helper
+            .get(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
+                new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, updatedSkill.getEntity().getId())
+            .getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity().getName().get(), is("newname"));
   }
@@ -157,9 +152,8 @@ public class SkillDetailResourceTests extends ResourceTests {
   @Test
   public void testUpdateWithEmptySkillId() {
     SkillDetailTo skillDetailTo = new SkillDetailTo();
-    Response<SkillDetailTo> updatedSkill = helper
-        .put(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), nullValue());
     assertThat(updatedSkill.getErrors(), notNullValue());
     assertThat(updatedSkill.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "id: may not be empty")));
@@ -169,9 +163,8 @@ public class SkillDetailResourceTests extends ResourceTests {
   public void testUpdateWithInvalidSkillId() {
     SkillDetailTo skillDetailTo = new SkillDetailTo();
     skillDetailTo.setId("testing");
-    Response<SkillDetailTo> updatedSkill = helper
-        .put(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), nullValue());
     assertThat(updatedSkill.getErrors(), notNullValue());
     assertThat(updatedSkill.getErrors(), hasItems(
@@ -182,9 +175,8 @@ public class SkillDetailResourceTests extends ResourceTests {
   public void testUpdateWithInvalidName() {
     SkillDetailTo skillDetailTo = new SkillDetailTo();
     skillDetailTo.setName(Optional.of(";."));
-    Response<SkillDetailTo> updatedSkill = helper
-        .put(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), nullValue());
     assertThat(updatedSkill.getErrors(), notNullValue());
     assertThat(updatedSkill.getErrors(),
@@ -195,9 +187,8 @@ public class SkillDetailResourceTests extends ResourceTests {
   public void testUpdateWithInvalidNameLength() {
     SkillDetailTo skillDetailTo = new SkillDetailTo();
     skillDetailTo.setName(Optional.of("asdasdjaskhdkasajsdhajkshdjkashdjkashdjkhasjkdhkajshdkjashdkjash"));
-    Response<SkillDetailTo> updatedSkill = helper
-        .put(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), nullValue());
     assertThat(updatedSkill.getErrors(), notNullValue());
     assertThat(updatedSkill.getErrors(),
@@ -208,9 +199,8 @@ public class SkillDetailResourceTests extends ResourceTests {
   public void testUpdateWithInvalidDeliveryType() {
     Map<String, String> skillDetailTo = new HashMap<>();
     skillDetailTo.put("deliveryType", "a");
-    Response<String> created =
-        helper.put(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<String>>() {}, port)
-            .getBody();
+    Response<String> created = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(),
         hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
@@ -227,12 +217,14 @@ public class SkillDetailResourceTests extends ResourceTests {
     skillDetailTo.setDeliveryType(Optional.of(Skill.DeliveryType.HOME));
     skillDetailTo.setName(Optional.of(skillName));
     skillDetailTo.setSkillGroupId(createdGroup.getEntity().getId());
-    Response<SkillDetailTo> createdSkill = helper
-        .post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> createdSkill = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(createdSkill.getEntity(), notNullValue());
-    Response<SkillDetailTo> read = helper.get(url + "skill-detail/{skillDetailId}",
-        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port, createdSkill.getEntity().getId()).getBody();
+    Response<SkillDetailTo> read =
+        helper
+            .get(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
+                new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, createdSkill.getEntity().getId())
+            .getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity().getName().get(), is(skillName));
     assertThat(read.getEntity().getDeliveryType().get(), is(Skill.DeliveryType.HOME));
@@ -240,16 +232,16 @@ public class SkillDetailResourceTests extends ResourceTests {
 
   @Test
   public void testReadEmptyId() {
-    Response<List<SkillDetailTo>> read = helper.get(url + "skill-detail/{skillDetailId}",
-        new ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {}, port, " ").getBody();
+    Response<List<SkillDetailTo>> read = helper.get(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {}, " ").getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity().size(), not(is(0)));
   }
 
   @Test
   public void testReadEmptyWithInvalidId() {
-    Response<SkillDetailTo> read = helper.get(url + "skill-detail/{skillDetailId}",
-        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port, "testing").getBody();
+    Response<SkillDetailTo> read = helper.get(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
     assertThat(read.getErrors(), hasItems(
         new Error(ErrorCode.INVALID_SKILL_DETAIL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
@@ -266,16 +258,15 @@ public class SkillDetailResourceTests extends ResourceTests {
     skillDetailTo.setDeliveryType(Optional.of(Skill.DeliveryType.HOME));
     skillDetailTo.setName(Optional.of(skillName));
     skillDetailTo.setSkillGroupId(createdGroup.getEntity().getId());
-    Response<SkillDetailTo> createdSkill = helper
-        .post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> createdSkill = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(createdSkill.getEntity(), notNullValue());
-    Response<Boolean> deleted = helper.delete(url + "skill-detail/{skillDetailId}",
-        new ParameterizedTypeReference<Response<Boolean>>() {}, port, createdSkill.getEntity().getId()).getBody();
+    Response<Boolean> deleted = helper.delete(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<Boolean>>() {}, createdSkill.getEntity().getId()).getBody();
     assertThat(deleted.getEntity(), notNullValue());
     assertThat(deleted.getEntity(), is(true));
-    Response<Boolean> read = helper.get(url + "skill-detail/{skillDetailId}",
-        new ParameterizedTypeReference<Response<Boolean>>() {}, port, createdSkill.getEntity().getId()).getBody();
+    Response<Boolean> read = helper.get(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<Boolean>>() {}, createdSkill.getEntity().getId()).getBody();
     assertThat(read.getEntity(), nullValue());
     assertThat(read.getErrors(), hasItems(
         new Error(ErrorCode.INVALID_SKILL_DETAIL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
@@ -283,9 +274,8 @@ public class SkillDetailResourceTests extends ResourceTests {
 
   @Test
   public void testDeleteEmptyId() {
-    Response<String> read = helper
-        .delete(url + "skill-detail/{skillDetailId}", new ParameterizedTypeReference<Response<String>>() {}, port, " ")
-        .getBody();
+    Response<String> read = helper.delete(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<String>>() {}, " ").getBody();
     assertThat(read.getEntity(), nullValue());
     assertThat(read.getErrors(),
         hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
@@ -293,8 +283,8 @@ public class SkillDetailResourceTests extends ResourceTests {
 
   @Test
   public void testDeleteEmptyWithInvalidId() {
-    Response<String> read = helper.delete(url + "skill-detail/{skillDetailId}",
-        new ParameterizedTypeReference<Response<String>>() {}, port, "testing").getBody();
+    Response<String> read = helper.delete(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<String>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
     assertThat(read.getErrors(), hasItems(
         new Error(ErrorCode.INVALID_SKILL_DETAIL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
@@ -302,8 +292,8 @@ public class SkillDetailResourceTests extends ResourceTests {
 
   @Test
   public void testList() {
-    Response<List<SkillDetailTo>> list = helper
-        .get(url + "skill-detail", new ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {}, port).getBody();
+    Response<List<SkillDetailTo>> list = helper.get(vaultUrl + "skill-detail", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {}).getBody();
     assertThat(list.getEntity(), notNullValue());
     int size = list.getEntity().size();
     String groupName = "Testing" + System.currentTimeMillis();
@@ -315,12 +305,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     skillDetailTo.setDeliveryType(Optional.of(Skill.DeliveryType.HOME));
     skillDetailTo.setName(Optional.of(skillName));
     skillDetailTo.setSkillGroupId(createdGroup.getEntity().getId());
-    Response<SkillDetailTo> createdSkill = helper
-        .post(url + "skill-detail", skillDetailTo, new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, port)
-        .getBody();
+    Response<SkillDetailTo> createdSkill = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
+        new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(createdSkill.getEntity(), notNullValue());
-    list = helper.get(url + "skill-detail", new ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {}, port)
-        .getBody();
+    list = helper.get(vaultUrl + "skill-detail", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {}).getBody();
     assertThat(list.getEntity(), notNullValue());
     assertThat(list.getEntity().size(), is(size + 1));
   }

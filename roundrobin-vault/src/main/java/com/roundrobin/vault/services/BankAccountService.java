@@ -42,8 +42,8 @@ public class BankAccountService {
     return convert(get(userId, bankAccountId));
   }
 
-  public BankAccountTo create(BankAccountTo bankAccountTo) {
-    UserProfile userProfile = profileService.getByUserId(bankAccountTo.getUserId().get());
+  public BankAccountTo create(String userId, BankAccountTo bankAccountTo) {
+    UserProfile userProfile = profileService.getByUserId(userId);
     BankAccount bankAccount = new BankAccount();
     bankAccount.setAccountNumber(jasyptStringEncryptor.encrypt(bankAccountTo.getAccountNumber().get()));
     bankAccount.setRoutingNumber(jasyptStringEncryptor.encrypt(bankAccountTo.getRoutingNumber().get()));
@@ -59,8 +59,8 @@ public class BankAccountService {
     return convert(bankAccount);
   }
 
-  public BankAccountTo update(BankAccountTo bankAccountTo) {
-    BankAccount bankAccount = get(bankAccountTo.getUserId().get(), bankAccountTo.getId());
+  public BankAccountTo update(String userId, BankAccountTo bankAccountTo) {
+    BankAccount bankAccount = get(userId, bankAccountTo.getId());
     bankAccount.setAccountNumber(bankAccountTo.getAccountNumber().orElse(bankAccount.getAccountNumber()));
     bankAccount.setRoutingNumber(bankAccountTo.getRoutingNumber().orElse(bankAccount.getRoutingNumber()));
     bankAccount.setBankName(bankAccountTo.getBankName().orElse(bankAccount.getBankName()));

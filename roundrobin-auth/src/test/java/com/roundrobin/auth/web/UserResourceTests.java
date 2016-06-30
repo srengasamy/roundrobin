@@ -66,7 +66,10 @@ public class UserResourceTests extends ResourceTests {
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity(), is(true));
-    token = getToken(username);
+    token = helper
+        .post(authUrl + "oauth/token?grant_type=password&username={username}&password={password}",
+            createWebClientHeaders(), (String) null, new ParameterizedTypeReference<Token>() {}, username, "testing")
+        .getBody();
     assertThat(token.getAccessToken(), nullValue());
   }
 

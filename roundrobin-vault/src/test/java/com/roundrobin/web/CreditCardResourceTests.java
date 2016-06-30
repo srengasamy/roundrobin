@@ -15,7 +15,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.vault.api.CreditCardTo;
-import com.roundrobin.vault.api.UserProfileTo;
 import com.roundrobin.vault.common.ErrorCode;
 
 /**
@@ -25,20 +24,20 @@ public class CreditCardResourceTests extends ResourceTests {
 
   @Test
   public void testCreate() {
-    Response<UserProfileTo> profile = createUserProfile();
+    String username = createUserProfile();
     CreditCardTo creditCardTo = new CreditCardTo();
     creditCardTo.setCardNumber(Optional.of("4015260001266035"));
     creditCardTo.setCvv(Optional.of("124"));
     creditCardTo.setExpiryMonth(Optional.of((byte) 6));
     creditCardTo.setExpiryYear(Optional.of((short) 17));
     creditCardTo.setPostalCode(Optional.of("87878"));
-//    creditCardTo.setUserProfileId(profile.getEntity().getId());
-    Response<CreditCardTo> created = helper
-        .post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port)
-        .getBody();
+    Response<CreditCardTo> created =
+        helper.post(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)), creditCardTo,
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(created.getEntity(), notNullValue());
-    Response<CreditCardTo> read = helper.get(url + "credit-card/{creditCardId}",
-        new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port, created.getEntity().getId()).getBody();
+    Response<CreditCardTo> read =
+        helper.get(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity().getCardNumber().get(), is("************6035"));
     assertThat(read.getEntity().getExpiryMonth().get(), is(creditCardTo.getExpiryMonth().get()));
@@ -50,8 +49,8 @@ public class CreditCardResourceTests extends ResourceTests {
   @Test
   public void testCreateWithEmptyValues() {
     CreditCardTo creditCardTo = new CreditCardTo();
-    Response<String> created = helper
-        .post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<String>>() {}, port).getBody();
+    Response<String> created = helper.post(vaultUrl + "credit-card", createBearerHeaders(), creditCardTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(), notNullValue());
     assertThat(created.getErrors(),
@@ -59,7 +58,6 @@ public class CreditCardResourceTests extends ResourceTests {
             new Error(ErrorCode.INVALID_FIELD, "expiryMonth: may not be null"),
             new Error(ErrorCode.INVALID_FIELD, "postalCode: may not be empty"),
             new Error(ErrorCode.INVALID_FIELD, "expiryYear: may not be null"),
-            new Error(ErrorCode.INVALID_FIELD, "userProfileId: may not be empty"),
             new Error(ErrorCode.INVALID_FIELD, "cardNumber: may not be empty")));
   }
 
@@ -71,8 +69,8 @@ public class CreditCardResourceTests extends ResourceTests {
     creditCardTo.setPostalCode(Optional.of("1213213123"));
     creditCardTo.setCvv(Optional.of("dfskfjsdkfjs"));
     creditCardTo.setCardNumber(Optional.of("abcd"));
-    Response<String> created = helper
-        .post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<String>>() {}, port).getBody();
+    Response<String> created = helper.post(vaultUrl + "credit-card", createBearerHeaders(), creditCardTo,
+        new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getErrors(), notNullValue());
     assertThat(created.getErrors(),
@@ -84,45 +82,28 @@ public class CreditCardResourceTests extends ResourceTests {
   }
 
   @Test
-  public void testCreateWithInvalidProfileId() {
-    CreditCardTo creditCardTo = new CreditCardTo();
-    creditCardTo.setCardNumber(Optional.of("4015260001266035"));
-    creditCardTo.setCvv(Optional.of("124"));
-    creditCardTo.setExpiryMonth(Optional.of((byte) 6));
-    creditCardTo.setExpiryYear(Optional.of((short) 17));
-    creditCardTo.setPostalCode(Optional.of("87878"));
-//    creditCardTo.setUserProfileId("testing");
-    Response<String> created = helper
-        .post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<String>>() {}, port).getBody();
-    assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_PROFILE_ID, messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
-  }
-
-  @Test
   public void testUpdate() {
-    Response<UserProfileTo> profile = createUserProfile();
+    String username = createUserProfile();
     CreditCardTo creditCardTo = new CreditCardTo();
     creditCardTo.setCardNumber(Optional.of("4015260001266035"));
     creditCardTo.setCvv(Optional.of("124"));
     creditCardTo.setExpiryMonth(Optional.of((byte) 6));
     creditCardTo.setExpiryYear(Optional.of((short) 17));
     creditCardTo.setPostalCode(Optional.of("87878"));
-//    creditCardTo.setUserProfileId(profile.getEntity().getId());
-    Response<CreditCardTo> created = helper
-        .post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port)
-        .getBody();
+    Response<CreditCardTo> created =
+        helper.post(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)), creditCardTo,
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(created.getEntity(), notNullValue());
     created.getEntity().setCvv(Optional.of("test"));
     created.getEntity().setPostalCode(Optional.of("test"));
     created.getEntity().setExpiryMonth(Optional.of((byte) 12));
     created.getEntity().setExpiryYear(Optional.of((short) 99));
-    Response<CreditCardTo> updated = helper.put(url + "credit-card", created.getEntity(),
-        new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port).getBody();
+    Response<CreditCardTo> updated = helper.put(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)),
+        created.getEntity(), new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(updated.getEntity(), notNullValue());
-    Response<CreditCardTo> read = helper.get(url + "credit-card/{creditCardId}",
-        new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port, created.getEntity().getId()).getBody();
+    Response<CreditCardTo> read =
+        helper.get(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity().getExpiryMonth().get(), is(created.getEntity().getExpiryMonth().get()));
     assertThat(read.getEntity().getExpiryYear().get(), is(created.getEntity().getExpiryYear().get()));
@@ -132,13 +113,11 @@ public class CreditCardResourceTests extends ResourceTests {
   @Test
   public void testUpdateWithEmptyValues() {
     CreditCardTo creditCardTo = new CreditCardTo();
-    Response<CreditCardTo> updated =
-        helper.put(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port)
-            .getBody();
+    Response<CreditCardTo> updated = helper.put(vaultUrl + "credit-card", createBearerHeaders(), creditCardTo,
+        new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
     assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "id: may not be empty"),
-        new Error(ErrorCode.INVALID_FIELD, "cvv: may not be empty")));
+    assertThat(updated.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "cvv: may not be empty")));
   }
 
   @Test
@@ -149,9 +128,8 @@ public class CreditCardResourceTests extends ResourceTests {
     creditCardTo.setPostalCode(Optional.of("1213213123"));
     creditCardTo.setCvv(Optional.of("dfskfjsdkfjs"));
     creditCardTo.setCardNumber(Optional.of("abcd"));
-    Response<CreditCardTo> updated =
-        helper.put(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port)
-            .getBody();
+    Response<CreditCardTo> updated = helper.put(vaultUrl + "credit-card", createBearerHeaders(), creditCardTo,
+        new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
     assertThat(updated.getErrors(), notNullValue());
     assertThat(updated.getErrors(),
@@ -163,12 +141,12 @@ public class CreditCardResourceTests extends ResourceTests {
 
   @Test
   public void testUpdateWithInvalidId() {
+    String username = createUserProfile();
     CreditCardTo creditCardTo = new CreditCardTo();
     creditCardTo.setId("testing");
     creditCardTo.setCvv(Optional.of("123"));
-    Response<CreditCardTo> updated =
-        helper.put(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port)
-            .getBody();
+    Response<CreditCardTo> updated = helper.put(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)),
+        creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
     assertThat(updated.getErrors(), notNullValue());
     assertThat(updated.getErrors(), hasItems(
@@ -177,20 +155,20 @@ public class CreditCardResourceTests extends ResourceTests {
 
   @Test
   public void testRead() {
-    Response<UserProfileTo> profile = createUserProfile();
+    String username = createUserProfile();
     CreditCardTo creditCardTo = new CreditCardTo();
     creditCardTo.setCardNumber(Optional.of("4015260001266035"));
     creditCardTo.setCvv(Optional.of("124"));
     creditCardTo.setExpiryMonth(Optional.of((byte) 6));
     creditCardTo.setExpiryYear(Optional.of((short) 17));
     creditCardTo.setPostalCode(Optional.of("87878"));
-//    creditCardTo.setUserProfileId(profile.getEntity().getId());
-    Response<CreditCardTo> created = helper
-        .post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port)
-        .getBody();
+    Response<CreditCardTo> created =
+        helper.post(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)), creditCardTo,
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(created.getEntity(), notNullValue());
-    Response<CreditCardTo> read = helper.get(url + "credit-card/{creditCardId}",
-        new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port, created.getEntity().getId()).getBody();
+    Response<CreditCardTo> read =
+        helper.get(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity().getCardNumber().get(), is("************6035"));
     assertThat(read.getEntity().getExpiryMonth().get(), is(creditCardTo.getExpiryMonth().get()));
@@ -200,19 +178,22 @@ public class CreditCardResourceTests extends ResourceTests {
 
   @Test
   public void testReadWithEmptyId() {
-    Response<CreditCardTo> read = helper
-        .get(url + "credit-card/{creditCardId}", new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port, " ")
-        .getBody();
-    assertThat(read.getEntity(), nullValue());
+    String username = createUserProfile();
+    Response<List<CreditCardTo>> read =
+        helper.get(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<List<CreditCardTo>>>() {}, " ").getBody();
+    assertThat(read.getEntity(), notNullValue());
     assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
+    assertThat(read.getEntity().size(), is(0));
+    assertThat(read.getErrors().size(), is(0));
   }
 
   @Test
   public void testReadWithInvalidId() {
-    Response<CreditCardTo> read = helper.get(url + "credit-card/{creditCardId}",
-        new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port, "testing").getBody();
+    String username = createUserProfile();
+    Response<CreditCardTo> read =
+        helper.get(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
     assertThat(read.getErrors(), notNullValue());
     assertThat(read.getErrors(), hasItems(
@@ -221,24 +202,25 @@ public class CreditCardResourceTests extends ResourceTests {
 
   @Test
   public void testDelete() {
-    Response<UserProfileTo> profile = createUserProfile();
+    String username = createUserProfile();
     CreditCardTo creditCardTo = new CreditCardTo();
     creditCardTo.setCardNumber(Optional.of("4015260001266035"));
     creditCardTo.setCvv(Optional.of("124"));
     creditCardTo.setExpiryMonth(Optional.of((byte) 6));
     creditCardTo.setExpiryYear(Optional.of((short) 17));
     creditCardTo.setPostalCode(Optional.of("87878"));
-//    creditCardTo.setUserProfileId(profile.getEntity().getId());
-    Response<CreditCardTo> created = helper
-        .post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port)
-        .getBody();
+    Response<CreditCardTo> created =
+        helper.post(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)), creditCardTo,
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(created.getEntity(), notNullValue());
-    Response<Boolean> deleted = helper.delete(url + "credit-card/{creditCardId}",
-        new ParameterizedTypeReference<Response<Boolean>>() {}, port, created.getEntity().getId()).getBody();
+    Response<Boolean> deleted =
+        helper.delete(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<Boolean>>() {}, created.getEntity().getId()).getBody();
     assertThat(deleted.getEntity(), notNullValue());
     assertThat(deleted.getEntity(), is(true));
-    Response<Boolean> read = helper.get(url + "credit-card/{creditCardId}",
-        new ParameterizedTypeReference<Response<Boolean>>() {}, port, created.getEntity().getId()).getBody();
+    Response<Boolean> read =
+        helper.get(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<Boolean>>() {}, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), nullValue());
     assertThat(read.getErrors(), notNullValue());
     assertThat(read.getErrors(), hasItems(
@@ -247,8 +229,8 @@ public class CreditCardResourceTests extends ResourceTests {
 
   @Test
   public void testDeleteWithEmptyId() {
-    Response<CreditCardTo> deleted = helper.delete(url + "credit-card/{creditCardId}",
-        new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port, " ").getBody();
+    Response<CreditCardTo> deleted = helper.delete(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(),
+        new ParameterizedTypeReference<Response<CreditCardTo>>() {}, " ").getBody();
     assertThat(deleted.getEntity(), nullValue());
     assertThat(deleted.getErrors(), notNullValue());
     assertThat(deleted.getErrors(),
@@ -257,8 +239,10 @@ public class CreditCardResourceTests extends ResourceTests {
 
   @Test
   public void testDeleteWithInvalidId() {
-    Response<CreditCardTo> deleted = helper.delete(url + "credit-card/{creditCardId}",
-        new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port, "testing").getBody();
+    String username = createUserProfile();
+    Response<CreditCardTo> deleted =
+        helper.delete(vaultUrl + "credit-card/{creditCardId}", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}, "testing").getBody();
     assertThat(deleted.getEntity(), nullValue());
     assertThat(deleted.getErrors(), notNullValue());
     assertThat(deleted.getErrors(), hasItems(
@@ -267,53 +251,34 @@ public class CreditCardResourceTests extends ResourceTests {
 
   @Test
   public void testList() {
-    Response<UserProfileTo> profile = createUserProfile();
+    String username = createUserProfile();
     CreditCardTo creditCardTo = new CreditCardTo();
     creditCardTo.setCardNumber(Optional.of("4015260001266035"));
     creditCardTo.setCvv(Optional.of("124"));
     creditCardTo.setExpiryMonth(Optional.of((byte) 6));
     creditCardTo.setExpiryYear(Optional.of((short) 17));
     creditCardTo.setPostalCode(Optional.of("87878"));
-//    creditCardTo.setUserProfileId(profile.getEntity().getId());
-    Response<CreditCardTo> created = helper
-        .post(url + "credit-card", creditCardTo, new ParameterizedTypeReference<Response<CreditCardTo>>() {}, port)
-        .getBody();
+    Response<CreditCardTo> created =
+        helper.post(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)), creditCardTo,
+            new ParameterizedTypeReference<Response<CreditCardTo>>() {}).getBody();
     assertThat(created.getEntity(), notNullValue());
-    Response<List<CreditCardTo>> list = helper
-        .get(url + "credit-card?profileId={creditCardId}",
-            new ParameterizedTypeReference<Response<List<CreditCardTo>>>() {}, port, null)//profile.getEntity().getId())
-        .getBody();
+    Response<List<CreditCardTo>> list =
+        helper.get(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<List<CreditCardTo>>>() {}).getBody();
     assertThat(list.getEntity(), notNullValue());
     assertThat(list.getEntity().size(), is(1));
   }
 
   @Test
   public void testListWithEmptyId() {
-    Response<List<CreditCardTo>> list = helper
-        .get(url + "credit-card", new ParameterizedTypeReference<Response<List<CreditCardTo>>>() {}, port).getBody();
-    assertThat(list.getEntity(), nullValue());
+    String username = createUserProfile();
+    Response<List<CreditCardTo>> list =
+        helper.get(vaultUrl + "credit-card", createBearerHeaders(getAccessToken(username)),
+            new ParameterizedTypeReference<Response<List<CreditCardTo>>>() {}).getBody();
+    assertThat(list.getEntity(), notNullValue());
     assertThat(list.getErrors(), notNullValue());
-    assertThat(list.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
+    assertThat(list.getEntity().size(), is(0));
+    assertThat(list.getErrors().size(), is(0));
   }
 
-  @Test
-  public void testListWithEmptyProfileId() {
-    Response<List<CreditCardTo>> list = helper.get(url + "credit-card?profileId={creditCardId}",
-        new ParameterizedTypeReference<Response<List<CreditCardTo>>>() {}, port, "").getBody();
-    assertThat(list.getEntity(), nullValue());
-    assertThat(list.getErrors(), notNullValue());
-    assertThat(list.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_PROFILE_ID, messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
-  }
-
-  @Test
-  public void testListWithInvalidProfileId() {
-    Response<List<CreditCardTo>> list = helper.get(url + "credit-card?profileId={creditCardId}",
-        new ParameterizedTypeReference<Response<List<CreditCardTo>>>() {}, port, "testing").getBody();
-    assertThat(list.getEntity(), nullValue());
-    assertThat(list.getErrors(), notNullValue());
-    assertThat(list.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_PROFILE_ID, messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
-  }
 }

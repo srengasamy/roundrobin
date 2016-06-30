@@ -19,6 +19,7 @@ import com.roundrobin.api.Response;
 import com.roundrobin.vault.api.UserProfileTo;
 import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.UserProfile;
+import com.roundrobin.vault.domain.UserProfile.SexType;
 
 public class UserProfileResourceTests extends ResourceTests {
 
@@ -128,8 +129,8 @@ public class UserProfileResourceTests extends ResourceTests {
 
   @Test
   public void testUpdateProfile() {
-    Response<UserProfileTo> userProfileTo = createUserProfile();
-    UserProfileTo created = userProfileTo.getEntity();
+    String username = createUserProfile();
+    UserProfileTo created = new UserProfileTo();
     created.setFirstName(Optional.of("testing"));
     created.setLastName(Optional.of("testing"));
     created.setMobileNumber(Optional.of("1111111111"));
@@ -137,8 +138,9 @@ public class UserProfileResourceTests extends ResourceTests {
     created.setSex(Optional.of(UserProfile.SexType.FEMALE));
     created.setDob(Optional.of(LocalDate.now().minusDays(1000)));
     created.setVendor(Optional.of(true));
-    Response<UserProfileTo> updated = helper.put(vaultUrl + "user-profile", createBearerHeaders(), created,
-        new ParameterizedTypeReference<Response<UserProfileTo>>() {}).getBody();
+    Response<UserProfileTo> updated =
+        helper.put(vaultUrl + "user-profile", createBearerHeaders(getAccessToken(username)), created,
+            new ParameterizedTypeReference<Response<UserProfileTo>>() {}).getBody();
     assertThat(updated.getEntity(), notNullValue());
     assertThat(updated.getEntity().getFirstName().get(), is(created.getFirstName().get()));
     assertThat(updated.getEntity().getLastName().get(), is(created.getLastName().get()));
@@ -147,16 +149,6 @@ public class UserProfileResourceTests extends ResourceTests {
     assertThat(updated.getEntity().getVendor().get(), is(created.getVendor().get()));
     assertThat(updated.getEntity().getDob().get(), is(created.getDob().get()));
     assertThat(updated.getEntity().getSex().get(), is(created.getSex().get()));
-  }
-
-  @Test
-  public void testUpdateWithEmptyValue() {
-    UserProfileTo userProfileTo = new UserProfileTo();
-    Response<String> updated = helper.put(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
-        new ParameterizedTypeReference<Response<String>>() {}).getBody();
-    assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "id: may not be empty")));
   }
 
   @Test
@@ -175,18 +167,6 @@ public class UserProfileResourceTests extends ResourceTests {
             new Error(ErrorCode.INVALID_FIELD, "firstName: length must be between 0 and 35"),
             new Error(ErrorCode.INVALID_FIELD, "mobileNumber: must match \"(^$|[0-9]{10})\""),
             new Error(ErrorCode.INVALID_FIELD, "homeNumber: must match \"(^$|[0-9]{10})\"")));
-  }
-
-  @Test
-  public void testUpdateWithInvalidProfileId() {
-    UserProfileTo userProfileTo = new UserProfileTo();
-    // userProfileTo.setId("testing");
-    Response<String> updated = helper.put(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
-        new ParameterizedTypeReference<Response<String>>() {}).getBody();
-    assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_PROFILE_ID, messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
   }
 
   @Test
@@ -227,67 +207,26 @@ public class UserProfileResourceTests extends ResourceTests {
 
   @Test
   public void testRead() {
-    Response<UserProfileTo> created = createUserProfile();
-    Response<UserProfileTo> read = helper.get(vaultUrl + "user-profile/{userProfileId}",
-        new ParameterizedTypeReference<Response<UserProfileTo>>() {}, null).getBody();// created.getEntity().getId()).getBody();
+    String username = createUserProfile();
+    Response<UserProfileTo> read = helper.get(vaultUrl + "user-profile", createBearerHeaders(getAccessToken(username)),
+        new ParameterizedTypeReference<Response<UserProfileTo>>() {}).getBody();
     assertThat(read.getEntity(), notNullValue());
-    assertThat(read.getEntity().getFirstName().get(), is(created.getEntity().getFirstName().get()));
-    assertThat(read.getEntity().getLastName().get(), is(created.getEntity().getLastName().get()));
-    assertThat(read.getEntity().getMobileNumber().get(), is(created.getEntity().getMobileNumber().get()));
-    assertThat(read.getEntity().getHomeNumber().get(), is(created.getEntity().getHomeNumber().get()));
-    assertThat(read.getEntity().getVendor().get(), is(created.getEntity().getVendor().get()));
-    assertThat(read.getEntity().getDob().get(), is(created.getEntity().getDob().get()));
-    assertThat(read.getEntity().getSex().get(), is(created.getEntity().getSex().get()));
-  }
-
-  @Test
-  public void testReadWithEmptyId() {
-    Response<String> read =
-        helper.get(vaultUrl + "user-profile/{userProfileId}", new ParameterizedTypeReference<Response<String>>() {}, "")
-            .getBody();
-    assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
-  }
-
-  @Test
-  public void testReadWithInvalidId() {
-    Response<String> read = helper.get(vaultUrl + "user-profile/{userProfileId}",
-        new ParameterizedTypeReference<Response<String>>() {}, "testing").getBody();
-    assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_PROFILE_ID, messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
+    assertThat(read.getEntity().getFirstName().get(), is("Suresh"));
+    assertThat(read.getEntity().getLastName().get(), is("Rengasamy"));
+    assertThat(read.getEntity().getMobileNumber().get(), is("5555555555"));
+    assertThat(read.getEntity().getHomeNumber().get(), is("5555555555"));
+    assertThat(read.getEntity().getVendor().get(), is(false));
+    assertThat(read.getEntity().getDob().get(), is(LocalDate.now()));
+    assertThat(read.getEntity().getSex().get(), is(SexType.MALE));
   }
 
   @Test
   public void testDelete() {
-    String username = createUser();
-    Response<UserProfileTo> created = createUserProfile(username);
-    Response<Boolean> deleted =
-        helper.delete(vaultUrl + "user-profile", createBearerHeaders(getToken(username).getAccessToken()),
-            new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
+    String username = createUserProfile();
+    Response<Boolean> deleted = helper.delete(vaultUrl + "user-profile", createBearerHeaders(getAccessToken(username)),
+        new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(deleted.getEntity(), notNullValue());
     assertThat(deleted.getEntity(), is(true));
   }
 
-  @Test
-  public void testDeleteWithEmptyId() {
-    Response<String> read = helper
-        .delete(vaultUrl + "user-profile/{userProfileId}", new ParameterizedTypeReference<Response<String>>() {}, "")
-        .getBody();
-    assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
-  }
-
-  @Test
-  public void testDeleteWithInvalidId() {
-    Response<String> read = helper.delete(vaultUrl + "user-profile/{userProfileId}",
-        new ParameterizedTypeReference<Response<String>>() {}, "testing").getBody();
-    assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_PROFILE_ID, messages.getErrorMessage(ErrorCode.INVALID_PROFILE_ID))));
-  }
 }

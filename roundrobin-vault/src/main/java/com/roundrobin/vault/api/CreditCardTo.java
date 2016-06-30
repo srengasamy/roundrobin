@@ -46,8 +46,6 @@ public class CreditCardTo {
   @Length(max = 7, groups = CreditCardValidator.class)
   private Optional<String> postalCode = Optional.empty();
 
-  private Optional<String> userId = Optional.empty();
-
   public String getId() {
     return id;
   }
@@ -95,14 +93,5 @@ public class CreditCardTo {
   public void setPostalCode(Optional<String> postalCode) {
     this.postalCode = postalCode;
   }
-
-  public Optional<String> getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Optional<String> userId) {
-    this.userId = userId;
-  }
-
 
 }

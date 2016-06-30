@@ -40,7 +40,8 @@ public class SkillDetailService {
     skillDetail.setDeliveryType(skillDetailTo.getDeliveryType().get());
     skillDetail.setName(skillDetailTo.getName().get());
     skillDetail.setSkillGroup(skillGroup);
-    return read(skillDetailRepo.save(skillDetail).getId());
+    skillDetailRepo.save(skillDetail);
+    return convert(skillDetail);
   }
 
   public SkillDetailTo update(SkillDetailTo skillDetailTo) {
@@ -51,7 +52,8 @@ public class SkillDetailService {
     if (skillDetailTo.getName().isPresent()) {
       skillDetail.setName(skillDetailTo.getName().get());
     }
-    return read(skillDetailRepo.save(skillDetail).getId());
+    skillDetailRepo.save(skillDetail);
+    return convert(skillDetail);
   }
 
   public void delete(String id) {

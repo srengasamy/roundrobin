@@ -27,12 +27,21 @@ public abstract class AbstractResourceTests {
   protected final String authUrl = "http://localhost:8080/roundrobin-auth/";
   protected final String vaultUrl = "http://localhost:9090/roundrobin-vault/";
 
-  protected String createUser() {
-    return createUser(false);
+  protected void createUser(String username) {
+    createUser(username, false);
   }
 
   protected String createUser(boolean vendor) {
     String username = "testing" + System.currentTimeMillis() + "@testing.com";
+    return createUser(username, vendor);
+  }
+
+  protected String createUser() {
+    String username = "testing" + System.currentTimeMillis() + "@testing.com";
+    return createUser(username, false);
+  }
+
+  protected String createUser(String username, boolean vendor) {
     String userTo = "{\"username\":\"" + username + "\", \"password\":\"testing\", \"vendor\":" + vendor + "}";
     Response<Boolean> created =
         helper.post(authUrl + "user-action/create-user", userTo, new ParameterizedTypeReference<Response<Boolean>>() {})
@@ -52,7 +61,12 @@ public abstract class AbstractResourceTests {
             createWebClientHeaders(), (String) null, new ParameterizedTypeReference<Token>() {}, username, password)
         .getBody();
     assertThat(token, notNullValue());
+    assertThat(token.getAccessToken(), notNullValue());
     return token;
+  }
+
+  protected String getAccessToken(String username) {
+    return getToken(username).getAccessToken();
   }
 
   protected HttpHeaders createWebClientHeaders() {

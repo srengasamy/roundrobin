@@ -29,13 +29,13 @@ public class SkillGroupResource {
 
   @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"})
   public Response<SkillGroupTo> create(
-          @RequestBody @Validated(CreateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
+      @RequestBody @Validated(CreateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
     return new Response<>(service.create(skillGroupTo));
   }
 
   @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
   public Response<SkillGroupTo> update(
-          @RequestBody @Validated(UpdateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
+      @RequestBody @Validated(UpdateSkillGroupValidator.class) SkillGroupTo skillGroupTo) {
     return new Response<>(service.update(skillGroupTo));
   }
 

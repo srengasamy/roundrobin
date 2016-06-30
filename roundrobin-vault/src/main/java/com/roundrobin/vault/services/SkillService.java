@@ -43,9 +43,9 @@ public class SkillService {
     return convert(get(userId, skillId));
   }
 
-  public SkillTo create(SkillTo skillTo) {
+  public SkillTo create(String userId, SkillTo skillTo) {
     SkillDetail skillDetail = skillDetailService.get(skillTo.getSkillDetailId());
-    UserProfile userProfile = profileService.getByUserId(skillTo.getUserId().get());
+    UserProfile userProfile = profileService.getByUserId(userId);
     checkSkillExists(skillDetail.getId(), userProfile);
     Skill skill = new Skill();
     skill.setTimeToComplete(skillTo.getTimeToComplete().get());
@@ -61,8 +61,8 @@ public class SkillService {
     return convert(skill);
   }
 
-  public SkillTo update(SkillTo skillTo) {
-    Skill skill = get(skillTo.getUserId().get(), skillTo.getId());
+  public SkillTo update(String userId, SkillTo skillTo) {
+    Skill skill = get(userId, skillTo.getId());
     skill.setMaxCost(skillTo.getMaxCost().orElse(skill.getMaxCost()));
     skill.setMinCost(skillTo.getMinCost().orElse(skill.getMinCost()));
     skill.setCost(skillTo.getCost().orElse(skill.getCost()));

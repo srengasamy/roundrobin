@@ -41,8 +41,6 @@ public class BankAccountTo {
   @Length(max = 50, groups = BankAccountValidator.class)
   private Optional<String> description = Optional.empty();
 
-  private Optional<String> userId = Optional.empty();
-
   public String getId() {
     return id;
   }
@@ -90,14 +88,5 @@ public class BankAccountTo {
   public void setDescription(Optional<String> description) {
     this.description = description;
   }
-
-  public Optional<String> getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Optional<String> userId) {
-    this.userId = userId;
-  }
-
 
 }

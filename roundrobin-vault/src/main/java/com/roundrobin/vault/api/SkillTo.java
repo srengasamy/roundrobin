@@ -24,9 +24,6 @@ public class SkillTo {
   @NotBlank(groups = CreateSkillValidator.class)
   private String skillDetailId;
 
-  @NotBlank(groups = CreateSkillValidator.class)
-  private Optional<String> userId = Optional.empty();
-
   @UnwrapValidatedValue
   @NotNull(groups = CreateSkillValidator.class)
   @Range(min = 10, max = 600, groups = SkillValidator.class)
@@ -100,14 +97,6 @@ public class SkillTo {
 
   public void setNumberOfReview(Integer numberOfReview) {
     this.numberOfReview = numberOfReview;
-  }
-
-  public Optional<String> getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Optional<String> userId) {
-    this.userId = userId;
   }
 
 }

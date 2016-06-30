@@ -40,8 +40,8 @@ public class CreditCardService {
     return convert(get(userId, creditCardId));
   }
 
-  public CreditCardTo create(CreditCardTo creditCardTo) {
-    UserProfile userProfile = profileService.getByUserId(creditCardTo.getUserId().get());
+  public CreditCardTo create(String userId, CreditCardTo creditCardTo) {
+    UserProfile userProfile = profileService.getByUserId(userId);
     CreditCard creditCard = new CreditCard();
     creditCard.setCardNumber(encryptor.encrypt(creditCardTo.getCardNumber().get()));
     creditCard.setCvv(encryptor.encrypt(creditCardTo.getCvv().get()));
@@ -57,8 +57,8 @@ public class CreditCardService {
     return convert(creditCard);
   }
 
-  public CreditCardTo update(CreditCardTo creditCardTo) {
-    CreditCard creditCard = get(creditCardTo.getUserId().get(), creditCardTo.getId());
+  public CreditCardTo update(String userId, CreditCardTo creditCardTo) {
+    CreditCard creditCard = get(userId, creditCardTo.getId());
     creditCard.setCvv(creditCardTo.getCvv().orElse(creditCard.getCvv()));
     creditCard.setExpiryMonth(creditCardTo.getExpiryMonth().orElse(creditCard.getExpiryMonth()));
     creditCard.setExpiryYear(creditCardTo.getExpiryYear().orElse(creditCard.getExpiryYear()));

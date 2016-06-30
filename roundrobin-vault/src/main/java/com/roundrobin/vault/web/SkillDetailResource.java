@@ -29,13 +29,13 @@ public class SkillDetailResource {
 
   @RequestMapping(method = RequestMethod.POST, consumes = {"application/json"})
   public Response<SkillDetailTo> create(
-          @RequestBody @Validated(CreateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
+      @RequestBody @Validated(CreateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
     return new Response<>(service.create(skillDetailTo));
   }
 
   @RequestMapping(method = RequestMethod.PUT, consumes = {"application/json"})
   public Response<SkillDetailTo> update(
-          @RequestBody @Validated(UpdateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
+      @RequestBody @Validated(UpdateSkillDetailValidator.class) SkillDetailTo skillDetailTo) {
     return new Response<>(service.update(skillDetailTo));
   }
 

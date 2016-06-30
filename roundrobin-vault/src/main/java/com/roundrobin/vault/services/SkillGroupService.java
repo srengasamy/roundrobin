@@ -35,7 +35,8 @@ public class SkillGroupService {
     SkillGroup skillGroup = new SkillGroup();
     skillGroup.setActive(true);
     skillGroup.setGroupName(skillGroupTo.getGroupName().get());
-    return read(skillGroupRepo.save(skillGroup).getId());
+    skillGroupRepo.save(skillGroup);
+    return convert(skillGroup);
   }
 
   public SkillGroupTo update(SkillGroupTo skillGroupTo) {
@@ -43,7 +44,8 @@ public class SkillGroupService {
     if (skillGroupTo.getGroupName().isPresent()) {
       skillGroup.setGroupName(skillGroupTo.getGroupName().get());
     }
-    return read(skillGroupRepo.save(skillGroup).getId());
+    skillGroupRepo.save(skillGroup);
+    return convert(skillGroup);
   }
 
   public void delete(String id) {
