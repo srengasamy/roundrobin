@@ -3,6 +3,7 @@ package com.roundrobin.auth.api;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.roundrobin.auth.groups.RequestUserActionValidator;
 import com.roundrobin.auth.groups.ResetPasswordValidator;
 import com.roundrobin.auth.groups.UserActionValidator;
@@ -11,6 +12,7 @@ import com.roundrobin.auth.groups.UserActionValidator;
 public class UserActionTo {
 
   @NotBlank(groups = UserActionValidator.class)
+  @JsonProperty("user_id")
   private String userId;
 
   @NotBlank(groups = UserActionValidator.class)

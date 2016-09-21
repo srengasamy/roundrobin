@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
 import com.roundrobin.api.Response;
-import com.roundrobin.api.Token;
-import com.roundrobin.api.UnauthorizedError;
+import com.roundrobin.test.api.Token;
+import com.roundrobin.test.api.UnauthorizedError;
 import com.roundrobin.auth.api.UserTo;
 
 public class UserResourceTests extends ResourceTests {

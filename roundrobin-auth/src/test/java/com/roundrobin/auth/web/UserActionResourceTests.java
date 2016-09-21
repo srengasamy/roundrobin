@@ -1,5 +1,14 @@
 package com.roundrobin.auth.web;
 
+import static com.roundrobin.auth.error.AuthErrorCode.INVALID_SECRET;
+import static com.roundrobin.auth.error.AuthErrorCode.INVALID_USERNAME;
+import static com.roundrobin.auth.error.AuthErrorCode.INVALID_USER_ID;
+import static com.roundrobin.auth.error.AuthErrorCode.USER_ALREADY_EXIST;
+import static com.roundrobin.auth.error.AuthErrorCode.USER_ALREADY_VERIFIED;
+import static com.roundrobin.error.ErrorCode.INVALID_FIELD;
+import static com.roundrobin.error.ErrorCode.UNPARSABLE_INPUT;
+import static com.roundrobin.error.ErrorType.INVALID_REQUEST_ERROR;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -14,11 +23,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 
-import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.auth.api.UserActionTo;
 import com.roundrobin.auth.api.UserTo;
-import com.roundrobin.auth.common.ErrorCode;
 import com.roundrobin.auth.domain.User;
 import com.roundrobin.auth.domain.UserAction;
 import com.roundrobin.auth.service.UserService;
@@ -56,11 +63,12 @@ public class UserActionResourceTests extends ResourceTests {
         .post(authUrl + "user-action/create-user", userProfileTo, new ParameterizedTypeReference<Response<String>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "username: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "password: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "vendor: may not be null")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(),
+        hasItems("username: may not be empty", "password: may not be empty", "vendor: may not be null"));
   }
 
   @Test
@@ -72,11 +80,12 @@ public class UserActionResourceTests extends ResourceTests {
         helper.post(authUrl + "user-action/create-user", userTo, new ParameterizedTypeReference<Response<String>>() {})
             .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "vendor: may not be null"),
-            new Error(ErrorCode.INVALID_FIELD, "password: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "username: not a well-formed email address")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("username: not a well-formed email address",
+        "vendor: may not be null", "password: length must be between 0 and 35"));
   }
 
   @Test
@@ -86,9 +95,10 @@ public class UserActionResourceTests extends ResourceTests {
     Response<String> created = helper
         .post(authUrl + "user-action/create-user", userProfileTo, new ParameterizedTypeReference<Response<String>>() {})
         .getBody();
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(created.getError().getMessage(), is("Unable to parse input"));
   }
 
   @Test
@@ -101,18 +111,20 @@ public class UserActionResourceTests extends ResourceTests {
     Response<String> created =
         helper.post(authUrl + "user-action/create-user", userTo, new ParameterizedTypeReference<Response<String>>() {})
             .getBody();
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.USER_ALREADY_EXIST, messages.getErrorMessage(ErrorCode.USER_ALREADY_EXIST))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(USER_ALREADY_EXIST));
+    assertThat(created.getError().getMessage(), is("User already present"));
   }
 
   @Test
   public void testCreateWithEmptyJson() {
     Response<String> created = helper
         .post(authUrl + "user-action/create-user", "", new ParameterizedTypeReference<Response<String>>() {}).getBody();
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(created.getError().getMessage(), is("Unable to parse input"));
   }
 
   @Test
@@ -145,9 +157,10 @@ public class UserActionResourceTests extends ResourceTests {
         .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {})
         .getBody();
     assertThat(verify.getEntity(), nullValue());
-    assertThat(verify.getErrors(), notNullValue());
-    assertThat(verify.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
+    assertThat(verify.getError(), notNullValue());
+    assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(verify.getError().getCode(), is(INVALID_SECRET));
+    assertThat(verify.getError().getMessage(), is("Invalid secret"));
   }
 
   @Test
@@ -156,9 +169,11 @@ public class UserActionResourceTests extends ResourceTests {
         .post(authUrl + "user-action/verify", new UserActionTo(), new ParameterizedTypeReference<Response<String>>() {})
         .getBody();
     assertThat(verify.getEntity(), nullValue());
-    assertThat(verify.getErrors(), notNullValue());
-    assertThat(verify.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "secret: may not be empty"),
-        new Error(ErrorCode.INVALID_FIELD, "userId: may not be empty")));
+    assertThat(verify.getError(), notNullValue());
+    assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(verify.getError().getCode(), is(INVALID_FIELD));
+    assertThat(verify.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(verify.getError().getFieldErrors(), hasItems("secret: may not be empty", "userId: may not be empty"));
   }
 
   @Test
@@ -170,9 +185,10 @@ public class UserActionResourceTests extends ResourceTests {
         helper.post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<String>>() {})
             .getBody();
     assertThat(verify.getEntity(), nullValue());
-    assertThat(verify.getErrors(), notNullValue());
-    assertThat(verify.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_USER_ID, messages.getErrorMessage(ErrorCode.INVALID_USER_ID))));
+    assertThat(verify.getError(), notNullValue());
+    assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(verify.getError().getCode(), is(INVALID_USER_ID));
+    assertThat(verify.getError().getMessage(), is("Invalid user id"));
   }
 
   @Test
@@ -186,9 +202,10 @@ public class UserActionResourceTests extends ResourceTests {
         .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {})
         .getBody();
     assertThat(verify.getEntity(), nullValue());
-    assertThat(verify.getErrors(), notNullValue());
-    assertThat(verify.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
+    assertThat(verify.getError(), notNullValue());
+    assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(verify.getError().getCode(), is(INVALID_SECRET));
+    assertThat(verify.getError().getMessage(), is("Invalid secret"));
   }
 
   @Test
@@ -202,9 +219,10 @@ public class UserActionResourceTests extends ResourceTests {
         .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {})
         .getBody();
     assertThat(verify.getEntity(), nullValue());
-    assertThat(verify.getErrors(), notNullValue());
-    assertThat(verify.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
+    assertThat(verify.getError(), notNullValue());
+    assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(verify.getError().getCode(), is(INVALID_SECRET));
+    assertThat(verify.getError().getMessage(), is("Invalid secret"));
   }
 
   @Test
@@ -224,8 +242,11 @@ public class UserActionResourceTests extends ResourceTests {
     Response<Boolean> verify = helper.post(authUrl + "user-action/request-verify", new UserActionTo(),
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(verify.getEntity(), nullValue());
-    assertThat(verify.getErrors(), notNullValue());
-    assertThat(verify.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "email: may not be empty")));
+    assertThat(verify.getError(), notNullValue());
+    assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(verify.getError().getCode(), is(INVALID_FIELD));
+    assertThat(verify.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(verify.getError().getFieldErrors(), contains("email: may not be empty"));
   }
 
   @Test
@@ -235,9 +256,11 @@ public class UserActionResourceTests extends ResourceTests {
     Response<Boolean> verify = helper.post(authUrl + "user-action/request-verify", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(verify.getEntity(), nullValue());
-    assertThat(verify.getErrors(), notNullValue());
-    assertThat(verify.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "email: not a well-formed email address")));
+    assertThat(verify.getError(), notNullValue());
+    assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(verify.getError().getCode(), is(INVALID_FIELD));
+    assertThat(verify.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(verify.getError().getFieldErrors(), contains("email: not a well-formed email address"));
   }
 
   @Test
@@ -248,9 +271,10 @@ public class UserActionResourceTests extends ResourceTests {
     Response<Boolean> verify = helper.post(authUrl + "user-action/request-verify", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(verify.getEntity(), nullValue());
-    assertThat(verify.getErrors(), notNullValue());
-    assertThat(verify.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_USERNAME, messages.getErrorMessage(ErrorCode.INVALID_USERNAME))));
+    assertThat(verify.getError(), notNullValue());
+    assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(verify.getError().getCode(), is(INVALID_USERNAME));
+    assertThat(verify.getError().getMessage(), is("Invalid username"));
   }
 
   @Test
@@ -270,9 +294,10 @@ public class UserActionResourceTests extends ResourceTests {
     Response<Boolean> requestVerify = helper.post(authUrl + "user-action/request-verify", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(requestVerify.getEntity(), nullValue());
-    assertThat(requestVerify.getErrors(), notNullValue());
-    assertThat(requestVerify.getErrors(), hasItems(
-        new Error(ErrorCode.USER_ALREADY_VERIFIED, messages.getErrorMessage(ErrorCode.USER_ALREADY_VERIFIED))));
+    assertThat(requestVerify.getError(), notNullValue());
+    assertThat(requestVerify.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(requestVerify.getError().getCode(), is(USER_ALREADY_VERIFIED));
+    assertThat(requestVerify.getError().getMessage(), is("User already verified"));
   }
 
   @Test
@@ -292,8 +317,11 @@ public class UserActionResourceTests extends ResourceTests {
     Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(reset.getEntity(), nullValue());
-    assertThat(reset.getErrors(), notNullValue());
-    assertThat(reset.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "email: may not be empty")));
+    assertThat(reset.getError(), notNullValue());
+    assertThat(reset.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(reset.getError().getCode(), is(INVALID_FIELD));
+    assertThat(reset.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(reset.getError().getFieldErrors(), contains("email: may not be empty"));
   }
 
   @Test
@@ -303,9 +331,11 @@ public class UserActionResourceTests extends ResourceTests {
     Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(reset.getEntity(), nullValue());
-    assertThat(reset.getErrors(), notNullValue());
-    assertThat(reset.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "email: not a well-formed email address")));
+    assertThat(reset.getError(), notNullValue());
+    assertThat(reset.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(reset.getError().getCode(), is(INVALID_FIELD));
+    assertThat(reset.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(reset.getError().getFieldErrors(), contains("email: not a well-formed email address"));
   }
 
   @Test
@@ -316,9 +346,10 @@ public class UserActionResourceTests extends ResourceTests {
     Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(reset.getEntity(), nullValue());
-    assertThat(reset.getErrors(), notNullValue());
-    assertThat(reset.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_USERNAME, messages.getErrorMessage(ErrorCode.INVALID_USERNAME))));
+    assertThat(reset.getError(), notNullValue());
+    assertThat(reset.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(reset.getError().getCode(), is(INVALID_USERNAME));
+    assertThat(reset.getError().getMessage(), is("Invalid username"));
   }
 
   @Test
@@ -351,14 +382,15 @@ public class UserActionResourceTests extends ResourceTests {
   @Test
   public void testResetPasswordWithEmptyValues() {
     UserActionTo userActionTo = new UserActionTo();
-    Response<Boolean> reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
-        new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
+    Response<Error> reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
+        new ParameterizedTypeReference<Response<Error>>() {}).getBody();
     assertThat(reset.getEntity(), nullValue());
-    assertThat(reset.getErrors(), notNullValue());
-    assertThat(reset.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "secret: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "userId: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "password: may not be empty")));
+    assertThat(reset.getError(), notNullValue());
+    assertThat(reset.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(reset.getError().getCode(), is(INVALID_FIELD));
+    assertThat(reset.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(reset.getError().getFieldErrors(),
+        hasItems("userId: may not be empty", "secret: may not be empty", "password: may not be empty"));
   }
 
   @Test
@@ -378,9 +410,10 @@ public class UserActionResourceTests extends ResourceTests {
     reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(reset.getEntity(), nullValue());
-    assertThat(reset.getErrors(), notNullValue());
-    assertThat(reset.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
+    assertThat(reset.getError(), notNullValue());
+    assertThat(reset.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(reset.getError().getCode(), is(INVALID_SECRET));
+    assertThat(reset.getError().getMessage(), is("Invalid secret"));
   }
 
   @Test
@@ -399,9 +432,10 @@ public class UserActionResourceTests extends ResourceTests {
     reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(reset.getEntity(), nullValue());
-    assertThat(reset.getErrors(), notNullValue());
-    assertThat(reset.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_USER_ID, messages.getErrorMessage(ErrorCode.INVALID_USER_ID))));
+    assertThat(reset.getError(), notNullValue());
+    assertThat(reset.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(reset.getError().getCode(), is(INVALID_USER_ID));
+    assertThat(reset.getError().getMessage(), is("Invalid user id"));
   }
 
   @Test
@@ -428,8 +462,9 @@ public class UserActionResourceTests extends ResourceTests {
     reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
         new ParameterizedTypeReference<Response<Boolean>>() {}).getBody();
     assertThat(reset.getEntity(), nullValue());
-    assertThat(reset.getErrors(), notNullValue());
-    assertThat(reset.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SECRET, messages.getErrorMessage(ErrorCode.INVALID_SECRET))));
+    assertThat(reset.getError(), notNullValue());
+    assertThat(reset.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(reset.getError().getCode(), is(INVALID_SECRET));
+    assertThat(reset.getError().getMessage(), is("Invalid secret"));
   }
 }

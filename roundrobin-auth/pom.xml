@@ -45,11 +45,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-guava</artifactId>
-			<version>${jackson-datatype-guava.version}</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>com.roundrobin</groupId>
-			<artifactId>roundrobin-common</artifactId>
+			<artifactId>roundrobin-test</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

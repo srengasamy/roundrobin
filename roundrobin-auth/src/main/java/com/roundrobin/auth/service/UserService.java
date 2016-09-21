@@ -1,6 +1,11 @@
 package com.roundrobin.auth.service;
 
-import static com.roundrobin.common.Assert.isTrue;
+import static com.roundrobin.auth.error.AuthErrorCode.INVALID_SECRET;
+import static com.roundrobin.auth.error.AuthErrorCode.INVALID_USERNAME;
+import static com.roundrobin.auth.error.AuthErrorCode.INVALID_USER_ID;
+import static com.roundrobin.auth.error.AuthErrorCode.USER_ALREADY_EXIST;
+import static com.roundrobin.auth.error.AuthErrorCode.USER_ALREADY_VERIFIED;
+import static com.roundrobin.conditions.Preconditions.checkArgument;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -13,12 +18,12 @@ import org.springframework.stereotype.Service;
 
 import com.roundrobin.auth.api.UserActionTo;
 import com.roundrobin.auth.api.UserTo;
-import com.roundrobin.auth.common.ErrorCode;
 import com.roundrobin.auth.domain.User;
 import com.roundrobin.auth.domain.User.Role;
 import com.roundrobin.auth.domain.UserAction;
 import com.roundrobin.auth.domain.UserAction.UserActionType;
 import com.roundrobin.auth.repository.UserRepository;
+import com.roundrobin.exception.BadRequestException;
 
 @Service
 public class UserService {
@@ -30,13 +35,13 @@ public class UserService {
 
   public User get(String id) {
     Optional<User> user = userRepo.findById(id);
-    isTrue(user.isPresent(), ErrorCode.INVALID_USER_ID);
+    checkArgument(user.isPresent(), new BadRequestException(INVALID_USER_ID));
     return user.get();
   }
 
   public User getByUsername(String username) {
     Optional<User> user = userRepo.findByUsername(username);
-    isTrue(user.isPresent(), ErrorCode.INVALID_USERNAME);
+    checkArgument(user.isPresent(), new BadRequestException(INVALID_USERNAME));
     return user.get();
   }
 
@@ -50,7 +55,7 @@ public class UserService {
 
   public void create(UserTo userTo) {
     Optional<User> existing = userRepo.findByUsername(userTo.getUsername().get());
-    isTrue(!existing.isPresent(), ErrorCode.USER_ALREADY_EXIST);
+    checkArgument(!existing.isPresent(), new BadRequestException(USER_ALREADY_EXIST));
     User user = new User();
     user.setUsername(userTo.getUsername().get());
     user.setPassword(passwordEncoder.encode(userTo.getPassword().get()));
@@ -86,7 +91,7 @@ public class UserService {
 
   public void requestVerify(UserActionTo userActionTo) {
     User user = getByUsername(userActionTo.getEmail());
-    isTrue(!user.getVerified(), ErrorCode.USER_ALREADY_VERIFIED);
+    checkArgument(!user.getVerified(), new BadRequestException(USER_ALREADY_VERIFIED));
     user.getActions().add(createVerifyLink());
     save(user);
   }
@@ -102,8 +107,8 @@ public class UserService {
     boolean found =
         user.getActions().stream().anyMatch(a -> (a.getActive() && a.getAction() == UserActionType.VERIFY_USER
             && a.getSecret().equals(userActionTo.getSecret()) && a.getExpiry().isAfterNow()));
-    isTrue(found, ErrorCode.INVALID_SECRET);
-    isTrue(!user.getVerified(), ErrorCode.USER_ALREADY_VERIFIED);
+    checkArgument(found, new BadRequestException(INVALID_SECRET));
+    checkArgument(!user.getVerified(), new BadRequestException(USER_ALREADY_VERIFIED));
     user.setVerified(true);
     user.getActions().forEach(a -> {
       if (a.getAction() == UserActionType.VERIFY_USER && a.getSecret().equals(userActionTo.getSecret())) {
@@ -118,7 +123,7 @@ public class UserService {
     boolean found =
         user.getActions().stream().anyMatch(a -> (a.getActive() && a.getAction() == UserActionType.RESET_PASSWORD
             && a.getSecret().equals(userActionTo.getSecret()) && a.getExpiry().isAfterNow()));
-    isTrue(found, ErrorCode.INVALID_SECRET);
+    checkArgument(found, new BadRequestException(INVALID_SECRET));
     user.setPassword(passwordEncoder.encode(userActionTo.getPassword()));
     user.setVerified(true);
     user.getActions().forEach(a -> {
