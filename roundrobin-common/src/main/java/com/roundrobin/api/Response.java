@@ -1,8 +1,5 @@
 package com.roundrobin.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -11,21 +8,15 @@ public class Response<T> {
   private long timestamp;
   private String uuid;
   private T entity;
-  private List<Error> errors = new ArrayList<>();
+  private Error error;
 
   public Response(T entity) {
-    this.entity = entity;
+    if (entity instanceof Error) {
+      this.error = (Error) entity;
+    } else {
+      this.entity = entity;
+    }
     timestamp = System.currentTimeMillis();
-  }
-
-  public Response(List<Error> errors) {
-    this.timestamp = System.currentTimeMillis();
-    this.errors = errors;
-  }
-
-  public Response(Error error) {
-    this.timestamp = System.currentTimeMillis();
-    this.errors.add(error);
   }
 
   public Response() {
@@ -48,12 +39,12 @@ public class Response<T> {
     this.entity = entity;
   }
 
-  public List<Error> getErrors() {
-    return errors;
+  public Error getError() {
+    return error;
   }
 
-  public void setErrors(List<Error> errors) {
-    this.errors = errors;
+  public void setError(Error error) {
+    this.error = error;
   }
 
   public String getUuid() {

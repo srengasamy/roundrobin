@@ -1,27 +1,19 @@
 package com.roundrobin.api;
 
-import java.util.Objects;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+@JsonInclude(Include.NON_NULL)
 public class Error {
-  private int code;
+  private String type;
+  private String code;
   private String message;
+  private String param;
 
-  public Error() {
-
-  }
-
-  public Error(int code, String message) {
-    this.code = code;
-    this.message = message;
-  }
-
-  public int getCode() {
-    return code;
-  }
-
-  public void setCode(int code) {
-    this.code = code;
-  }
+  @JsonProperty("field_errors")
+  private List<String> fieldErrors;
 
   public String getMessage() {
     return message;
@@ -31,18 +23,36 @@ public class Error {
     this.message = message;
   }
 
-  @Override
-  public String toString() {
-    return code + ":" + message;
+  public String getType() {
+    return type;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    Error error = (Error) obj;
-    if (error == null) {
-      return false;
-    }
-    return Objects.equals(code, error.getCode()) && Objects.equals(message, error.getMessage());
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getCode() {
+    return code;
+  }
+
+  public void setCode(String code) {
+    this.code = code;
+  }
+
+  public String getParam() {
+    return param;
+  }
+
+  public void setParam(String param) {
+    this.param = param;
+  }
+
+  public List<String> getFieldErrors() {
+    return fieldErrors;
+  }
+
+  public void setFieldErrors(List<String> fieldErrors) {
+    this.fieldErrors = fieldErrors;
   }
 
 }
