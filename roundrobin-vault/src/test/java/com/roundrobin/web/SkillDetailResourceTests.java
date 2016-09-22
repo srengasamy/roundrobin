@@ -1,8 +1,12 @@
 package com.roundrobin.web;
 
+import static com.roundrobin.error.ErrorCode.INVALID_FIELD;
+import static com.roundrobin.error.ErrorCode.UNPARSABLE_INPUT;
+import static com.roundrobin.error.ErrorType.INVALID_REQUEST_ERROR;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_DETAIL_ID;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_GROUP_ID;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -15,11 +19,9 @@ import java.util.Optional;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
-import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.vault.api.SkillDetailTo;
 import com.roundrobin.vault.api.SkillGroupTo;
-import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.Skill;
 
 /**
@@ -51,10 +53,12 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "name: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "skillGroupId: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "deliveryType: may not be null")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(),
+        hasItems("name: may not be empty", "skillGroupId: may not be empty", "deliveryType: may not be null"));
   }
 
   @Test
@@ -64,8 +68,10 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(created.getError().getMessage(), is("Unable to parse input"));
   }
 
   @Test
@@ -76,10 +82,12 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "name: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "skillGroupId: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "deliveryType: may not be null")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(),
+        hasItems("name: may not be empty", "skillGroupId: may not be empty", "deliveryType: may not be null"));
   }
 
   @Test
@@ -89,10 +97,12 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "name: must match \"^[A-Za-z0-9]*$\""),
-            new Error(ErrorCode.INVALID_FIELD, "skillGroupId: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "deliveryType: may not be null")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("name: must match \"^[A-Za-z0-9]*$\"",
+        "skillGroupId: may not be empty", "deliveryType: may not be null"));
   }
 
   @Test
@@ -103,10 +113,12 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "name: length must be between 0 and 25"),
-            new Error(ErrorCode.INVALID_FIELD, "skillGroupId: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "deliveryType: may not be null")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("name: length must be between 0 and 25",
+        "skillGroupId: may not be empty", "deliveryType: may not be null"));
   }
 
   @Test
@@ -118,8 +130,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_GROUP_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_GROUP_ID))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_SKILL_GROUP_ID));
+    assertThat(created.getError().getMessage(), is("Invalid skill group id"));
+    assertThat(created.getError().getParam(), is("skill_group_id"));
   }
 
   @Test
@@ -155,8 +170,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), nullValue());
-    assertThat(updatedSkill.getErrors(), notNullValue());
-    assertThat(updatedSkill.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "id: may not be empty")));
+    assertThat(updatedSkill.getError(), notNullValue());
+    assertThat(updatedSkill.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updatedSkill.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updatedSkill.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updatedSkill.getError().getFieldErrors(), hasItems("id: may not be empty"));
   }
 
   @Test
@@ -166,9 +184,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), nullValue());
-    assertThat(updatedSkill.getErrors(), notNullValue());
-    assertThat(updatedSkill.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_DETAIL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
+    assertThat(updatedSkill.getError(), notNullValue());
+    assertThat(updatedSkill.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updatedSkill.getError().getCode(), is(INVALID_SKILL_DETAIL_ID));
+    assertThat(updatedSkill.getError().getMessage(), is("Invalid skill detail id"));
+    assertThat(updatedSkill.getError().getParam(), is("skill_detail_id"));
   }
 
   @Test
@@ -178,9 +198,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), nullValue());
-    assertThat(updatedSkill.getErrors(), notNullValue());
-    assertThat(updatedSkill.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "name: must match \"^[A-Za-z0-9]*$\"")));
+    assertThat(updatedSkill.getError(), notNullValue());
+    assertThat(updatedSkill.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updatedSkill.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updatedSkill.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updatedSkill.getError().getFieldErrors(), hasItems("name: must match \"^[A-Za-z0-9]*$\""));
   }
 
   @Test
@@ -190,9 +212,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<SkillDetailTo> updatedSkill = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<SkillDetailTo>>() {}).getBody();
     assertThat(updatedSkill.getEntity(), nullValue());
-    assertThat(updatedSkill.getErrors(), notNullValue());
-    assertThat(updatedSkill.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "name: length must be between 0 and 25")));
+    assertThat(updatedSkill.getError(), notNullValue());
+    assertThat(updatedSkill.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updatedSkill.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updatedSkill.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updatedSkill.getError().getFieldErrors(), hasItems("name: length must be between 0 and 25"));
   }
 
   @Test
@@ -202,8 +226,10 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> created = helper.put(vaultUrl + "skill-detail", createBearerHeaders(), skillDetailTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(created.getError().getMessage(), is("Unable to parse input"));
   }
 
   @Test
@@ -234,8 +260,12 @@ public class SkillDetailResourceTests extends ResourceTests {
   public void testReadEmptyId() {
     Response<List<SkillDetailTo>> read = helper.get(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<List<SkillDetailTo>>>() {}, " ").getBody();
-    assertThat(read.getEntity(), notNullValue());
-    assertThat(read.getEntity().size(), not(is(0)));
+    assertThat(read.getEntity(), nullValue());
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_DETAIL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill detail id"));
+    assertThat(read.getError().getParam(), is("skill_detail_id"));
   }
 
   @Test
@@ -243,8 +273,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<SkillDetailTo> read = helper.get(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<SkillDetailTo>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_DETAIL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_DETAIL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill detail id"));
+    assertThat(read.getError().getParam(), is("skill_detail_id"));
   }
 
   @Test
@@ -268,8 +301,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<Boolean> read = helper.get(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<Boolean>>() {}, createdSkill.getEntity().getId()).getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_DETAIL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_DETAIL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill detail id"));
+    assertThat(read.getError().getParam(), is("skill_detail_id"));
   }
 
   @Test
@@ -277,8 +313,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> read = helper.delete(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<String>>() {}, " ").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_DETAIL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill detail id"));
+    assertThat(read.getError().getParam(), is("skill_detail_id"));
   }
 
   @Test
@@ -286,8 +325,11 @@ public class SkillDetailResourceTests extends ResourceTests {
     Response<String> read = helper.delete(vaultUrl + "skill-detail/{skillDetailId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<String>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_DETAIL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_DETAIL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill detail id"));
+    assertThat(read.getError().getParam(), is("skill_detail_id"));
   }
 
   @Test

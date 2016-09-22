@@ -1,5 +1,9 @@
 package com.roundrobin.vault.services;
 
+import static com.roundrobin.conditions.Preconditions.checkArgument;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_GROUP_ID;
+import static com.roundrobin.vault.error.VaultErrorCode.SKILL_GROUP_ALREADY_EXISTS;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -7,9 +11,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.roundrobin.common.Assert;
+import com.roundrobin.exception.BadRequestException;
 import com.roundrobin.vault.api.SkillGroupTo;
-import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.SkillGroup;
 import com.roundrobin.vault.repository.SkillGroupRepository;
 
@@ -21,7 +24,8 @@ public class SkillGroupService {
 
   public SkillGroup get(String id) {
     Optional<SkillGroup> skillGroup = skillGroupRepo.findById(id);
-    Assert.isTrue(skillGroup.isPresent() && skillGroup.get().getActive(), ErrorCode.INVALID_SKILL_GROUP_ID);
+    checkArgument(skillGroup.isPresent() && skillGroup.get().getActive(),
+        new BadRequestException(INVALID_SKILL_GROUP_ID, "skill_group_id"));
     return skillGroup.get();
   }
 
@@ -31,7 +35,7 @@ public class SkillGroupService {
 
   public SkillGroupTo create(SkillGroupTo skillGroupTo) {
     Optional<SkillGroup> existing = skillGroupRepo.findByGroupName(skillGroupTo.getGroupName().get());
-    Assert.isTrue(!existing.isPresent(), ErrorCode.SKILL_GROUP_ALREADY_EXISTS);
+    checkArgument(!existing.isPresent(), new BadRequestException(SKILL_GROUP_ALREADY_EXISTS, "skill_group_name"));
     SkillGroup skillGroup = new SkillGroup();
     skillGroup.setActive(true);
     skillGroup.setGroupName(skillGroupTo.getGroupName().get());

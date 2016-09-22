@@ -18,6 +18,14 @@ public abstract class AbstractException extends RuntimeException {
     this.httpStatus = httpStatus;
   }
 
+  public AbstractException(String errorType, String errorCode, String param, HttpStatus httpStatus) {
+    super(errorCode.toString());
+    this.errorType = errorType;
+    this.errorCode = errorCode;
+    this.param = param;
+    this.httpStatus = httpStatus;
+  }
+
   public AbstractException(String errorType, String errorCode, HttpStatus httpStatus, Throwable t) {
     super(errorCode.toString(), t);
     this.errorType = errorType;
@@ -55,6 +63,14 @@ public abstract class AbstractException extends RuntimeException {
 
   public void setHttpStatus(HttpStatus httpStatus) {
     this.httpStatus = httpStatus;
+  }
+
+  public String getParam() {
+    return param;
+  }
+
+  public void setParam(String param) {
+    this.param = param;
   }
 
 }

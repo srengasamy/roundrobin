@@ -1,14 +1,16 @@
 package com.roundrobin.vault.services;
 
+import static com.roundrobin.conditions.Preconditions.checkArgument;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_USER_ID;
+
 import java.util.Optional;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.roundrobin.common.Assert;
+import com.roundrobin.exception.BadRequestException;
 import com.roundrobin.vault.api.UserProfileTo;
-import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.UserProfile;
 import com.roundrobin.vault.repository.UserProfileRepository;
 
@@ -19,7 +21,7 @@ public class UserProfileService {
 
   public UserProfile getByUserId(String userId) {
     Optional<UserProfile> userProfile = profileRepo.findByUserId(userId);
-    Assert.isTrue(userProfile.isPresent(), ErrorCode.INVALID_USER_ID);
+    checkArgument(userProfile.isPresent(), new BadRequestException(INVALID_USER_ID));
     return userProfile.get();
   }
 

@@ -5,12 +5,13 @@ import static com.roundrobin.common.Constants.ERROR_CODE;
 import static com.roundrobin.common.Constants.ERROR_MESSAGE;
 import static com.roundrobin.common.Constants.ERROR_TYPE;
 import static com.roundrobin.common.Constants.ERROR_UUID;
-import static net.logstash.logback.marker.Markers.append;
 import static com.roundrobin.error.ErrorCode.INVALID_FIELD;
 import static com.roundrobin.error.ErrorCode.INVALID_URL;
 import static com.roundrobin.error.ErrorCode.SERVICE_ERROR;
 import static com.roundrobin.error.ErrorCode.UNPARSABLE_INPUT;
+import static net.logstash.logback.marker.Markers.append;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -49,9 +50,12 @@ public class ExceptionMapper {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Response<Error>> handleBindException(MethodArgumentNotValidException ex) {
     BadRequestException bex = new BadRequestException(INVALID_FIELD, ex);
-    List<String> fieldErrors = ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof FieldError)
-        .map(e -> (FieldError) e).map(e -> e.getField() + ": " + e.getDefaultMessage()).collect(Collectors.toList());
-    return log(bex, fieldErrors);
+    List<String> fieldErrors = new ArrayList<>();
+    fieldErrors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof FieldError)
+        .map(e -> (FieldError) e).map(e -> e.getField() + ": " + e.getDefaultMessage()).collect(Collectors.toList()));
+    fieldErrors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> !(e instanceof FieldError))
+        .map(e -> e.getDefaultMessage()).collect(Collectors.toList()));
+    return log(bex, fieldErrors.isEmpty() ? null : fieldErrors);
   }
 
   @ExceptionHandler(AbstractException.class)
@@ -77,6 +81,7 @@ public class ExceptionMapper {
     Error error = new Error();
     error.setType(exception.getErrorType());
     error.setCode(exception.getErrorCode());
+    error.setParam(exception.getParam());
     error.setMessage(messages.getErrorMessage(exception.getErrorCode()));
     error.setFieldErrors(fieldErrors);
     Response<Error> response = new Response<Error>(error);

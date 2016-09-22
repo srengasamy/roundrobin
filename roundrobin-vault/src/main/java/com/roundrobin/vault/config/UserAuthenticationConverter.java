@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticat
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.roundrobin.common.User;
+import com.roundrobin.api.User;
 
 public class UserAuthenticationConverter extends DefaultUserAuthenticationConverter {
   private ObjectMapper mapper = new ObjectMapper();

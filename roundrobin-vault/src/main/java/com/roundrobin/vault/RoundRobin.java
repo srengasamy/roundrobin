@@ -32,3 +32,13 @@ public class RoundRobin {
   }
 
 }
+
+// TODO if preference is top rated, sort by review
+// TODO Limit the end date for vendor search to 10 days
+// TODO Consider overlap at user end agenda
+/**
+ * If Urgent = Find vendors, in .5 miles, select a vendor random, if not found , search for 1 mile
+ * If Top reviews = Find vendors in 2 miles, groups vendors by 3.5 to 5 star and select random. If
+ * cheap = find vendors in 3 miles, pick the bottom batch and select random. If urgent, dont ask
+ * permission If not, give user to select review/price based on choice.
+ */

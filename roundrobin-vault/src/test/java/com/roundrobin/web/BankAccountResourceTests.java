@@ -1,5 +1,8 @@
 package com.roundrobin.web;
 
+import static com.roundrobin.error.ErrorCode.INVALID_FIELD;
+import static com.roundrobin.error.ErrorType.INVALID_REQUEST_ERROR;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_BANK_ACCOUNT_ID;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -12,10 +15,8 @@ import java.util.Optional;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
-import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.vault.api.BankAccountTo;
-import com.roundrobin.vault.common.ErrorCode;
 
 /**
  * Created by rengasu on 5/12/16.
@@ -23,6 +24,8 @@ import com.roundrobin.vault.common.ErrorCode;
 
 // TODO Dont allow delete when list has only one
 // TODO Test getAll
+// TODO Revisit all services
+// TODO Reconsider allowing update
 public class BankAccountResourceTests extends ResourceTests {
 
   @Test
@@ -52,12 +55,12 @@ public class BankAccountResourceTests extends ResourceTests {
         helper.post(vaultUrl + "bank-account", createBearerHeaders(getAccessToken(username)), bankAccountTo,
             new ParameterizedTypeReference<Response<BankAccountTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "bankName: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "routingNumber: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "accountNumber: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "nameOnAccount: may not be empty")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("bankName: may not be empty",
+        "routingNumber: may not be empty", "accountNumber: may not be empty", "nameOnAccount: may not be empty"));
   }
 
   @Test
@@ -76,13 +79,14 @@ public class BankAccountResourceTests extends ResourceTests {
         helper.post(vaultUrl + "bank-account", createBearerHeaders(getAccessToken(username)), bankAccountTo,
             new ParameterizedTypeReference<Response<BankAccountTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "bankName: length must be between 0 and 50"),
-            new Error(ErrorCode.INVALID_FIELD, "routingNumber: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "accountNumber: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "nameOnAccount: length must be between 0 and 100"),
-            new Error(ErrorCode.INVALID_FIELD, "description: length must be between 0 and 50")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(),
+        hasItems("bankName: length must be between 0 and 50", "routingNumber: length must be between 0 and 35",
+            "accountNumber: length must be between 0 and 35", "nameOnAccount: length must be between 0 and 100",
+            "description: length must be between 0 and 50"));
   }
 
   @Test
@@ -122,9 +126,12 @@ public class BankAccountResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "bank-account", createBearerHeaders(), bankAccountTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "id: may not be empty"),
-        new Error(ErrorCode.INVALID_FIELD, "routingNumber: may not be empty")));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updated.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updated.getError().getFieldErrors(),
+        hasItems("id: may not be empty", "routingNumber: may not be empty"));
   }
 
   @Test
@@ -142,13 +149,14 @@ public class BankAccountResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "bank-account", createBearerHeaders(getAccessToken(username)),
         bankAccountTo, new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "bankName: length must be between 0 and 50"),
-            new Error(ErrorCode.INVALID_FIELD, "routingNumber: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "accountNumber: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "nameOnAccount: length must be between 0 and 100"),
-            new Error(ErrorCode.INVALID_FIELD, "description: length must be between 0 and 50")));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updated.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updated.getError().getFieldErrors(),
+        hasItems("bankName: length must be between 0 and 50", "routingNumber: length must be between 0 and 35",
+            "accountNumber: length must be between 0 and 35", "nameOnAccount: length must be between 0 and 100",
+            "description: length must be between 0 and 50"));
   }
 
   @Test
@@ -160,9 +168,11 @@ public class BankAccountResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "bank-account", createBearerHeaders(getAccessToken(username)),
         bankAccountTo, new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_BANK_ACCOUNT_ID, messages.getErrorMessage(ErrorCode.INVALID_BANK_ACCOUNT_ID))));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_BANK_ACCOUNT_ID));
+    assertThat(updated.getError().getMessage(), is("Invalid bank account id"));
+    assertThat(updated.getError().getParam(), is("bank_account_id"));
   }
 
   @Test
@@ -194,10 +204,11 @@ public class BankAccountResourceTests extends ResourceTests {
     Response<List<BankAccountTo>> read =
         helper.get(vaultUrl + "bank-account/{bankAccountId}", createBearerHeaders(getAccessToken(username)),
             new ParameterizedTypeReference<Response<List<BankAccountTo>>>() {}, " ").getBody();
-    assertThat(read.getEntity(), notNullValue());
-    assertThat(read.getEntity().size(), is(0));
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors().size(), is(0));
+    assertThat(read.getEntity(), nullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_BANK_ACCOUNT_ID));
+    assertThat(read.getError().getMessage(), is("Invalid bank account id"));
+    assertThat(read.getError().getParam(), is("bank_account_id"));
   }
 
   @Test
@@ -207,9 +218,11 @@ public class BankAccountResourceTests extends ResourceTests {
         helper.get(vaultUrl + "bank-account/{bankAccountId}", createBearerHeaders(getAccessToken(username)),
             new ParameterizedTypeReference<Response<String>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_BANK_ACCOUNT_ID, messages.getErrorMessage(ErrorCode.INVALID_BANK_ACCOUNT_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_BANK_ACCOUNT_ID));
+    assertThat(read.getError().getMessage(), is("Invalid bank account id"));
+    assertThat(read.getError().getParam(), is("bank_account_id"));
   }
 
   @Test
@@ -234,10 +247,11 @@ public class BankAccountResourceTests extends ResourceTests {
         helper.get(vaultUrl + "bank-account/{bankAccountId}", createBearerHeaders(getAccessToken(username)),
             new ParameterizedTypeReference<Response<Boolean>>() {}, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_BANK_ACCOUNT_ID, messages.getErrorMessage(ErrorCode.INVALID_BANK_ACCOUNT_ID))));
-
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_BANK_ACCOUNT_ID));
+    assertThat(read.getError().getMessage(), is("Invalid bank account id"));
+    assertThat(read.getError().getParam(), is("bank_account_id"));
   }
 
   @Test
@@ -247,9 +261,11 @@ public class BankAccountResourceTests extends ResourceTests {
         helper.delete(vaultUrl + "bank-account/{bankAccountId}", createBearerHeaders(getAccessToken(username)),
             new ParameterizedTypeReference<Response<String>>() {}, " ").getBody();
     assertThat(deleted.getEntity(), nullValue());
-    assertThat(deleted.getErrors(), notNullValue());
-    assertThat(deleted.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
+    assertThat(deleted.getError(), notNullValue());
+    assertThat(deleted.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(deleted.getError().getCode(), is(INVALID_BANK_ACCOUNT_ID));
+    assertThat(deleted.getError().getMessage(), is("Invalid bank account id"));
+    assertThat(deleted.getError().getParam(), is("bank_account_id"));
   }
 
   @Test
@@ -259,9 +275,11 @@ public class BankAccountResourceTests extends ResourceTests {
         helper.delete(vaultUrl + "bank-account/{bankAccountId}", createBearerHeaders(getAccessToken(username)),
             new ParameterizedTypeReference<Response<String>>() {}, "testing").getBody();
     assertThat(deleted.getEntity(), nullValue());
-    assertThat(deleted.getErrors(), notNullValue());
-    assertThat(deleted.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_BANK_ACCOUNT_ID, messages.getErrorMessage(ErrorCode.INVALID_BANK_ACCOUNT_ID))));
+    assertThat(deleted.getError(), notNullValue());
+    assertThat(deleted.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(deleted.getError().getCode(), is(INVALID_BANK_ACCOUNT_ID));
+    assertThat(deleted.getError().getMessage(), is("Invalid bank account id"));
+    assertThat(deleted.getError().getParam(), is("bank_account_id"));
   }
 
   @Test

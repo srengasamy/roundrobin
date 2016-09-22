@@ -1,5 +1,8 @@
 package com.roundrobin.vault.services;
 
+import static com.roundrobin.conditions.Preconditions.checkArgument;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_CREDIT_CARD_ID;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,9 +12,8 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.roundrobin.common.Assert;
+import com.roundrobin.exception.BadRequestException;
 import com.roundrobin.vault.api.CreditCardTo;
-import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.CreditCard;
 import com.roundrobin.vault.domain.UserProfile;
 import com.roundrobin.vault.repository.CreditCardRepository;
@@ -32,7 +34,7 @@ public class CreditCardService {
     UserProfile profile = profileService.getByUserId(userId);
     Optional<CreditCard> creditCard =
         profile.getCreditCards().stream().filter(c -> c.getActive() && c.getId().equals(creditCardId)).findFirst();
-    Assert.isTrue(creditCard.isPresent(), ErrorCode.INVALID_CREDIT_CARD_ID);
+    checkArgument(creditCard.isPresent(), new BadRequestException(INVALID_CREDIT_CARD_ID, "credit_card_id"));
     return creditCard.get();
   }
 

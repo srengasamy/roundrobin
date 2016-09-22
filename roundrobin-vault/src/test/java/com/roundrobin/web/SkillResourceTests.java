@@ -1,5 +1,10 @@
 package com.roundrobin.web;
 
+import static com.roundrobin.error.ErrorCode.INVALID_FIELD;
+import static com.roundrobin.error.ErrorType.INVALID_REQUEST_ERROR;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_DETAIL_ID;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_ID;
+import static com.roundrobin.vault.error.VaultErrorCode.SKILL_ALREADY_EXISTS;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -12,11 +17,9 @@ import java.util.Optional;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
-import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.vault.api.SkillDetailTo;
 import com.roundrobin.vault.api.SkillTo;
-import com.roundrobin.vault.common.ErrorCode;
 
 /**
  * Created by rengasu on 5/13/16.
@@ -53,8 +56,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "skill", createBearerHeaders(getAccessToken(username)), skillTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_DETAIL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_DETAIL_ID))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_SKILL_DETAIL_ID));
+    assertThat(created.getError().getMessage(), is("Invalid skill detail id"));
+    assertThat(created.getError().getParam(), is("skill_detail_id"));
   }
 
   @Test
@@ -64,8 +70,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "timeToComplete: must be between 10 and 600")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("timeToComplete: must be between 10 and 600"));
   }
 
   @Test
@@ -74,8 +83,12 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "skillDetailId: may not be empty"),
-        new Error(ErrorCode.INVALID_FIELD, "timeToComplete: may not be null")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(),
+        hasItems("skillDetailId: may not be empty", "timeToComplete: may not be null"));
   }
 
   @Test
@@ -86,7 +99,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -98,7 +115,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -110,7 +131,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -122,7 +147,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -135,7 +164,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -148,7 +181,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -161,7 +198,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -174,7 +215,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> created = helper.post(vaultUrl + "skill", createBearerHeaders(), skillTo,
         new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -194,8 +239,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> duplicate = helper.post(vaultUrl + "skill", createBearerHeaders(getAccessToken(username)),
         skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {}).getBody();
     assertThat(duplicate.getEntity(), nullValue());
-    assertThat(duplicate.getErrors(),
-        hasItems(new Error(ErrorCode.SKILL_ALREADY_EXISTS, messages.getErrorMessage(ErrorCode.SKILL_ALREADY_EXISTS))));
+    assertThat(duplicate.getError(), notNullValue());
+    assertThat(duplicate.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(duplicate.getError().getCode(), is(SKILL_ALREADY_EXISTS));
+    assertThat(duplicate.getError().getMessage(), is("Skill already exists"));
+    assertThat(duplicate.getError().getParam(), is("skill_detail_id"));
   }
 
   @Test
@@ -230,9 +278,12 @@ public class SkillResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "skill", createBearerHeaders(), new SkillTo(),
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value"),
-        new Error(ErrorCode.INVALID_FIELD, "id: may not be empty")));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updated.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updated.getError().getFieldErrors(), hasItems("Invalid cost value",
+        "id: may not be empty"));
   }
 
   @Test
@@ -245,9 +296,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "skill", createBearerHeaders(getAccessToken(createUserProfile())),
         skillTo, new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SKILL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_ID))));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_SKILL_ID));
+    assertThat(updated.getError().getMessage(), is("Invalid skill id"));
+    assertThat(updated.getError().getParam(), is("skill_id"));
   }
 
   @Test
@@ -258,9 +311,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<String>>() {})
         .getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "timeToComplete: must be between 10 and 600")));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updated.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updated.getError().getFieldErrors(), hasItems("timeToComplete: must be between 10 and 600"));
   }
 
   @Test
@@ -272,7 +327,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -285,7 +344,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -298,7 +361,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -311,7 +378,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -325,7 +396,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -339,7 +414,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -353,7 +432,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -367,7 +450,11 @@ public class SkillResourceTests extends ResourceTests {
         .put(vaultUrl + "skill", createBearerHeaders(), skillTo, new ParameterizedTypeReference<Response<SkillTo>>() {})
         .getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "Invalid cost value")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("Invalid cost value"));
   }
 
   @Test
@@ -394,10 +481,13 @@ public class SkillResourceTests extends ResourceTests {
     Response<List<SkillTo>> read =
         helper.get(vaultUrl + "skill/{skillId}", createBearerHeaders(getAccessToken(createUserProfile())),
             new ParameterizedTypeReference<Response<List<SkillTo>>>() {}, " ").getBody();
-    assertThat(read.getEntity(), notNullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getEntity().size(), is(0));
-    assertThat(read.getErrors().size(), is(0));
+    assertThat(read.getEntity(), nullValue());
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill id"));
+    assertThat(read.getError().getParam(), is("skill_id"));
   }
 
   @Test
@@ -406,8 +496,11 @@ public class SkillResourceTests extends ResourceTests {
     Response<SkillTo> read = helper.get(vaultUrl + "skill/{skillId}", createBearerHeaders(getAccessToken(username)),
         new ParameterizedTypeReference<Response<SkillTo>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SKILL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill id"));
+    assertThat(read.getError().getParam(), is("skill_id"));
   }
 
   @Test
@@ -432,17 +525,23 @@ public class SkillResourceTests extends ResourceTests {
     read = helper.get(vaultUrl + "skill/{skillId}", createBearerHeaders(getAccessToken(username)),
         new ParameterizedTypeReference<Response<SkillTo>>() {}, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SKILL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill id"));
+    assertThat(read.getError().getParam(), is("skill_id"));   
   }
 
   @Test
   public void testDeleteWithEmptyId() {
-    Response<SkillTo> read = helper.delete(vaultUrl + "skill/{skillId}", createBearerHeaders(),
+    Response<SkillTo> read = helper.delete(vaultUrl + "skill/{skillId}", createBearerHeaders(getAccessToken(createUserProfile())),
         new ParameterizedTypeReference<Response<SkillTo>>() {}, " ").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill id"));
+    assertThat(read.getError().getParam(), is("skill_id"));
   }
 
   @Test
@@ -451,8 +550,11 @@ public class SkillResourceTests extends ResourceTests {
         helper.delete(vaultUrl + "skill/{skillId}", createBearerHeaders(getAccessToken(createUserProfile())),
             new ParameterizedTypeReference<Response<SkillTo>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_SKILL_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill id"));
+    assertThat(read.getError().getParam(), is("skill_id"));   
   }
 
   @Test
@@ -479,8 +581,7 @@ public class SkillResourceTests extends ResourceTests {
         helper.get(vaultUrl + "skill", createBearerHeaders(getAccessToken(createUserProfile())),
             new ParameterizedTypeReference<Response<List<SkillTo>>>() {}).getBody();
     assertThat(list.getEntity(), notNullValue());
-    assertThat(list.getErrors(), notNullValue());
+    assertThat(list.getError(), nullValue());
     assertThat(list.getEntity().size(), is(0));
-    assertThat(list.getErrors().size(), is(0));
   }
 }

@@ -1,5 +1,10 @@
 package com.roundrobin.vault.services;
 
+import static com.roundrobin.conditions.Preconditions.checkArgument;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_DETAIL_ID;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_ID;
+import static com.roundrobin.vault.error.VaultErrorCode.SKILL_ALREADY_EXISTS;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -8,9 +13,8 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.roundrobin.common.Assert;
+import com.roundrobin.exception.BadRequestException;
 import com.roundrobin.vault.api.SkillTo;
-import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.Skill;
 import com.roundrobin.vault.domain.SkillDetail;
 import com.roundrobin.vault.domain.UserProfile;
@@ -31,7 +35,15 @@ public class SkillService {
     UserProfile profile = profileService.getByUserId(userId);
     Optional<Skill> skill =
         profile.getSkills().stream().filter(c -> c.getActive() && c.getId().equals(skillId)).findFirst();
-    Assert.isTrue(skill.isPresent(), ErrorCode.INVALID_SKILL_ID);
+    checkArgument(skill.isPresent(), new BadRequestException(INVALID_SKILL_ID, "skill_id"));
+    return skill.get();
+  }
+
+  public Skill getBySkillDetailId(String userId, String skillDetailId) {
+    UserProfile profile = profileService.getByUserId(userId);
+    Optional<Skill> skill = profile.getSkills().stream()
+        .filter(c -> c.getActive() && c.getSkillDetails().getId().equals(skillDetailId)).findFirst();
+    checkArgument(skill.isPresent(), new BadRequestException(INVALID_SKILL_DETAIL_ID, "skill_detail_id"));
     return skill.get();
   }
 
@@ -80,7 +92,7 @@ public class SkillService {
   private void checkSkillExists(String skillDetailId, UserProfile userProfile) {
     boolean exists = userProfile.getSkills().stream().map(s -> s.getSkillDetails().getId()).collect(Collectors.toList())
         .contains(skillDetailId);
-    Assert.isTrue(!exists, ErrorCode.SKILL_ALREADY_EXISTS);
+    checkArgument(!exists, new BadRequestException(SKILL_ALREADY_EXISTS, "skill_detail_id"));
   }
 
   public List<SkillTo> list(String userId) {

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
-import com.roundrobin.common.User;
+import com.roundrobin.api.User;
 import com.roundrobin.vault.api.BankAccountTo;
 import com.roundrobin.vault.groups.CreateBankAccountValidator;
 import com.roundrobin.vault.groups.UpdateBankAccountValidator;

@@ -1,5 +1,8 @@
 package com.roundrobin.web;
 
+import static com.roundrobin.error.ErrorCode.INVALID_FIELD;
+import static com.roundrobin.error.ErrorCode.UNPARSABLE_INPUT;
+import static com.roundrobin.error.ErrorType.INVALID_REQUEST_ERROR;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -14,10 +17,8 @@ import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
-import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.vault.api.UserProfileTo;
-import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.UserProfile;
 import com.roundrobin.vault.domain.UserProfile.SexType;
 
@@ -53,14 +54,17 @@ public class UserProfileResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "firstName: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "lastName: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "email: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "password: may not be empty"),
-            new Error(ErrorCode.INVALID_FIELD, "vendor: may not be null"),
-            new Error(ErrorCode.INVALID_FIELD, "mobileNumber: may not be empty")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(),
+        hasItems("firstName: may not be empty",
+            "lastName: may not be empty",
+            "email: may not be empty",
+            "password: may not be empty",
+            "vendor: may not be null",
+            "mobileNumber: may not be empty"));
   }
 
   @Test
@@ -72,11 +76,14 @@ public class UserProfileResourceTests extends ResourceTests {
     Response<String> created = helper.post(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "mobileNumber: must match \"(^$|[0-9]{10})\""),
-            new Error(ErrorCode.INVALID_FIELD, "homeNumber: must match \"(^$|[0-9]{10})\""),
-            new Error(ErrorCode.INVALID_FIELD, "email: not a well-formed email address")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(),
+        hasItems("mobileNumber: must match \"(^$|[0-9]{10})\"",
+            "homeNumber: must match \"(^$|[0-9]{10})\"",
+            "email: not a well-formed email address"));
   }
 
   @Test
@@ -85,9 +92,10 @@ public class UserProfileResourceTests extends ResourceTests {
     userProfileTo.put("vendor", "testing");
     Response<String> created = helper.post(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(created.getError().getMessage(), is("Unable to parse input"));
   }
 
   @Test
@@ -96,9 +104,10 @@ public class UserProfileResourceTests extends ResourceTests {
     userProfileTo.put("dob", "testing");
     Response<String> created = helper.post(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(created.getError().getMessage(), is("Unable to parse input"));
   }
 
   @Test
@@ -107,9 +116,10 @@ public class UserProfileResourceTests extends ResourceTests {
     userProfileTo.put("sex", "testing");
     Response<String> created = helper.post(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(created.getError().getMessage(), is("Unable to parse input"));
   }
 
   @Test
@@ -120,11 +130,14 @@ public class UserProfileResourceTests extends ResourceTests {
     userProfileTo.setPassword(Optional.of("aaaaaaaaaadasdajshdasjdaskdasdjasdasdasdasdasdasdasdasdasd"));
     Response<String> created = helper.post(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "lastName: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "firstName: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "password: length must be between 0 and 35")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(),
+        hasItems("lastName: length must be between 0 and 35",
+            "firstName: length must be between 0 and 35",
+            "password: length must be between 0 and 35"));
   }
 
   @Test
@@ -161,12 +174,15 @@ public class UserProfileResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "lastName: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "firstName: length must be between 0 and 35"),
-            new Error(ErrorCode.INVALID_FIELD, "mobileNumber: must match \"(^$|[0-9]{10})\""),
-            new Error(ErrorCode.INVALID_FIELD, "homeNumber: must match \"(^$|[0-9]{10})\"")));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updated.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updated.getError().getFieldErrors(),
+        hasItems("lastName: length must be between 0 and 35",
+            "firstName: length must be between 0 and 35",
+            "mobileNumber: must match \"(^$|[0-9]{10})\"",
+            "homeNumber: must match \"(^$|[0-9]{10})\""));
   }
 
   @Test
@@ -176,9 +192,10 @@ public class UserProfileResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(updated.getError().getMessage(), is("Unable to parse input"));    
   }
 
   @Test
@@ -188,9 +205,10 @@ public class UserProfileResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(updated.getError().getMessage(), is("Unable to parse input"));    
   }
 
   @Test
@@ -200,9 +218,10 @@ public class UserProfileResourceTests extends ResourceTests {
     Response<String> updated = helper.put(vaultUrl + "user-profile", createBearerHeaders(), userProfileTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.UNPARSABLE_INPUT, messages.getErrorMessage(ErrorCode.UNPARSABLE_INPUT))));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(UNPARSABLE_INPUT));
+    assertThat(updated.getError().getMessage(), is("Unable to parse input"));    
   }
 
   @Test

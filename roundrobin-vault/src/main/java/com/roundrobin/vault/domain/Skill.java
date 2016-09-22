@@ -19,6 +19,8 @@ public class Skill {
   private Double maxCost;
   private Double averageReview;
   private Integer numberOfReview;
+  private Double punctuality;
+  private Double hospitality;
   private Boolean active;
   private DateTime created;
   @Version
@@ -110,6 +112,22 @@ public class Skill {
 
   public void setVersion(Long version) {
     this.version = version;
+  }
+
+  public Double getPunctuality() {
+    return punctuality;
+  }
+
+  public void setPunctuality(Double punctuality) {
+    this.punctuality = punctuality;
+  }
+
+  public Double getHospitality() {
+    return hospitality;
+  }
+
+  public void setHospitality(Double hospitality) {
+    this.hospitality = hospitality;
   }
 
   public static enum DeliveryType {

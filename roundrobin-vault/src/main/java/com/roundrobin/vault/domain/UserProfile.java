@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.tomcat.jni.Address;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -30,6 +31,10 @@ public class UserProfile {
   private Long version;
   private GeoJsonPoint location;
 
+  private LocalTime startWindow;
+  private LocalTime endWindow;
+  private int overtime;
+  
   private Address address;
   @DBRef
   private List<UserAction> actions = new ArrayList<>();
@@ -198,6 +203,30 @@ public class UserProfile {
 
   public void setUserId(String userId) {
     this.userId = userId;
+  }
+
+  public LocalTime getStartWindow() {
+    return startWindow;
+  }
+
+  public void setStartWindow(LocalTime startWindow) {
+    this.startWindow = startWindow;
+  }
+
+  public LocalTime getEndWindow() {
+    return endWindow;
+  }
+
+  public void setEndWindow(LocalTime endWindow) {
+    this.endWindow = endWindow;
+  }
+
+  public int getOvertime() {
+    return overtime;
+  }
+
+  public void setOvertime(int overtime) {
+    this.overtime = overtime;
   }
 
   public static enum SexType {

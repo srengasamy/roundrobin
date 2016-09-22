@@ -1,5 +1,8 @@
 package com.roundrobin.vault.services;
 
+import static com.roundrobin.conditions.Preconditions.checkArgument;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_DETAIL_ID;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -7,9 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.roundrobin.common.Assert;
+import com.roundrobin.exception.BadRequestException;
 import com.roundrobin.vault.api.SkillDetailTo;
-import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.SkillDetail;
 import com.roundrobin.vault.domain.SkillGroup;
 import com.roundrobin.vault.repository.SkillDetailRepository;
@@ -25,7 +27,8 @@ public class SkillDetailService {
 
   public SkillDetail get(String id) {
     Optional<SkillDetail> skillDetail = skillDetailRepo.findById(id);
-    Assert.isTrue(skillDetail.isPresent() && skillDetail.get().getActive(), ErrorCode.INVALID_SKILL_DETAIL_ID);
+    checkArgument(skillDetail.isPresent() && skillDetail.get().getActive(),
+        new BadRequestException(INVALID_SKILL_DETAIL_ID, "skill_detail_id"));
     return skillDetail.get();
   }
 

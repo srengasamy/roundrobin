@@ -1,8 +1,11 @@
 package com.roundrobin.web;
 
+import static com.roundrobin.error.ErrorCode.INVALID_FIELD;
+import static com.roundrobin.error.ErrorType.INVALID_REQUEST_ERROR;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_SKILL_GROUP_ID;
+import static com.roundrobin.vault.error.VaultErrorCode.SKILL_GROUP_ALREADY_EXISTS;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -13,10 +16,8 @@ import java.util.Optional;
 import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 
-import com.roundrobin.api.Error;
 import com.roundrobin.api.Response;
 import com.roundrobin.vault.api.SkillGroupTo;
-import com.roundrobin.vault.common.ErrorCode;
 
 public class SkillGroupResourceTests extends ResourceTests {
 
@@ -43,9 +44,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<String> duplicate = helper.post(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
         new ParameterizedTypeReference<Response<String>>() {}).getBody();
     assertThat(duplicate.getEntity(), nullValue());
-    assertThat(duplicate.getErrors(), notNullValue());
-    assertThat(duplicate.getErrors(), hasItems(new Error(ErrorCode.SKILL_GROUP_ALREADY_EXISTS,
-        messages.getErrorMessage(ErrorCode.SKILL_GROUP_ALREADY_EXISTS))));
+    assertThat(duplicate.getError(), notNullValue());
+    assertThat(duplicate.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(duplicate.getError().getCode(), is(SKILL_GROUP_ALREADY_EXISTS));
+    assertThat(duplicate.getError().getMessage(), is("Skill group is same name is already exists"));
+    assertThat(duplicate.getError().getParam(), is("skill_group_name"));
   }
 
   @Test
@@ -54,8 +57,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<SkillGroupTo> created = helper.post(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
         new ParameterizedTypeReference<Response<SkillGroupTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "groupName: may not be empty")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("groupName: may not be empty"));
   }
 
   @Test
@@ -66,9 +72,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<SkillGroupTo> created = helper.post(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
         new ParameterizedTypeReference<Response<SkillGroupTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "groupName: must match \"^[A-Za-z0-9]*$\"")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("groupName: must match \"^[A-Za-z0-9]*$\""));
   }
 
   @Test
@@ -79,9 +87,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<SkillGroupTo> created = helper.post(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
         new ParameterizedTypeReference<Response<SkillGroupTo>>() {}).getBody();
     assertThat(created.getEntity(), nullValue());
-    assertThat(created.getErrors(), notNullValue());
-    assertThat(created.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "groupName: length must be between 0 and 25")));
+    assertThat(created.getError(), notNullValue());
+    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(created.getError().getCode(), is(INVALID_FIELD));
+    assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(created.getError().getFieldErrors(), hasItems("groupName: length must be between 0 and 25"));
   }
 
   @Test
@@ -110,8 +120,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<SkillGroupTo> updated = helper.put(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
         new ParameterizedTypeReference<Response<SkillGroupTo>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "id: may not be empty")));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updated.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updated.getError().getFieldErrors(), hasItems("id: may not be empty"));
   }
 
   @Test
@@ -123,8 +136,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<SkillGroupTo> updated = helper.put(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
         new ParameterizedTypeReference<Response<SkillGroupTo>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(), hasItems(new Error(ErrorCode.INVALID_FIELD, "id: may not be empty")));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updated.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updated.getError().getFieldErrors(), hasItems("id: may not be empty"));
   }
 
   @Test
@@ -136,9 +152,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<SkillGroupTo> updated = helper.put(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
         new ParameterizedTypeReference<Response<SkillGroupTo>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_GROUP_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_GROUP_ID))));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_SKILL_GROUP_ID));
+    assertThat(updated.getError().getMessage(), is("Invalid skill group id"));
+    assertThat(updated.getError().getParam(), is("skill_group_id"));
   }
 
   @Test
@@ -149,9 +167,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<SkillGroupTo> updated = helper.put(vaultUrl + "skill-group", createBearerHeaders(), skillGroupTo,
         new ParameterizedTypeReference<Response<SkillGroupTo>>() {}).getBody();
     assertThat(updated.getEntity(), nullValue());
-    assertThat(updated.getErrors(), notNullValue());
-    assertThat(updated.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_FIELD, "groupName: length must be between 0 and 25")));
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_FIELD));
+    assertThat(updated.getError().getMessage(), is("Invalid values specified for fields"));
+    assertThat(updated.getError().getFieldErrors(), hasItems("groupName: length must be between 0 and 25"));
   }
 
   @Test
@@ -173,8 +193,12 @@ public class SkillGroupResourceTests extends ResourceTests {
   public void testReadWithEmptyId() {
     Response<List<SkillGroupTo>> read = helper.get(vaultUrl + "skill-group/{skillGroupId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<List<SkillGroupTo>>>() {}, " ").getBody();
-    assertThat(read.getEntity(), notNullValue());
-    assertThat(read.getEntity().size(), not(is(0)));
+    assertThat(read.getEntity(), nullValue());
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_GROUP_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill group id"));
+    assertThat(read.getError().getParam(), is("skill_group_id"));
   }
 
   @Test
@@ -182,9 +206,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<String> read = helper.get(vaultUrl + "skill-group/{skillGroupId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<String>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_GROUP_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_GROUP_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_GROUP_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill group id"));
+    assertThat(read.getError().getParam(), is("skill_group_id"));
   }
 
   @Test
@@ -207,9 +233,11 @@ public class SkillGroupResourceTests extends ResourceTests {
         helper.get(vaultUrl + "skill-group/{skillGroupId}", createBearerHeaders(getAccessToken(username)),
             new ParameterizedTypeReference<Response<Boolean>>() {}, created.getEntity().getId()).getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_GROUP_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_GROUP_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_GROUP_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill group id"));
+    assertThat(read.getError().getParam(), is("skill_group_id"));
   }
 
   @Test
@@ -217,9 +245,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<Boolean> read = helper.delete(vaultUrl + "skill-group/{skillGroupId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<Boolean>>() {}, " ").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(),
-        hasItems(new Error(ErrorCode.INVALID_URL, messages.getErrorMessage(ErrorCode.INVALID_URL))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_GROUP_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill group id"));
+    assertThat(read.getError().getParam(), is("skill_group_id"));
   }
 
   @Test
@@ -227,9 +257,11 @@ public class SkillGroupResourceTests extends ResourceTests {
     Response<Boolean> read = helper.delete(vaultUrl + "skill-group/{skillGroupId}", createBearerHeaders(),
         new ParameterizedTypeReference<Response<Boolean>>() {}, "testing").getBody();
     assertThat(read.getEntity(), nullValue());
-    assertThat(read.getErrors(), notNullValue());
-    assertThat(read.getErrors(), hasItems(
-        new Error(ErrorCode.INVALID_SKILL_GROUP_ID, messages.getErrorMessage(ErrorCode.INVALID_SKILL_GROUP_ID))));
+    assertThat(read.getError(), notNullValue());
+    assertThat(read.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(read.getError().getCode(), is(INVALID_SKILL_GROUP_ID));
+    assertThat(read.getError().getMessage(), is("Invalid skill group id"));
+    assertThat(read.getError().getParam(), is("skill_group_id"));
   }
 
   @Test

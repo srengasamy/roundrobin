@@ -1,6 +1,7 @@
 package com.roundrobin.vault.services;
 
-import static com.roundrobin.common.Assert.isTrue;
+import static com.roundrobin.conditions.Preconditions.checkArgument;
+import static com.roundrobin.vault.error.VaultErrorCode.INVALID_BANK_ACCOUNT_ID;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,8 +12,8 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.roundrobin.exception.BadRequestException;
 import com.roundrobin.vault.api.BankAccountTo;
-import com.roundrobin.vault.common.ErrorCode;
 import com.roundrobin.vault.domain.BankAccount;
 import com.roundrobin.vault.domain.UserProfile;
 import com.roundrobin.vault.repository.BankAccountRepository;
@@ -34,7 +35,7 @@ public class BankAccountService {
     UserProfile profile = profileService.getByUserId(userId);
     Optional<BankAccount> bankAccount =
         profile.getBankAccounts().stream().filter(c -> c.getActive() && c.getId().equals(bankAccountId)).findFirst();
-    isTrue(bankAccount.isPresent(), ErrorCode.INVALID_BANK_ACCOUNT_ID);
+    checkArgument(bankAccount.isPresent(), new BadRequestException(INVALID_BANK_ACCOUNT_ID, "bank_account_id"));
     return bankAccount.get();
   }
 

@@ -12,6 +12,10 @@ public class BadRequestException extends AbstractException {
     super(INVALID_REQUEST_ERROR, errorCode, HttpStatus.BAD_REQUEST);
   }
 
+  public BadRequestException(String errorCode, String param) {
+    super(INVALID_REQUEST_ERROR, errorCode, param, HttpStatus.BAD_REQUEST);
+  }
+
   public BadRequestException(String errorCode, Throwable t) {
     super(INVALID_REQUEST_ERROR, errorCode, HttpStatus.BAD_REQUEST, t);
   }

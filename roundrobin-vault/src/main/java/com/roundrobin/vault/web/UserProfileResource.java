@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.roundrobin.api.Response;
-import com.roundrobin.common.User;
+import com.roundrobin.api.User;
 import com.roundrobin.vault.api.UserProfileTo;
 import com.roundrobin.vault.groups.CreateProfileValidator;
 import com.roundrobin.vault.groups.UpdateProfileValidator;
