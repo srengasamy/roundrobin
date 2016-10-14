@@ -25,11 +25,16 @@ public class TrailService {
   @Autowired
   private VendorService vendorService;
 
+  @Autowired
+  private MapService mapService;
+
   public TrailTo create(TrailTo trailTo) {
     Trail trail = new Trail();
+    Vendor vendor =getVendor(trailTo);
     trail.setPoint(trailTo.getPoint());
-    trail.setVendor(getVendor(trailTo));
+    trail.setVendor(vendor);
     trail.setCreated(DateTime.now());
+    mapService.update(vendor, trailTo.getPoint());
     return convert(trailRepo.save(trail));
   }
 

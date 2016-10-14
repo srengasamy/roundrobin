@@ -14,7 +14,6 @@ public class Map {
   @DBRef
   private Vendor vendor;
 
-  @DBRef
   @Indexed
   private GeoJsonPoint point;
 

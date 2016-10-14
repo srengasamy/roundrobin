@@ -1,4 +1,4 @@
-package com.roundrobin.map.config;
+package org.roundrobin.security.config;
 
 import java.util.Collection;
 import java.util.Map;

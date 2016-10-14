@@ -8,42 +8,20 @@
 		<artifactId>roundrobin</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>roundrobin-map</artifactId>
-	<name>roundrobin-map</name>
+	<artifactId>roundrobin-security</artifactId>
+	<name>roundrobin-security</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-jwt</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.github.ulisesbocchio</groupId>
-			<artifactId>jasypt-spring-boot-starter</artifactId>
-			<version>1.6</version>
-		</dependency>
-		<dependency>
 			<groupId>com.roundrobin</groupId>
 			<artifactId>roundrobin-test</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.roundrobin</groupId>
-			<artifactId>roundrobin-security</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

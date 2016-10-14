@@ -5,17 +5,24 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.roundrobin.geo.GeoJsonDeserializer;
 import com.roundrobin.map.groups.MapValidator;
-
+@JsonInclude(Include.NON_ABSENT)
 public class MapTo {
   @NotBlank(groups = MapValidator.class)
+  @JsonProperty("skill_id")
   private String skillId;
 
   @NotNull(groups = MapValidator.class)
+  @JsonDeserialize(using = GeoJsonDeserializer.class)
   private GeoJsonPoint location;
 
   @NotNull(groups = MapValidator.class)
-  private double radius;
+  private Double radius;
 
   private String vendorId;
   private int minutes;
@@ -45,11 +52,11 @@ public class MapTo {
     this.location = location;
   }
 
-  public double getRadius() {
+  public Double getRadius() {
     return radius;
   }
 
-  public void setRadius(double radius) {
+  public void setRadius(Double radius) {
     this.radius = radius;
   }
 

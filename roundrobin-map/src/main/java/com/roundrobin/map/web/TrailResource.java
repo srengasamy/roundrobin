@@ -21,8 +21,9 @@ public class TrailResource {
   @Autowired
   private TrailService service;
 
-  @RequestMapping(method = RequestMethod.POST)
-  public Response<TrailTo> create(Authentication authentication, @RequestBody @Validated(TrailValidator.class) TrailTo trailTo) {
+  @RequestMapping(value = "create", method = RequestMethod.POST)
+  public Response<TrailTo> create(Authentication authentication,
+      @RequestBody @Validated(TrailValidator.class) TrailTo trailTo) {
     User user = (User) authentication.getPrincipal();
     trailTo.setVendorId(user.getUserId());
     return new Response<>(service.create(trailTo));

@@ -6,15 +6,21 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.roundrobin.geo.GeoJsonDeserializer;
 import com.roundrobin.map.groups.VendorValidator;
 
+@JsonInclude(Include.NON_ABSENT)
 public class VendorTo {
   @NotNull(groups = VendorValidator.class)
   @JsonProperty("vendor_id")
   private String vendorId;
 
   @NotNull(groups = VendorValidator.class)
+  @JsonDeserialize(using = GeoJsonDeserializer.class)
   private GeoJsonPoint location;
 
   @NotNull(groups = VendorValidator.class)
