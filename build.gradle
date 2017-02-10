@@ -1,8 +1,18 @@
 allprojects {
+    apply plugin: 'java'
     group = 'com.roundrobin'
-    version = '1.1'
-}
-
-repositories {
-    jcenter()
+    version = '1.0'
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+    repositories {
+        jcenter()
+    }
+    buildscript {
+        repositories {
+            jcenter()
+        }
+        dependencies {
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
+        }
+    }
 }
