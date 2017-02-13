@@ -2,8 +2,8 @@ allprojects {
     apply plugin: 'java'
     group = 'com.roundrobin'
     version = '1.0'
-    sourceCompatibility = 1.6
-    targetCompatibility = 1.6
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
     repositories {
         jcenter()
     }

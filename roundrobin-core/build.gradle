@@ -1,2 +1,10 @@
+apply plugin: 'org.springframework.boot'
+
 dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-test")
+    compile("org.springframework.boot:spring-boot-starter-security")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    compile("net.logstash.logback:logstash-logback-encoder:4.8+")
 }
