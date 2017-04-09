@@ -1,0 +1,12 @@
+apply plugin: "io.franzbecker.gradle-lombok"
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    testCompile("junit:junit")
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+    compile("com.github.ulisesbocchio:jasypt-spring-boot-starter:1.6+")
+    compile("joda-time:joda-time")
+    compile project(':roundrobin-core')
+    compile project(':roundrobin-test')
+}

@@ -3,15 +3,19 @@ package com.roundrobin.test.common;
 import com.roundrobin.core.api.Response;
 import com.roundrobin.core.common.ClientMessages;
 import com.roundrobin.test.api.Token;
-import com.roundrobin.test.helper.TestHttpHelper;
 
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.crypto.codec.Base64;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 
-import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -20,34 +24,32 @@ import static org.junit.Assert.assertThat;
 @Ignore
 public abstract class AbstractResourceTests {
   @Autowired
-  protected TestHttpHelper helper;
+  protected TestRestTemplate template;
 
   @Autowired
-  protected ClientMessages messages;
+  protected ClientMessages clientMessages;
 
   protected final String authUrl = "http://localhost:8080/roundrobin-auth/";
   protected final String vaultUrl = "http://localhost:9090/roundrobin-vault/";
+  protected final String tokenUrl = authUrl + "oauth/token?grant_type=password&username={username}&password={password}";
 
-  protected void createUser(String username) {
-    createUser(username, false);
-  }
-
-  protected String createUser(boolean vendor) {
-    String username = "testing" + System.currentTimeMillis() + "@testing.com";
-    return createUser(username, vendor);
+  protected String createUsername() {
+    return "testing" + System.currentTimeMillis() + "@testing.com";
   }
 
   protected String createUser() {
-    String username = "testing" + System.currentTimeMillis() + "@testing.com";
-    return createUser(username, false);
+    return createUser(createUsername());
   }
 
-  protected String createUser(String username, boolean vendor) {
-    String userTo = "{\"username\":\"" + username + "\", \"password\":\"testing\", \"vendor\":" + vendor + "}";
-    Response<Boolean> created =
-            helper.post(authUrl + "user-action/create-user", userTo, new ParameterizedTypeReference<Response<Boolean>>() {
-            })
-                    .getBody();
+  protected String createUser(String username) {
+    Map<String, String> userTo = new HashMap<>();
+    userTo.put("username", username);
+    userTo.put("password", "testing");
+    Response<Boolean> created = template.exchange(authUrl + "user-action/create-user",
+            HttpMethod.POST,
+            createHttpEntity(userTo),
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }).getBody();
     assertThat(created.getEntity(), notNullValue());
     assertThat(created.getEntity(), is(true));
     return username;
@@ -58,11 +60,12 @@ public abstract class AbstractResourceTests {
   }
 
   protected Token getToken(String username, String password) {
-    Token token = helper
-            .post(authUrl + "oauth/token?grant_type=password&username={username}&password={password}",
-                    createWebClientHeaders(), (String) null, new ParameterizedTypeReference<Token>() {
-                    }, username, password)
-            .getBody();
+    Token token = template
+            .exchange(authUrl + "oauth/token?grant_type=password&username={username}&password={password}",
+                    HttpMethod.POST,
+                    createHttpEntity(createAuthHeader()),
+                    new ParameterizedTypeReference<Token>() {
+                    }, username, password).getBody();
     assertThat(token, notNullValue());
     assertThat(token.getAccessToken(), notNullValue());
     return token;
@@ -72,31 +75,42 @@ public abstract class AbstractResourceTests {
     return getToken(username).getAccessToken();
   }
 
-  protected HttpHeaders createWebClientHeaders() {
-    return new HttpHeaders() {
-      private static final long serialVersionUID = 2987123839863076324L;
-
-      {
-        String auth = "web2:secret";
-        byte[] encodedAuth = Base64.encode(auth.getBytes(Charset.forName("US-ASCII")));
-        String authHeader = "Basic " + new String(encodedAuth);
-        set("Authorization", authHeader);
-      }
-    };
+  protected HttpHeaders createBearerHeader() {
+    return createBearerHeader(getToken(createUser()).getAccessToken());
   }
 
-  protected HttpHeaders createBearerHeaders(String token) {
-    return new HttpHeaders() {
-      private static final long serialVersionUID = 2987123839863076324L;
-
-      {
-        String authHeader = "Bearer " + token;
-        set("Authorization", authHeader);
-      }
-    };
+  protected HttpHeaders createBearerHeader(String token) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + token);
+    return headers;
   }
 
-  protected HttpHeaders createBearerHeaders() {
-    return createBearerHeaders(getToken(createUser()).getAccessToken());
+  protected HttpHeaders createAuthHeader() {
+    return createAuthHeader("web2", "secret");
   }
+
+  protected HttpHeaders createAuthHeader(String username, String password) {
+    HttpHeaders headers = new HttpHeaders();
+    String auth = username + ":" + password;
+    headers.add("Authorization", "Basic " + new String(Base64.getEncoder().encode(auth.getBytes())));
+    return headers;
+  }
+
+  protected HttpEntity<?> createHttpEntity() {
+    return createHttpEntity(null, new HttpHeaders());
+  }
+
+  protected HttpEntity<?> createHttpEntity(HttpHeaders headers) {
+    return createHttpEntity(null, headers);
+  }
+
+  protected HttpEntity<?> createHttpEntity(Object entity) {
+    return createHttpEntity(entity, new HttpHeaders());
+  }
+
+  protected HttpEntity<?> createHttpEntity(Object entity, HttpHeaders headers) {
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    return new HttpEntity<>(entity, headers);
+  }
+
 }

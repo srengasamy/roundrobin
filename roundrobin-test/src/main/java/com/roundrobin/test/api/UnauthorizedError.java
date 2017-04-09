@@ -1,22 +1,14 @@
 package com.roundrobin.test.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
+
+@Data
 public class UnauthorizedError {
   private String error;
-  private String error_description;
 
-  public String getError() {
-    return error;
-  }
+  @JsonProperty("error_description")
+  private String description;
 
-  public void setError(String error) {
-    this.error = error;
-  }
-
-  public String getError_description() {
-    return error_description;
-  }
-
-  public void setError_description(String error_description) {
-    this.error_description = error_description;
-  }
 }

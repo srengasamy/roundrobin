@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
@@ -29,8 +30,13 @@ import java.util.Optional;
 /**
  * Created by rengasu on 5/24/16.
  */
+//TODO: Change to yaml file
+//TODO: Move password encoder to config
+//TODO: Send user action by mail
+//TODO: Parameterized spring version in gradle
+//TODO: Fix StringUtils class
 @SpringBootApplication
-@ComponentScan("com.roundrobin.auth")
+@ComponentScan("com.roundrobin")
 public class RoundRobin {
   @Value(value = "${keystore.password}")
   private String keystorePassword;

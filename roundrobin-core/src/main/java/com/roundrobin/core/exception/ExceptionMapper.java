@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +30,7 @@ import static com.roundrobin.core.common.Constants.ERROR_UUID;
 import static com.roundrobin.core.common.ErrorCodes.INVALID_FIELD;
 import static com.roundrobin.core.common.ErrorCodes.INVALID_URL;
 import static com.roundrobin.core.common.ErrorCodes.SERVICE_ERROR;
+import static com.roundrobin.core.common.ErrorCodes.UNKNOWN_MEDIATYPE;
 import static com.roundrobin.core.common.ErrorCodes.UNPARSABLE_INPUT;
 import static net.logstash.logback.marker.Markers.append;
 
@@ -44,14 +46,19 @@ public class ExceptionMapper {
     return log(new BadRequestException(UNPARSABLE_INPUT, e));
   }
 
+  @ExceptionHandler(HttpMediaTypeException.class)
+  public ResponseEntity<Response<Error>> handleMediaTypeException(HttpMediaTypeException e) {
+    return log(new BadRequestException(UNKNOWN_MEDIATYPE, e));
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Response<Error>> handleBindException(MethodArgumentNotValidException ex) {
     BadRequestException bex = new BadRequestException(INVALID_FIELD, ex);
     List<String> fieldErrors = new ArrayList<>();
     fieldErrors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof FieldError)
-        .map(e -> (FieldError) e).map(e -> e.getField() + ": " + e.getDefaultMessage()).collect(Collectors.toList()));
+            .map(e -> (FieldError) e).map(e -> e.getField() + ": " + e.getDefaultMessage()).collect(Collectors.toList()));
     fieldErrors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> !(e instanceof FieldError))
-        .map(e -> e.getDefaultMessage()).collect(Collectors.toList()));
+            .map(e -> e.getDefaultMessage()).collect(Collectors.toList()));
     return log(bex, fieldErrors.isEmpty() ? null : fieldErrors);
   }
 
@@ -84,9 +91,9 @@ public class ExceptionMapper {
     Response<Error> response = new Response<Error>(error);
     response.setUuid(UUID.randomUUID().toString());
     logger.error(
-        append(ERROR_TYPE, exception.getErrorType()).and(append(ERROR_CODE, exception.getErrorCode()))
-            .and(append(ERROR_MESSAGE, error.getMessage())).and(append(ERROR_UUID, response.getUuid())),
-        "Exception:" + exception, exception);
+            append(ERROR_TYPE, exception.getErrorType()).and(append(ERROR_CODE, exception.getErrorCode()))
+                    .and(append(ERROR_MESSAGE, error.getMessage())).and(append(ERROR_UUID, response.getUuid())),
+            "Exception:" + exception, exception);
     return new ResponseEntity<>(response, exception.getHttpStatus());
   }
 

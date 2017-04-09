@@ -1,5 +1,23 @@
 package com.roundrobin.auth.web;
 
+import com.roundrobin.auth.api.UserActionTo;
+import com.roundrobin.auth.api.UserTo;
+import com.roundrobin.auth.domain.User;
+import com.roundrobin.auth.domain.UserAction;
+import com.roundrobin.auth.enums.UserActionType;
+import com.roundrobin.auth.service.UserService;
+import com.roundrobin.core.api.Response;
+
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import static com.roundrobin.auth.common.ErrorCodes.INVALID_SECRET;
 import static com.roundrobin.auth.common.ErrorCodes.INVALID_USERNAME;
 import static com.roundrobin.auth.common.ErrorCodes.INVALID_USER_ID;
@@ -14,21 +32,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-
-import com.roundrobin.core.api.Response;
-import com.roundrobin.auth.api.UserActionTo;
-import com.roundrobin.auth.api.UserTo;
-import com.roundrobin.auth.domain.User;
-import com.roundrobin.auth.domain.UserAction;
-import com.roundrobin.auth.service.UserService;
 
 /**
  * Created by rengasu on 5/12/16.
@@ -46,31 +49,33 @@ public class UserActionResourceTests extends ResourceTests {
   @Test
   public void testCreate() {
     UserTo userTo = new UserTo();
-    userTo.setUsername(Optional.of("testing" + System.currentTimeMillis() + "@testing.com"));
-    userTo.setVendor(Optional.of(false));
+    userTo.setUsername(Optional.of(createUsername()));
     userTo.setPassword(Optional.of("testing"));
-    Response<Boolean> created =
-            helper.post(authUrl + "user-action/create-user", userTo, new ParameterizedTypeReference<Response<Boolean>>() {
-            })
-                    .getBody();
+    Response<Boolean> created = template.exchange(authUrl + "user-action/create-user",
+            HttpMethod.POST,
+            createHttpEntity(userTo),
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }).getBody();
     assertThat(created.getEntity(), notNullValue());
     assertThat(created.getEntity(), is(true));
   }
 
   @Test
   public void testCreateWithEmptyValue() {
-    UserTo userProfileTo = new UserTo();
-    Response<String> created = helper
-            .post(authUrl + "user-action/create-user", userProfileTo, new ParameterizedTypeReference<Response<String>>() {
-            })
-            .getBody();
+    UserTo userTo = new UserTo();
+    Response<String> created = template.exchange(authUrl + "user-action/create-user",
+            HttpMethod.POST,
+            createHttpEntity(userTo),
+            new ParameterizedTypeReference<Response<String>>() {
+            }).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getError(), notNullValue());
     assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
     assertThat(created.getError().getCode(), is(INVALID_FIELD));
     assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
     assertThat(created.getError().getFieldErrors(),
-            hasItems("username: may not be empty", "password: may not be empty", "vendor: may not be null"));
+            hasItems("username: may not be empty",
+                    "password: may not be empty"));
   }
 
   @Test
@@ -78,31 +83,18 @@ public class UserActionResourceTests extends ResourceTests {
     Map<String, String> userTo = new HashMap<>();
     userTo.put("username", "testing");
     userTo.put("password", "testingdaskdjaskjdkasjdkjaskdjkasjdkasjdkasjdkasjdkajsdkjaksdjkasdjkajs");
-    Response<String> created =
-            helper.post(authUrl + "user-action/create-user", userTo, new ParameterizedTypeReference<Response<String>>() {
-            })
-                    .getBody();
+    Response<String> created = template.exchange(authUrl + "user-action/create-user",
+            HttpMethod.POST,
+            createHttpEntity(userTo),
+            new ParameterizedTypeReference<Response<String>>() {
+            }).getBody();
     assertThat(created.getEntity(), nullValue());
     assertThat(created.getError(), notNullValue());
     assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
     assertThat(created.getError().getCode(), is(INVALID_FIELD));
     assertThat(created.getError().getMessage(), is("Invalid values specified for fields"));
     assertThat(created.getError().getFieldErrors(), hasItems("username: not a well-formed email address",
-            "vendor: may not be null", "password: length must be between 0 and 35"));
-  }
-
-  @Test
-  public void testCreateWithInvalidVendor() {
-    Map<String, String> userProfileTo = new HashMap<>();
-    userProfileTo.put("vendor", "testing");
-    Response<String> created = helper
-            .post(authUrl + "user-action/create-user", userProfileTo, new ParameterizedTypeReference<Response<String>>() {
-            })
-            .getBody();
-    assertThat(created.getError(), notNullValue());
-    assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
-    assertThat(created.getError().getCode(), is(UNPARSABLE_INPUT));
-    assertThat(created.getError().getMessage(), is("Unable to parse input"));
+            "password: length must be between 0 and 35"));
   }
 
   @Test
@@ -110,12 +102,12 @@ public class UserActionResourceTests extends ResourceTests {
     String username = createUser();
     UserTo userTo = new UserTo();
     userTo.setUsername(Optional.of(username));
-    userTo.setVendor(Optional.of(false));
     userTo.setPassword(Optional.of("testing"));
-    Response<String> created =
-            helper.post(authUrl + "user-action/create-user", userTo, new ParameterizedTypeReference<Response<String>>() {
-            })
-                    .getBody();
+    Response<String> created = template.exchange(authUrl + "user-action/create-user",
+            HttpMethod.POST,
+            createHttpEntity(userTo),
+            new ParameterizedTypeReference<Response<String>>() {
+            }).getBody();
     assertThat(created.getError(), notNullValue());
     assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
     assertThat(created.getError().getCode(), is(USER_ALREADY_EXIST));
@@ -124,8 +116,10 @@ public class UserActionResourceTests extends ResourceTests {
 
   @Test
   public void testCreateWithEmptyJson() {
-    Response<String> created = helper
-            .post(authUrl + "user-action/create-user", "", new ParameterizedTypeReference<Response<String>>() {
+    Response<String> created = template.exchange(authUrl + "user-action/create-user",
+            HttpMethod.POST,
+            createHttpEntity(),
+            new ParameterizedTypeReference<Response<String>>() {
             }).getBody();
     assertThat(created.getError(), notNullValue());
     assertThat(created.getError().getType(), is(INVALID_REQUEST_ERROR));
@@ -140,10 +134,11 @@ public class UserActionResourceTests extends ResourceTests {
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setUserId(user.getId());
     userActionTo.setSecret(user.getActions().get(0).getSecret());
-    Response<Boolean> verify = helper
-            .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {
-            })
-            .getBody();
+    Response<Boolean> verify = template.exchange(authUrl + "user-action/verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }).getBody();
     assertThat(verify.getEntity(), notNullValue());
     assertThat(verify.getEntity(), is(true));
   }
@@ -155,14 +150,16 @@ public class UserActionResourceTests extends ResourceTests {
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setUserId(user.getId());
     userActionTo.setSecret(user.getActions().get(0).getSecret());
-    Response<Boolean> verify = helper
-            .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {
-            })
-            .getBody();
+    Response<Boolean> verify = template.exchange(authUrl + "user-action/verify", HttpMethod.POST,
+            createHttpEntity(userActionTo),
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }).getBody();
     assertThat(verify.getEntity(), notNullValue());
     assertThat(verify.getEntity(), is(true));
-    verify = helper
-            .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {
+    verify = template.exchange(authUrl + "user-action/verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
+            new ParameterizedTypeReference<Response<Boolean>>() {
             })
             .getBody();
     assertThat(verify.getEntity(), nullValue());
@@ -174,10 +171,11 @@ public class UserActionResourceTests extends ResourceTests {
 
   @Test
   public void testVerifyWithEmptyValues() {
-    Response<String> verify = helper
-            .post(authUrl + "user-action/verify", new UserActionTo(), new ParameterizedTypeReference<Response<String>>() {
-            })
-            .getBody();
+    Response<String> verify = template.exchange(authUrl + "user-action/verify",
+            HttpMethod.POST,
+            createHttpEntity(new UserActionTo()),
+            new ParameterizedTypeReference<Response<String>>() {
+            }).getBody();
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getError(), notNullValue());
     assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
@@ -191,10 +189,11 @@ public class UserActionResourceTests extends ResourceTests {
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setUserId("testing");
     userActionTo.setSecret("testing");
-    Response<String> verify =
-            helper.post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<String>>() {
-            })
-                    .getBody();
+    Response<String> verify = template.exchange(authUrl + "user-action/verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
+            new ParameterizedTypeReference<Response<String>>() {
+            }).getBody();
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getError(), notNullValue());
     assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
@@ -209,10 +208,11 @@ public class UserActionResourceTests extends ResourceTests {
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setUserId(user.getId());
     userActionTo.setSecret("testing");
-    Response<Boolean> verify = helper
-            .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {
-            })
-            .getBody();
+    Response<Boolean> verify = template.exchange(authUrl + "user-action/verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }).getBody();
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getError(), notNullValue());
     assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
@@ -227,10 +227,11 @@ public class UserActionResourceTests extends ResourceTests {
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setUserId(userService.getByUsername(createUser()).getId());
     userActionTo.setSecret(user.getActions().get(0).getSecret());
-    Response<Boolean> verify = helper
-            .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {
-            })
-            .getBody();
+    Response<Boolean> verify = template.exchange(authUrl + "user-action/verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
+            new ParameterizedTypeReference<Response<Boolean>>() {
+            }).getBody();
     assertThat(verify.getEntity(), nullValue());
     assertThat(verify.getError(), notNullValue());
     assertThat(verify.getError().getType(), is(INVALID_REQUEST_ERROR));
@@ -244,7 +245,9 @@ public class UserActionResourceTests extends ResourceTests {
     User user = userService.getByUsername(username);
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail(user.getUsername());
-    Response<Boolean> requestVerify = helper.post(authUrl + "user-action/request-verify", userActionTo,
+    Response<Boolean> requestVerify = template.exchange(authUrl + "user-action/request-verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(requestVerify.getEntity(), notNullValue());
@@ -253,7 +256,9 @@ public class UserActionResourceTests extends ResourceTests {
 
   @Test
   public void testRequestVerifyWithEmptyValues() {
-    Response<Boolean> verify = helper.post(authUrl + "user-action/request-verify", new UserActionTo(),
+    Response<Boolean> verify = template.exchange(authUrl + "user-action/request-verify",
+            HttpMethod.POST,
+            createHttpEntity(new UserActionTo()),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(verify.getEntity(), nullValue());
@@ -268,7 +273,9 @@ public class UserActionResourceTests extends ResourceTests {
   public void testRequestVerifyWithInvalidValues() {
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail("testing");
-    Response<Boolean> verify = helper.post(authUrl + "user-action/request-verify", userActionTo,
+    Response<Boolean> verify = template.exchange(authUrl + "user-action/request-verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(verify.getEntity(), nullValue());
@@ -284,7 +291,9 @@ public class UserActionResourceTests extends ResourceTests {
     String email = System.currentTimeMillis() + "@testing.com";
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail(email);
-    Response<Boolean> verify = helper.post(authUrl + "user-action/request-verify", userActionTo,
+    Response<Boolean> verify = template.exchange(authUrl + "user-action/request-verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(verify.getEntity(), nullValue());
@@ -301,15 +310,19 @@ public class UserActionResourceTests extends ResourceTests {
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setUserId(user.getId());
     userActionTo.setSecret(user.getActions().get(0).getSecret());
-    Response<Boolean> verify = helper
-            .post(authUrl + "user-action/verify", userActionTo, new ParameterizedTypeReference<Response<Boolean>>() {
+    Response<Boolean> verify = template.exchange(authUrl + "user-action/verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
+            new ParameterizedTypeReference<Response<Boolean>>() {
             })
             .getBody();
     assertThat(verify.getEntity(), notNullValue());
     assertThat(verify.getEntity(), is(true));
     userActionTo = new UserActionTo();
     userActionTo.setEmail(user.getUsername());
-    Response<Boolean> requestVerify = helper.post(authUrl + "user-action/request-verify", userActionTo,
+    Response<Boolean> requestVerify = template.exchange(authUrl + "user-action/request-verify",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(requestVerify.getEntity(), nullValue());
@@ -324,7 +337,9 @@ public class UserActionResourceTests extends ResourceTests {
     String username = createUser();
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail(username);
-    Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
+    Response<Boolean> reset = template.exchange(authUrl + "user-action/request-reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), notNullValue());
@@ -334,7 +349,9 @@ public class UserActionResourceTests extends ResourceTests {
   @Test
   public void testRequestResetPasswordWithEmptyValues() {
     UserActionTo userActionTo = new UserActionTo();
-    Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
+    Response<Boolean> reset = template.exchange(authUrl + "user-action/request-reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), nullValue());
@@ -349,7 +366,9 @@ public class UserActionResourceTests extends ResourceTests {
   public void testRequestResetPasswordWithInvalidValues() {
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail("testing");
-    Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
+    Response<Boolean> reset = template.exchange(authUrl + "user-action/request-reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), nullValue());
@@ -365,7 +384,9 @@ public class UserActionResourceTests extends ResourceTests {
     String email = System.currentTimeMillis() + "@testing.com";
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail(email);
-    Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
+    Response<Boolean> reset = template.exchange(authUrl + "user-action/request-reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), nullValue());
@@ -380,7 +401,8 @@ public class UserActionResourceTests extends ResourceTests {
     String username = createUser();
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail(username);
-    Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
+    Response<Boolean> reset = template.exchange(authUrl + "user-action/request-reset-password", HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), notNullValue());
@@ -388,7 +410,7 @@ public class UserActionResourceTests extends ResourceTests {
     User user = userService.getByUsername(username);
     UserAction userAction = null;
     for (UserAction action : user.getActions()) {
-      if (action.getAction() == UserAction.UserActionType.RESET_PASSWORD) {
+      if (action.getAction() == UserActionType.RESET_PASSWORD) {
         userAction = action;
         break;
       }
@@ -397,7 +419,9 @@ public class UserActionResourceTests extends ResourceTests {
     userActionTo.setUserId(user.getId());
     userActionTo.setSecret(userAction.getSecret());
     userActionTo.setPassword("newpassword");
-    reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
+    reset = template.exchange(authUrl + "user-action/reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), notNullValue());
@@ -407,7 +431,9 @@ public class UserActionResourceTests extends ResourceTests {
   @Test
   public void testResetPasswordWithEmptyValues() {
     UserActionTo userActionTo = new UserActionTo();
-    Response<Error> reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
+    Response<Error> reset = template.exchange(authUrl + "user-action/reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Error>>() {
             }).getBody();
     assertThat(reset.getEntity(), nullValue());
@@ -424,7 +450,9 @@ public class UserActionResourceTests extends ResourceTests {
     String username = createUser();
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail(username);
-    Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
+    Response<Boolean> reset = template.exchange(authUrl + "user-action/request-reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), notNullValue());
@@ -434,7 +462,9 @@ public class UserActionResourceTests extends ResourceTests {
     userActionTo.setUserId(user.getId());
     userActionTo.setSecret("testing");
     userActionTo.setPassword("newpassword");
-    reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
+    reset = template.exchange(authUrl + "user-action/reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), nullValue());
@@ -449,7 +479,9 @@ public class UserActionResourceTests extends ResourceTests {
     String username = createUser();
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail(username);
-    Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
+    Response<Boolean> reset = template.exchange(authUrl + "user-action/request-reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), notNullValue());
@@ -458,7 +490,9 @@ public class UserActionResourceTests extends ResourceTests {
     userActionTo.setUserId("testing");
     userActionTo.setSecret("testing");
     userActionTo.setPassword("newpassword");
-    reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
+    reset = template.exchange(authUrl + "user-action/reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), nullValue());
@@ -473,7 +507,9 @@ public class UserActionResourceTests extends ResourceTests {
     String username = createUser();
     UserActionTo userActionTo = new UserActionTo();
     userActionTo.setEmail(username);
-    Response<Boolean> reset = helper.post(authUrl + "user-action/request-reset-password", userActionTo,
+    Response<Boolean> reset = template.exchange(authUrl + "user-action/request-reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), notNullValue());
@@ -482,7 +518,7 @@ public class UserActionResourceTests extends ResourceTests {
     User user = userService.getByUsername(username);
     UserAction userAction = null;
     for (UserAction action : user.getActions()) {
-      if (action.getAction() == UserAction.UserActionType.RESET_PASSWORD) {
+      if (action.getAction() == UserActionType.RESET_PASSWORD) {
         userAction = action;
         break;
       }
@@ -490,7 +526,9 @@ public class UserActionResourceTests extends ResourceTests {
     userActionTo.setUserId(userService.getByUsername(createUser()).getId());
     userActionTo.setSecret(userAction.getSecret());
     userActionTo.setPassword("newpassword");
-    reset = helper.post(authUrl + "user-action/reset-password", userActionTo,
+    reset = template.exchange(authUrl + "user-action/reset-password",
+            HttpMethod.POST,
+            createHttpEntity(userActionTo),
             new ParameterizedTypeReference<Response<Boolean>>() {
             }).getBody();
     assertThat(reset.getEntity(), nullValue());

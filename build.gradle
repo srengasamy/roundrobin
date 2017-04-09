@@ -1,5 +1,6 @@
-allprojects {
+subprojects {
     apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
     group = 'com.roundrobin'
     version = '1.0'
     sourceCompatibility = 1.8
@@ -7,12 +8,27 @@ allprojects {
     repositories {
         jcenter()
     }
-    buildscript {
-        repositories {
-            jcenter()
+    dependencyManagement() {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
         }
-        dependencies {
-            classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
+    }
+}
+
+buildscript {
+    ext {
+        springBootVersion = '1.5.1.RELEASE'
+        dependencyManagementPluginVersion = '1.0.0.RELEASE'
+    }
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
         }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("io.spring.gradle:dependency-management-plugin:${dependencyManagementPluginVersion}")
+        classpath("io.franzbecker:gradle-lombok:1.8")
     }
 }

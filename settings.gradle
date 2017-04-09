@@ -18,6 +18,9 @@ include 'services:webservice'
 
 rootProject.name = 'roundrobin'
 include 'roundrobin-core'
-include 'roundrobin-auth'
 include 'roundrobin-test'
+include 'roundrobin-auth'
+include 'roundrobin-vault'
+include 'roundrobin-api'
+include 'roundrobin-vault'
 

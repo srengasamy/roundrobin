@@ -1,15 +1,18 @@
 package com.roundrobin.auth.domain;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
+import lombok.Data;
+
+@Data
 @Document(collection = "client_detail")
 public class ClientDetail {
   @Id
@@ -33,133 +36,5 @@ public class ClientDetail {
   @CreatedDate
   private Date created;
   private Boolean active;
-
-  public String getClientId() {
-    return clientId;
-  }
-
-  public void setClientId(String clientId) {
-    this.clientId = clientId;
-  }
-
-  public Set<String> getResourceIds() {
-    return resourceIds;
-  }
-
-  public void setResourceIds(Set<String> resourceIds) {
-    this.resourceIds = resourceIds;
-  }
-
-  public boolean isSecretRequired() {
-    return secretRequired;
-  }
-
-  public Set<String> getScope() {
-    return scope;
-  }
-
-  public void setScope(Set<String> scope) {
-    this.scope = scope;
-  }
-
-  public void setSecretRequired(boolean secretRequired) {
-    this.secretRequired = secretRequired;
-  }
-
-  public String getClientSecret() {
-    return clientSecret;
-  }
-
-  public void setClientSecret(String clientSecret) {
-    this.clientSecret = clientSecret;
-  }
-
-  public boolean isScoped() {
-    return scoped;
-  }
-
-  public void setScoped(boolean scoped) {
-    this.scoped = scoped;
-  }
-
-  public Set<String> getAuthorizedGrantTypes() {
-    return authorizedGrantTypes;
-  }
-
-  public void setAuthorizedGrantTypes(Set<String> authorizedGrantTypes) {
-    this.authorizedGrantTypes = authorizedGrantTypes;
-  }
-
-  public Set<String> getRegisteredRedirectUri() {
-    return registeredRedirectUri;
-  }
-
-  public void setRegisteredRedirectUri(Set<String> registeredRedirectUri) {
-    this.registeredRedirectUri = registeredRedirectUri;
-  }
-
-  public Collection<String> getAuthorities() {
-    return authorities;
-  }
-
-  public void setAuthorities(Collection<String> authorities) {
-    this.authorities = authorities;
-  }
-
-  public Integer getAccessTokenValiditySeconds() {
-    return accessTokenValiditySeconds;
-  }
-
-  public void setAccessTokenValiditySeconds(Integer accessTokenValiditySeconds) {
-    this.accessTokenValiditySeconds = accessTokenValiditySeconds;
-  }
-
-  public Integer getRefreshTokenValiditySeconds() {
-    return refreshTokenValiditySeconds;
-  }
-
-  public void setRefreshTokenValiditySeconds(Integer refreshTokenValiditySeconds) {
-    this.refreshTokenValiditySeconds = refreshTokenValiditySeconds;
-  }
-
-  public boolean isAutoApprove() {
-    return autoApprove;
-  }
-
-  public void setAutoApprove(boolean autoApprove) {
-    this.autoApprove = autoApprove;
-  }
-
-  public Map<String, Object> getAdditionalInformation() {
-    return additionalInformation;
-  }
-
-  public void setAdditionalInformation(Map<String, Object> additionalInformation) {
-    this.additionalInformation = additionalInformation;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public Date getCreated() {
-    return created;
-  }
-
-  public void setCreated(Date created) {
-    this.created = created;
-  }
-
-  public Boolean getActive() {
-    return active;
-  }
-
-  public void setActive(Boolean active) {
-    this.active = active;
-  }
 
 }

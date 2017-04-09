@@ -16,4 +16,10 @@ public class Preconditions {
     }
   }
 
+  public static void badRequest(boolean expression, String errorCode, String param) {
+    if (!expression) {
+      throw new BadRequestException(errorCode, param);
+    }
+  }
+
 }
