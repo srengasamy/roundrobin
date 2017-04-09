@@ -49,8 +49,8 @@ public class UserActionResourceTests extends ResourceTests {
   @Test
   public void testCreate() {
     UserTo userTo = new UserTo();
-    userTo.setUsername(Optional.of(createUsername()));
-    userTo.setPassword(Optional.of("testing"));
+    userTo.setUsername(createUsername());
+    userTo.setPassword("testing");
     Response<Boolean> created = template.exchange(authUrl + "user-action/create-user",
             HttpMethod.POST,
             createHttpEntity(userTo),
@@ -101,8 +101,8 @@ public class UserActionResourceTests extends ResourceTests {
   public void testCreateWithExistingName() {
     String username = createUser();
     UserTo userTo = new UserTo();
-    userTo.setUsername(Optional.of(username));
-    userTo.setPassword(Optional.of("testing"));
+    userTo.setUsername(username);
+    userTo.setPassword("testing");
     Response<String> created = template.exchange(authUrl + "user-action/create-user",
             HttpMethod.POST,
             createHttpEntity(userTo),

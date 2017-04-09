@@ -50,11 +50,11 @@ public class UserService {
   }
 
   public void create(UserTo userTo) {
-    Optional<User> existing = userRepo.findByUsername(userTo.getUsername().get());
+    Optional<User> existing = userRepo.findByUsername(userTo.getUsername());
     badRequest(!existing.isPresent(), USER_ALREADY_EXIST);
     User user = new User();
-    user.setUsername(userTo.getUsername().get());
-    user.setPassword(passwordEncoder.encode(userTo.getPassword().get()));
+    user.setUsername(userTo.getUsername());
+    user.setPassword(passwordEncoder.encode(userTo.getPassword()));
     user.setActive(true);
     user.setVerified(false);
     user.getRoles().add(RoleType.USER);
@@ -71,7 +71,7 @@ public class UserService {
   private UserTo convert(User user) {
     UserTo userTo = new UserTo();
     userTo.setUserId(user.getId());
-    userTo.setUsername(Optional.of(user.getUsername()));
+    userTo.setUsername(user.getUsername());
     userTo.setRoles(user.getRoles().stream().map(r -> r.toString()).collect(Collectors.toList()));
     userTo.setVerified(user.getVerified());
     return userTo;
