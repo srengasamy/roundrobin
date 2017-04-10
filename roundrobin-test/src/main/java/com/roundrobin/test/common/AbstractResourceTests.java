@@ -86,7 +86,7 @@ public abstract class AbstractResourceTests {
   }
 
   protected HttpHeaders createAuthHeader() {
-    return createAuthHeader("web2", "secret");
+    return createAuthHeader("web", "secret");
   }
 
   protected HttpHeaders createAuthHeader(String username, String password) {

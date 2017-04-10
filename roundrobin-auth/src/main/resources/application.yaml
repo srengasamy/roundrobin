@@ -1,3 +1,6 @@
+spring:
+  profiles:
+    active: local
 server:
   port: 8080
   contextPath:  '/roundrobin-auth'
@@ -12,14 +15,6 @@ security:
   oauth2:
       resource:
         id: roundrobin-auth
-spring:
-  data:
-    mongodb:
-      username: roundrobin-auth
-      password: ENC(aqPvQem0wL63P7Tjtt3hc4uCzsiTDgCe)
-      host: localhost
-      port: 27017
-      database: admin
 
 keystore:
   password: ENC(18OV7Pc9GqNEdgY2F5Sbh0O9+FgzsGp2u6WuS8vIWMoeCTJgGE9htQ==)
