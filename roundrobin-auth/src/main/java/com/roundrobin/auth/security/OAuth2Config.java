@@ -1,13 +1,10 @@
 package com.roundrobin.auth.security;
 
-import com.roundrobin.auth.beans.CustomTokenEnhancer;
-import com.roundrobin.auth.beans.MongoTokenConverter;
-import com.roundrobin.auth.beans.MongoTokenStore;
-import com.roundrobin.auth.domain.User;
-import com.roundrobin.auth.domain.UserDetail;
+import com.roundrobin.auth.config.CustomTokenEnhancer;
+import com.roundrobin.auth.config.MongoTokenConverter;
+import com.roundrobin.auth.config.MongoTokenStore;
 import com.roundrobin.auth.repository.AccessTokenRepository;
 import com.roundrobin.auth.repository.RefreshTokenRepository;
-import com.roundrobin.auth.repository.UserRepository;
 import com.roundrobin.auth.service.ClientDetailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -31,7 +25,6 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 @Configuration
 @EnableAuthorizationServer

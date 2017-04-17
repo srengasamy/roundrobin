@@ -1,9 +1,13 @@
-package com.roundrobin.core.exception;
+package com.roundrobin.core.config;
 
 
 import com.roundrobin.core.api.Error;
 import com.roundrobin.core.api.Response;
 import com.roundrobin.core.common.ClientMessages;
+import com.roundrobin.core.exception.AbstractException;
+import com.roundrobin.core.exception.BadRequestException;
+import com.roundrobin.core.exception.NotFoundException;
+import com.roundrobin.core.exception.ServiceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -19,7 +19,6 @@ import java.util.Optional;
  * Created by rengasu on 5/24/16.
  */
 //TODO: Send user action by mail
-//TODO: Fix StringUtils class
 @SpringBootApplication
 @ComponentScan("com.roundrobin")
 public class RoundRobin {

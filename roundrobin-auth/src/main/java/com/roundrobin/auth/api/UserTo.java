@@ -2,6 +2,7 @@ package com.roundrobin.auth.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.roundrobin.auth.groups.CreateUserValidator;
 import com.roundrobin.auth.groups.UserValidator;
 
@@ -15,8 +16,9 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-@JsonInclude(Include.NON_ABSENT)
+@JsonInclude(Include.NON_NULL)
 public class UserTo {
+  @JsonProperty("user_id")
   private String userId;
 
   @NotBlank(groups = CreateUserValidator.class)

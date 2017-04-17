@@ -1,4 +1,4 @@
-package com.roundrobin.auth.beans;
+package com.roundrobin.auth.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.DefaultExpiringOAuth2RefreshToken;

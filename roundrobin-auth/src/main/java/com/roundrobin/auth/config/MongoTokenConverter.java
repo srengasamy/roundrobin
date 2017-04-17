@@ -1,4 +1,4 @@
-package com.roundrobin.auth.beans;
+package com.roundrobin.auth.config;
 
 import java.util.Map;
 

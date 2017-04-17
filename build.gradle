@@ -1,4 +1,5 @@
 subprojects {
+    apply plugin: 'propdeps'
     apply plugin: 'java'
     apply plugin: 'io.spring.dependency-management'
     group = 'com.roundrobin'
@@ -25,10 +26,14 @@ buildscript {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+        maven {
+            url 'http://repo.spring.io/plugins-release'
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("io.spring.gradle:dependency-management-plugin:${dependencyManagementPluginVersion}")
         classpath("io.franzbecker:gradle-lombok:1.8")
+        classpath("io.spring.gradle:propdeps-plugin:0.0.8")
     }
 }

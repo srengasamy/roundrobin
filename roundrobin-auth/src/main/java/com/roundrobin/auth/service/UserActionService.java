@@ -5,9 +5,6 @@ import com.roundrobin.auth.domain.User;
 import com.roundrobin.auth.domain.UserAction;
 import com.roundrobin.auth.enums.UserActionType;
 
-import static com.roundrobin.auth.enums.UserActionType.VERIFY_USER;
-import static com.roundrobin.auth.enums.UserActionType.RESET_PASSWORD;
-
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +14,8 @@ import java.util.UUID;
 
 import static com.roundrobin.auth.common.ErrorCodes.INVALID_SECRET;
 import static com.roundrobin.auth.common.ErrorCodes.USER_ALREADY_VERIFIED;
+import static com.roundrobin.auth.enums.UserActionType.RESET_PASSWORD;
+import static com.roundrobin.auth.enums.UserActionType.VERIFY_USER;
 import static com.roundrobin.core.common.Preconditions.badRequest;
 
 /**

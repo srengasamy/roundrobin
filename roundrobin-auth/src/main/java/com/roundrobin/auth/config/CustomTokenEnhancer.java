@@ -1,4 +1,4 @@
-package com.roundrobin.auth.beans;
+package com.roundrobin.auth.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +13,7 @@ import com.roundrobin.auth.domain.UserDetail;
 
 @Configuration
 public class CustomTokenEnhancer implements TokenEnhancer {
+
   @Override
   public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
     UserDetail user = (UserDetail) authentication.getPrincipal();
