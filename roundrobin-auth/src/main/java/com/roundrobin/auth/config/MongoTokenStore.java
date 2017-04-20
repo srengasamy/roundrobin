@@ -1,5 +1,10 @@
 package com.roundrobin.auth.config;
 
+import com.roundrobin.auth.domain.AccessToken;
+import com.roundrobin.auth.domain.RefreshToken;
+import com.roundrobin.auth.repository.AccessTokenRepository;
+import com.roundrobin.auth.repository.RefreshTokenRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.DefaultExpiringOAuth2RefreshToken;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -9,12 +14,6 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AuthenticationKeyGenerator;
 import org.springframework.security.oauth2.provider.token.DefaultAuthenticationKeyGenerator;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.stereotype.Component;
-
-import com.roundrobin.auth.domain.AccessToken;
-import com.roundrobin.auth.domain.RefreshToken;
-import com.roundrobin.auth.repository.AccessTokenRepository;
-import com.roundrobin.auth.repository.RefreshTokenRepository;
 
 public class MongoTokenStore extends JwtTokenStore {
 

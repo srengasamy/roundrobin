@@ -9,8 +9,6 @@ import org.junit.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 
-import javax.jws.soap.SOAPBinding;
-
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -64,5 +62,29 @@ public class UserResourceTests extends ResourceTests {
     assertThat(read.getEntity().getUsername(), notNullValue());
     assertThat(read.getEntity().getRoles().size(), not(0));
     assertThat(read.getEntity().isVerified(), notNullValue());
+  }
+
+  @Test
+  public void testReadWithEmptyToken() {
+    UnauthorizedError read = template.exchange(authUrl + "admin/user", HttpMethod.GET,
+            createHttpEntity(), UnauthorizedError.class).getBody();
+    assertThat(read.getError(), is("unauthorized"));
+  }
+
+  @Test
+  public void testReadWithInvalidToken() {
+    UnauthorizedError read = template.exchange(authUrl + "admin/user", HttpMethod.GET,
+            createHttpEntity(createBearerHeader("testing")), UnauthorizedError.class).getBody();
+    assertThat(read.getError(), is("invalid_token"));
+  }
+
+  @Test
+  public void test404() {
+    String username = createUsername();
+    Token token = getToken(createUser(username));
+    UnauthorizedError read = template.exchange(authUrl + "abcd", HttpMethod.GET,
+            createHttpEntity(createBearerHeader(token.getAccessToken())), UnauthorizedError.class).getBody();
+    assertThat(read.getError(), is("Not Found"));
+    assertThat(read.getMessage(), is("No message available"));
   }
 }

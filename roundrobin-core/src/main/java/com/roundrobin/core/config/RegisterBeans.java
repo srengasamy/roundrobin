@@ -1,4 +1,4 @@
-package com.roundrobin.core.beans;
+package com.roundrobin.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;

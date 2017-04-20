@@ -38,9 +38,6 @@ import static org.junit.Assert.assertThat;
  */
 public class UserActionResourceTests extends ResourceTests {
   // TODO Include all test cases
-  // TODO Messages for all error code
-  // TODO Handle all other api failures like 404/400
-  // TODO Complete pom file
   // TODO Add indexes to columns
 
   @Autowired
