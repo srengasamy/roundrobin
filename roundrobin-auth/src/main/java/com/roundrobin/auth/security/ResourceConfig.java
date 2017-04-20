@@ -21,7 +21,7 @@ public class ResourceConfig extends ResourceServerConfigurerAdapter {
     //@formatter:off
     http.authorizeRequests().
             antMatchers("/admin/**").access("#oauth2.hasScope('write')").
-            antMatchers("/user-action/**").anonymous();
+            antMatchers("/user-action/**").permitAll();
     //@formatter:on
     http.csrf().disable();
   }

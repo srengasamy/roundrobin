@@ -1,4 +1,4 @@
-package com.roundrobin.core.common;
+package com.roundrobin.core.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

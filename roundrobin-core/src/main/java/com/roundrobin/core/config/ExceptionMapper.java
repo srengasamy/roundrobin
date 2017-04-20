@@ -3,7 +3,6 @@ package com.roundrobin.core.config;
 
 import com.roundrobin.core.api.Error;
 import com.roundrobin.core.api.Response;
-import com.roundrobin.core.common.ClientMessages;
 import com.roundrobin.core.exception.AbstractException;
 import com.roundrobin.core.exception.BadRequestException;
 import com.roundrobin.core.exception.NotFoundException;

@@ -1,7 +1,7 @@
 package com.roundrobin.test.common;
 
 import com.roundrobin.core.api.Response;
-import com.roundrobin.core.common.ClientMessages;
+import com.roundrobin.core.config.ClientMessages;
 import com.roundrobin.test.api.Token;
 
 import org.junit.Ignore;
