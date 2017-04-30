@@ -24,7 +24,6 @@ public class SkillGroupTo {
   @JsonProperty("group_name")
   @NotBlank(groups = CreateSkillGroupValidator.class)
   @Length(max = 25, groups = SkillGroupValidator.class)
-  @Pattern(regexp = "^[A-Za-z0-9]*$", groups=SkillGroupValidator.class)
   private Optional<String> groupName = Optional.empty();
 
 }

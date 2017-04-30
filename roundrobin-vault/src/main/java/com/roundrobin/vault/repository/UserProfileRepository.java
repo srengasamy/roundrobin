@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import com.roundrobin.vault.domain.UserProfile;
 
 public interface UserProfileRepository extends MongoRepository<UserProfile, String> {
-  public Optional<UserProfile> findByUserId(String id);
+  public Optional<UserProfile> findById(String id);
 
 }

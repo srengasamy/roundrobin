@@ -11,12 +11,18 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
-  @JsonProperty("user_id")
+
+  @JsonProperty("user_name")
   private String userId;
 
-  private String username;
-
+  @JsonProperty("authorities")
   private List<String> roles = new ArrayList<>();
+
+  @JsonProperty("scope")
+  private List<String> scopes = new ArrayList<>();
+
+  @JsonProperty("aud")
+  private List<String> resources = new ArrayList<>();
 
   private boolean verified;
 

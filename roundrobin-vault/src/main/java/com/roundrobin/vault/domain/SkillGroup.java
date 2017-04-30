@@ -1,7 +1,6 @@
 package com.roundrobin.vault.domain;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
@@ -13,7 +12,5 @@ public class SkillGroup {
   private String id;
   private String groupName;
   private Boolean active;
-  @Version
-  private Long version;
 
 }

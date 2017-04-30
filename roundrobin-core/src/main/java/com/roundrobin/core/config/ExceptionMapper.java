@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -58,6 +60,8 @@ public class ExceptionMapper {
   public ResponseEntity<Response<Error>> handleBindException(MethodArgumentNotValidException ex) {
     BadRequestException bex = new BadRequestException(INVALID_FIELD, ex);
     List<String> fieldErrors = new ArrayList<>();
+    BindingResult br = ex.getBindingResult();
+    List<ObjectError> errors  = br.getAllErrors();
     fieldErrors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> e instanceof FieldError)
             .map(e -> (FieldError) e).map(e -> e.getField() + ": " + e.getDefaultMessage()).collect(Collectors.toList()));
     fieldErrors.addAll(ex.getBindingResult().getAllErrors().stream().filter(e -> !(e instanceof FieldError))

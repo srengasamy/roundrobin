@@ -8,6 +8,7 @@ import com.roundrobin.vault.groups.UpdateProfileValidator;
 import com.roundrobin.vault.service.UserProfileService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,7 @@ public class UserProfileResource {
   @RequestMapping(method = RequestMethod.GET)
   public Response<UserProfileTo> read(Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    return new Response<>(service.read(user.getUserId()));
+    return new Response<>(service.read(user));
   }
 
   @RequestMapping(consumes = {"application/json"}, method = RequestMethod.POST)
@@ -32,8 +33,7 @@ public class UserProfileResource {
           @RequestBody @Validated(CreateProfileValidator.class) UserProfileTo userProfileTo,
           Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    userProfileTo.setUserId(user.getUserId());
-    return new Response<>(service.create(userProfileTo));
+    return new Response<>(service.create(user, userProfileTo));
   }
 
   @RequestMapping(consumes = {"application/json"}, method = RequestMethod.PUT)
@@ -41,14 +41,13 @@ public class UserProfileResource {
           @RequestBody @Validated(UpdateProfileValidator.class) UserProfileTo userProfileTo,
           Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    userProfileTo.setUserId(user.getUserId());
-    return new Response<>(service.update(userProfileTo));
+    return new Response<>(service.update(user, userProfileTo));
   }
 
   @RequestMapping(method = RequestMethod.DELETE)
   public Response<Boolean> delete(Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    service.delete(user.getUserId());
+    service.delete(user);
     return new Response<>(true);
   }
 }

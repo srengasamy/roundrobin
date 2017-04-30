@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "skill-group", produces = {"application/json"})
+@RequestMapping(value = "admin/skill-group", produces = {"application/json"})
 public class SkillGroupResource {
   @Autowired
   private SkillGroupService service;

@@ -1,7 +1,7 @@
 package com.roundrobin.auth.web;
 
 import com.roundrobin.core.api.Response;
-import com.roundrobin.core.api.User;
+import com.roundrobin.core.api.UserInfo;
 import com.roundrobin.test.api.Token;
 import com.roundrobin.test.api.UnauthorizedError;
 
@@ -52,10 +52,10 @@ public class UserResourceTests extends ResourceTests {
   public void testRead() {
     String username = createUsername();
     Token token = getToken(createUser(username));
-    Response<User> read = template.exchange(authUrl + "admin/user",
+    Response<UserInfo> read = template.exchange(authUrl + "admin/user",
             HttpMethod.GET,
             createHttpEntity(createBearerHeader(token.getAccessToken())),
-            new ParameterizedTypeReference<Response<User>>() {
+            new ParameterizedTypeReference<Response<UserInfo>>() {
             }).getBody();
     assertThat(read.getEntity(), notNullValue());
     assertThat(read.getEntity().getUserId(), notNullValue());

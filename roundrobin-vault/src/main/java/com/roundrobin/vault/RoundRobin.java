@@ -13,14 +13,14 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
-@EnableResourceServer
-@EnableWebSecurity
+//TODO: Added invalid scope, resources and expired tests for all apis
+//TODO: Check all api have _ in all fields
 @SpringBootApplication
+@EnableResourceServer
 @ComponentScan("com.roundrobin")
 public class RoundRobin {
 
   public static void main(String[] args) {
-    DefaultUserAuthenticationConverter a;
     SpringApplication.run(RoundRobin.class, args);
   }
 

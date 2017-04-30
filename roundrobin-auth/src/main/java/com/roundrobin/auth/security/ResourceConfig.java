@@ -20,7 +20,7 @@ public class ResourceConfig extends ResourceServerConfigurerAdapter {
   public void configure(HttpSecurity http) throws Exception {
     //@formatter:off
     http.authorizeRequests().
-            antMatchers("/admin/**").access("#oauth2.hasScope('write')").
+            antMatchers("/admin/**").access("#oauth2.hasScope('profile')").
             antMatchers("/user-action/**").permitAll();
     //@formatter:on
     http.csrf().disable();

@@ -11,5 +11,6 @@ public class ErrorCodes{
   public static final String SKILL_GROUP_ALREADY_EXISTS = "skill_group_already_exists";
   public static final String UNKNOWN_PROFILE = "unknown_profile";
   public static final String INVALID_USER_ID = "invalid_user_id";
+  public static final String INVALID_REQUEST = "invalid_request";
   public static final String INVALID_URGENT_GROUP = "invalid_urgent_group";
 }

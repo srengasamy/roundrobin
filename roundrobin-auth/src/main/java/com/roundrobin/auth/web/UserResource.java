@@ -3,6 +3,7 @@ package com.roundrobin.auth.web;
 import com.roundrobin.auth.api.UserTo;
 import com.roundrobin.auth.service.UserService;
 import com.roundrobin.core.api.Response;
+import com.roundrobin.core.api.UserInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,9 +18,15 @@ public class UserResource {
   private UserService service;
 
   @RequestMapping(value = "user", method = RequestMethod.GET)
-  public Response<UserTo> user(Authentication authentication) {
+  public Response<UserInfo> user(Authentication authentication) {
     String userId = (String) authentication.getPrincipal();
-    return new Response<>(service.read(userId));
+    UserTo userTo = service.read(userId);
+    UserInfo userInfo = new UserInfo();
+    userInfo.setUserId(userTo.getUserId());
+    userInfo.setUsername(userTo.getUsername());
+    userInfo.setRoles(userTo.getRoles());
+    userInfo.setVerified(userTo.isVerified());
+    return new Response<>(userInfo);
   }
 
   @RequestMapping(value = "user", method = RequestMethod.DELETE)

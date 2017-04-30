@@ -3,6 +3,7 @@ package com.roundrobin.vault.security;
 import java.util.Collection;
 import java.util.Map;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.roundrobin.core.api.User;
 
+@Configuration
 public class UserAuthenticationConverter extends DefaultUserAuthenticationConverter {
   private ObjectMapper mapper = new ObjectMapper();
 

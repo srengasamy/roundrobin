@@ -1,5 +1,7 @@
 package com.roundrobin.vault.service;
 
+import com.roundrobin.core.api.User;
+import com.roundrobin.core.service.GenericService;
 import com.roundrobin.vault.api.SkillTo;
 import com.roundrobin.vault.domain.Skill;
 import com.roundrobin.vault.domain.SkillDetail;
@@ -15,12 +17,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.roundrobin.core.common.Preconditions.badRequest;
-import static com.roundrobin.vault.common.ErrorCodes.INVALID_SKILL_DETAIL_ID;
 import static com.roundrobin.vault.common.ErrorCodes.INVALID_SKILL_ID;
 import static com.roundrobin.vault.common.ErrorCodes.SKILL_ALREADY_EXISTS;
 
 @Service
-public class SkillService {
+public class SkillService implements GenericService<Skill, SkillTo> {
   @Autowired
   private SkillDetailService skillDetailService;
 
@@ -30,33 +31,29 @@ public class SkillService {
   @Autowired
   private UserProfileService profileService;
 
-  private Skill get(String userId, String skillId) {
-    UserProfile profile = profileService.getByUserId(userId);
-    Optional<Skill> skill =
-            profile.getSkills().stream().filter(c -> c.getActive() && c.getId().equals(skillId)).findFirst();
-    badRequest(skill.isPresent(), INVALID_SKILL_ID, "skill_id");
+  @Override
+  public Skill get(User user, String id) {
+    Optional<Skill> skill = skillRepo.findById(id);
+    badRequest(skill.isPresent()
+            && skill.get().isActive()
+            && skill.get().getProfile().getId().equals(user.getUserId()), INVALID_SKILL_ID, "skill_id");
     return skill.get();
   }
 
-  public Skill getBySkillDetailId(String userId, String skillDetailId) {
-    UserProfile profile = profileService.getByUserId(userId);
-    Optional<Skill> skill = profile.getSkills().stream()
-            .filter(c -> c.getActive() && c.getSkillDetails().getId().equals(skillDetailId)).findFirst();
-    badRequest(skill.isPresent(), INVALID_SKILL_DETAIL_ID, "skill_detail_id");
-    return skill.get();
-  }
-
-  private Skill save(Skill skill) {
+  @Override
+  public Skill save(Skill skill) {
     return skillRepo.save(skill);
   }
 
-  public SkillTo read(String userId, String skillId) {
-    return convert(get(userId, skillId));
+  @Override
+  public SkillTo read(User user, String id) {
+    return convert(get(user, id));
   }
 
-  public SkillTo create(String userId, SkillTo skillTo) {
+  @Override
+  public SkillTo create(User user, SkillTo skillTo) {
     SkillDetail skillDetail = skillDetailService.get(skillTo.getSkillDetailId());
-    UserProfile userProfile = profileService.getByUserId(userId);
+    UserProfile userProfile = profileService.get(user);
     checkSkillExists(skillDetail.getId(), userProfile);
     Skill skill = new Skill();
     skill.setTimeToComplete(skillTo.getTimeToComplete().get());
@@ -66,40 +63,38 @@ public class SkillService {
     skill.setActive(true);
     skill.setCreated(DateTime.now());
     skill.setSkillDetails(skillDetail);
-    save(skill);
-    userProfile.getSkills().add(skill);
-    profileService.save(userProfile);
-    return convert(skill);
+    skill.setProfile(userProfile);
+    return convert(save(skill));
   }
 
-  public SkillTo update(String userId, SkillTo skillTo) {
-    Skill skill = get(userId, skillTo.getId());
+  @Override
+  public SkillTo update(User user, SkillTo skillTo) {
+    Skill skill = get(user, skillTo.getId());
     skill.setMaxCost(skillTo.getMaxCost().orElse(skill.getMaxCost()));
     skill.setMinCost(skillTo.getMinCost().orElse(skill.getMinCost()));
     skill.setCost(skillTo.getCost().orElse(skill.getCost()));
     skill.setTimeToComplete(skillTo.getTimeToComplete().orElse(skill.getTimeToComplete()));
-    save(skill);
-    return convert(skill);
+    return convert(save(skill));
   }
 
-  public void delete(String userId, String skillId) {
-    Skill skill = get(userId, skillId);
+  @Override
+  public void delete(User user, String id) {
+    Skill skill = get(user, id);
     skill.setActive(false);
     save(skill);
   }
 
-  private void checkSkillExists(String skillDetailId, UserProfile userProfile) {
-    boolean exists = userProfile.getSkills().stream().map(s -> s.getSkillDetails().getId()).collect(Collectors.toList())
-            .contains(skillDetailId);
-    badRequest(!exists, SKILL_ALREADY_EXISTS, "skill_detail_id");
+  @Override
+  public List<SkillTo> list(User user) {
+    return skillRepo.findAllByProfile(profileService.get(user))
+            .stream()
+            .filter(c -> c.isActive())
+            .map(c -> convert(c))
+            .collect(Collectors.toList());
   }
 
-  public List<SkillTo> list(String userId) {
-    UserProfile profile = profileService.getByUserId(userId);
-    return profile.getSkills().stream().filter(c -> c.getActive()).map(c -> convert(c)).collect(Collectors.toList());
-  }
-
-  private SkillTo convert(Skill skill) {
+  @Override
+  public SkillTo convert(Skill skill) {
     SkillTo skillTo = new SkillTo();
     skillTo.setId(skill.getId());
     skillTo.setCost(Optional.ofNullable(skill.getCost()));
@@ -107,5 +102,13 @@ public class SkillService {
     skillTo.setMaxCost(Optional.ofNullable(skill.getMaxCost()));
     skillTo.setTimeToComplete(Optional.of(skill.getTimeToComplete()));
     return skillTo;
+  }
+
+  private void checkSkillExists(String skillDetailId, UserProfile userProfile) {
+    Optional<Skill> existing = skillRepo.findAllByProfile(userProfile)
+            .stream()
+            .filter(s -> s.getSkillDetails().getId().equals(skillDetailId))
+            .findFirst();
+    badRequest(!existing.isPresent(), SKILL_ALREADY_EXISTS, "skill_detail_id");
   }
 }

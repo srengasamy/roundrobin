@@ -1,5 +1,6 @@
 package com.roundrobin.vault.service;
 
+import com.roundrobin.core.api.User;
 import com.roundrobin.vault.api.UserProfileTo;
 import com.roundrobin.vault.domain.UserProfile;
 import com.roundrobin.vault.repository.UserProfileRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.roundrobin.core.common.Preconditions.badRequest;
+import static com.roundrobin.vault.common.ErrorCodes.INVALID_REQUEST;
 import static com.roundrobin.vault.common.ErrorCodes.INVALID_USER_ID;
 
 @Service
@@ -18,8 +20,8 @@ public class UserProfileService {
   @Autowired
   private UserProfileRepository profileRepo;
 
-  public UserProfile getByUserId(String userId) {
-    Optional<UserProfile> userProfile = profileRepo.findByUserId(userId);
+  public UserProfile get(User user) {
+    Optional<UserProfile> userProfile = profileRepo.findById(user.getUserId());
     badRequest(userProfile.isPresent(), INVALID_USER_ID);
     return userProfile.get();
   }
@@ -28,31 +30,30 @@ public class UserProfileService {
     return profileRepo.save(userProfile);
   }
 
-  public UserProfileTo read(String userId) {
-    return convert(getByUserId(userId));
+  public UserProfileTo read(User user) {
+    return convert(get(user));
   }
 
-  public UserProfileTo create(UserProfileTo userProfileTo) {
+  public UserProfileTo create(User user, UserProfileTo userProfileTo) {
+    Optional<UserProfile> existing = profileRepo.findById(user.getUserId());
+    badRequest(!existing.isPresent(), INVALID_REQUEST);
     UserProfile userProfile = new UserProfile();
+    userProfile.setId(user.getUserId());
     userProfile.setFirstName(userProfileTo.getFirstName().get());
     userProfile.setLastName(userProfileTo.getLastName().get());
     userProfile.setDob(userProfileTo.getDob().get());
-    userProfile.setEmail(userProfileTo.getEmail().get());
     userProfile.setMobileNumber(userProfileTo.getMobileNumber().get());
     userProfile.setHomeNumber(userProfileTo.getHomeNumber().orElse(null));
     userProfile.setSex(userProfileTo.getSex().orElse(null));
-    userProfile.setLocation(userProfileTo.getLocation().orElse(null));
     userProfile.setVendor(userProfileTo.getVendor().get());
-    userProfile.setUserId(userProfileTo.getUserId());
     userProfile.setFlags(0);
     userProfile.setActive(false);
     userProfile.setCreated(DateTime.now());
-    save(userProfile);
-    return convert(userProfile);
+    return convert(save(userProfile));
   }
 
-  public UserProfileTo update(UserProfileTo userProfileTo) {
-    UserProfile userProfile = getByUserId(userProfileTo.getUserId());
+  public UserProfileTo update(User user, UserProfileTo userProfileTo) {
+    UserProfile userProfile = get(user);
     userProfile.setFirstName(userProfileTo.getFirstName().orElse(userProfile.getFirstName()));
     userProfile.setLastName(userProfileTo.getLastName().orElse(userProfile.getLastName()));
     userProfile.setDob(userProfileTo.getDob().orElse(userProfile.getDob()));
@@ -60,13 +61,11 @@ public class UserProfileService {
     userProfile.setHomeNumber(userProfileTo.getHomeNumber().orElse(userProfile.getHomeNumber()));
     userProfile.setSex(userProfileTo.getSex().orElse(userProfile.getSex()));
     userProfile.setVendor(userProfileTo.getVendor().orElse(userProfile.getVendor()));
-    userProfile.setLocation(userProfileTo.getLocation().orElse(userProfile.getLocation()));
-    save(userProfile);
-    return convert(userProfile);
+    return convert(save(userProfile));
   }
 
-  public void delete(String userId) {
-    UserProfile userProfile = getByUserId(userId);
+  public void delete(User user) {
+    UserProfile userProfile = get(user);
     userProfile.setActive(false);
     save(userProfile);
   }
@@ -80,7 +79,6 @@ public class UserProfileService {
     userProfileTo.setMobileNumber(Optional.of(userProfile.getMobileNumber()));
     userProfileTo.setSex(Optional.ofNullable(userProfile.getSex()));
     userProfileTo.setVendor(Optional.of(userProfile.getVendor()));
-    userProfileTo.setLocation(Optional.ofNullable(userProfile.getLocation()));
     return userProfileTo;
   }
 }

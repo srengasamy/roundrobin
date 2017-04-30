@@ -3,7 +3,7 @@ spring:
     active: local
 server:
   port: 8080
-  contextPath:  '/roundrobin-auth'
+  contextPath:  '/auth'
   tomcat:
     accesslog:
       enabled: true
@@ -14,7 +14,7 @@ server:
 security:
   oauth2:
       resource:
-        id: roundrobin-auth
+        id: auth
 
 keystore:
   password: ENC(18OV7Pc9GqNEdgY2F5Sbh0O9+FgzsGp2u6WuS8vIWMoeCTJgGE9htQ==)

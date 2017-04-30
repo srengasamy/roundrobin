@@ -28,33 +28,33 @@ public class SkillResource {
   @RequestMapping(value = "{skillId}", method = RequestMethod.GET)
   public Response<SkillTo> read(@PathVariable String skillId, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    return new Response<>(service.read(user.getUserId(), skillId));
+    return new Response<>(service.read(user, skillId));
   }
 
   @RequestMapping(consumes = {"application/json"}, method = RequestMethod.POST)
   public Response<SkillTo> create(@RequestBody @Validated(CreateSkillValidator.class) SkillTo skillTo,
       Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    return new Response<>(service.create(user.getUserId(), skillTo));
+    return new Response<>(service.create(user, skillTo));
   }
 
   @RequestMapping(consumes = {"application/json"}, method = RequestMethod.PUT)
   public Response<SkillTo> update(@RequestBody @Validated(UpdateSkillValidator.class) SkillTo skillTo,
       Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    return new Response<>(service.update(user.getUserId(), skillTo));
+    return new Response<>(service.update(user, skillTo));
   }
 
   @RequestMapping(value = "{skillId}", method = RequestMethod.DELETE)
   public Response<Boolean> delete(@PathVariable String skillId, Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    service.delete(user.getUserId(), skillId);
+    service.delete(user, skillId);
     return new Response<>(true);
   }
 
   @RequestMapping(method = RequestMethod.GET)
   public Response<List<SkillTo>> list(Authentication authentication) {
     User user = (User) authentication.getPrincipal();
-    return new Response<>(service.list(user.getUserId()));
+    return new Response<>(service.list(user));
   }
 }

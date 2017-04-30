@@ -17,7 +17,7 @@ import com.roundrobin.vault.groups.UpdateSkillDetailValidator;
 import com.roundrobin.vault.service.SkillDetailService;
 
 @RestController
-@RequestMapping(value = "skill-detail", produces = {"application/json"})
+@RequestMapping(value = "admin/skill-detail", produces = {"application/json"})
 public class SkillDetailResource {
   @Autowired
   private SkillDetailService service;

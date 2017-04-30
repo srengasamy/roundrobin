@@ -43,10 +43,4 @@ public class SkillTo {
   @JsonProperty("max_cost")
   private Optional<Double> maxCost = Optional.empty();
 
-  @JsonProperty("average_review")
-  private Double averageReview;
-
-  @JsonProperty("number_of_review")
-  private Integer numberOfReview;
-
 }

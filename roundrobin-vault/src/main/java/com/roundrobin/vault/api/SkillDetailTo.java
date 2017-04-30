@@ -27,7 +27,6 @@ public class SkillDetailTo {
 
   @UnwrapValidatedValue
   @NotBlank(groups = CreateSkillDetailValidator.class)
-  @Pattern(regexp = "^[A-Za-z0-9]*$", groups = SkillDetailValidator.class)
   @Length(max = 25, groups = SkillDetailValidator.class)
   private Optional<String> name = Optional.empty();
 

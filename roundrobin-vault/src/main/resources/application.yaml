@@ -1,0 +1,36 @@
+spring:
+  profiles:
+    active: local
+server:
+  port: 9090
+  contextPath:  '/vault'
+  tomcat:
+    accesslog:
+      enabled: true
+      prefix: localhost_access
+      pattern: '%h %l %u %t "%r" %s %B %D'
+      suffix: .log
+
+security:
+  user:
+    name: vault
+    password: ENC(riWbPS6SKyRuHrRxtilnsVe2ob/sHthMGgGMoHaDjSo=)
+  basic:
+      realm: 'vault'
+  oauth2:
+      resource:
+        id: vault
+        jwt:
+          key-value: |
+            -----BEGIN PUBLIC KEY-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1VPv07EHI1deGzG6BPu0
+            nfNKhmFonWjvZeg+snUqv5sGP0/wec30rTmjlPULz/2Wk39LtUmqsUyfWbrw/6io
+            gzND41W6sLlH57ZsN2p8kqN4HKBxFvMTF5g6HJmUeEmZtBrJKD3ykaSiTDlWSfWN
+            Yl5/g47v0kuKd0f6Kv07mcSFZKVH2O3opzgTIl5Rhlq/YbDeoNxPYZBMMDEt0K4x
+            Ru+zCkbBqcSgqRUKirw6lLNuVfSR1UeLhFEK6IkoVx9mm/ETMCl8EA0EEO4Wofhv
+            PGRv3WYMwgIo6ACOawih3VPuL+Zs+R7HCFZAwNiAakC7Aqwlx3hh5+szY4smBvxx
+            oQIDAQAB
+            -----END PUBLIC KEY-----
+
+keystore:
+  password: ENC(18OV7Pc9GqNEdgY2F5Sbh0O9+FgzsGp2u6WuS8vIWMoeCTJgGE9htQ==)

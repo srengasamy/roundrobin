@@ -1,21 +1,36 @@
 package com.roundrobin.test.common;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.roundrobin.core.api.Response;
 import com.roundrobin.core.config.ClientMessages;
 import com.roundrobin.test.api.Token;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
+import java.security.KeyPair;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -27,10 +42,16 @@ public abstract class AbstractResourceTests {
   protected TestRestTemplate template;
 
   @Autowired
+  private ObjectMapper objectMapper;
+
+  @Autowired
   protected ClientMessages clientMessages;
 
-  protected final String authUrl = "http://localhost:8080/roundrobin-auth/";
-  protected final String vaultUrl = "http://localhost:9090/roundrobin-vault/";
+  @Value("${keystore.password}")
+  private String keystorePassword;
+
+  protected final String authUrl = "http://localhost:8080/auth/";
+  protected final String vaultUrl = "http://localhost:9090/vault/";
   protected final String tokenUrl = authUrl + "oauth/token?grant_type=password&username={username}&password={password}";
 
   protected String createUsername() {
@@ -55,6 +76,10 @@ public abstract class AbstractResourceTests {
     return username;
   }
 
+  protected String getToken() {
+    return getToken(createUser()).getAccessToken();
+  }
+
   protected Token getToken(String username) {
     return getToken(username, "testing");
   }
@@ -69,10 +94,6 @@ public abstract class AbstractResourceTests {
     assertThat(token, notNullValue());
     assertThat(token.getAccessToken(), notNullValue());
     return token;
-  }
-
-  protected String getAccessToken(String username) {
-    return getToken(username).getAccessToken();
   }
 
   protected HttpHeaders createBearerHeader() {
@@ -108,9 +129,85 @@ public abstract class AbstractResourceTests {
     return createHttpEntity(entity, new HttpHeaders());
   }
 
-  protected HttpEntity<?> createHttpEntity(Object entity, HttpHeaders headers) {
-    headers.setContentType(MediaType.APPLICATION_JSON);
+  protected HttpEntity<?> createHttpEntity(MediaType mediaType, Object entity, HttpHeaders headers) {
+    headers.setContentType(mediaType);
     return new HttpEntity<>(entity, headers);
   }
 
+  protected HttpEntity<?> createHttpEntity(Object entity, HttpHeaders headers) {
+    return createHttpEntity(MediaType.APPLICATION_JSON, entity, headers);
+  }
+
+  protected String getAccessToken(String username) {
+    return getToken(username).getAccessToken();
+  }
+
+
+  protected String getMockAccessToken(String userId, long expiry, List<String> scopes, List<String> resources) {
+    Map<String, Object> token = new HashMap<>();
+    token.put("user_name", userId);
+    token.put("exp", expiry);
+    token.put("scope", scopes);
+    token.put("aud", resources);
+    return createMockAccessToken(token);
+  }
+
+  protected String getMockAccessToken() {
+    return getMockAccessToken(UUID.randomUUID().toString());
+  }
+
+  protected String getMockAccessToken(String userId) {
+    return getMockAccessToken(userId,
+            (System.currentTimeMillis() / 1000) + 1800,
+            getValidScopes(),
+            getValidResources());
+  }
+
+  private String createMockAccessToken(Map<String, Object> payload) {
+    try {
+      return createMockAccessToken(objectMapper.writeValueAsString(payload));
+    } catch (Exception e) {
+      return "error";
+    }
+  }
+
+  private String createMockAccessToken(String payload) {
+    KeyStoreKeyFactory keyStoreKeyFactory =
+            new KeyStoreKeyFactory(new ClassPathResource("roundrobin-auth.jks"), keystorePassword.toCharArray());
+    KeyPair pair = keyStoreKeyFactory.getKeyPair("roundrobin-auth");
+    return Jwts.builder()
+            .setPayload(payload)
+            .signWith(SignatureAlgorithm.RS256, pair.getPrivate())
+            .compact();
+  }
+
+  protected List<String> getValidResources() {
+    List<String> resources = new ArrayList<>();
+    resources.add("vault");
+    resources.add("auth");
+    resources.add("api");
+    return resources;
+  }
+
+  protected List<String> getValidScopes() {
+    List<String> scopes = new ArrayList<>();
+    scopes.add("profile");
+    scopes.add("location");
+    scopes.add("vault");
+    scopes.add("api");
+    scopes.add("skill");
+    return scopes;
+  }
+
+  protected List<String> getInvalidScopes() {
+    List<String> scopes = new ArrayList<>();
+    scopes.add("abc");
+    return scopes;
+  }
+
+  protected List<String> getInvalidResources() {
+    List<String> scopes = new ArrayList<>();
+    scopes.add("abc");
+    return scopes;
+  }
 }
