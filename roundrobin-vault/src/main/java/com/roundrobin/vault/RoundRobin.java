@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 
 //TODO: Added invalid scope, resources and expired tests for all apis
 //TODO: Check all api have _ in all fields
+//TODO: complete skill resource test
 @SpringBootApplication
 @EnableResourceServer
 @ComponentScan("com.roundrobin")

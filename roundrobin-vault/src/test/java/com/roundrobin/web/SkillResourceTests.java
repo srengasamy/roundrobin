@@ -362,6 +362,37 @@ public class SkillResourceTests extends ResourceTests {
   }
 
   @Test
+  public void testUpdateWithWrongSkillId() {
+    String userId = createUserProfile();
+    SkillDetailTo skillDetailTo = createSkillDetail();
+    SkillTo skillTo = new SkillTo();
+    skillTo.setMinCost(Optional.of(1.0));
+    skillTo.setMaxCost(Optional.of(10.0));
+    skillTo.setSkillDetailId(skillDetailTo.getId());
+    skillTo.setTimeToComplete(Optional.of(10));
+    Response<SkillTo> created = template.exchange(vaultUrl + "skill", POST,
+            createHttpEntity(skillTo, createBearerHeader(getMockAccessToken(userId))),
+            new ParameterizedTypeReference<Response<SkillTo>>() {
+            }).getBody();
+
+    skillTo = new SkillTo();
+    skillTo.setId(created.getEntity().getId());
+    skillTo.setMinCost(Optional.of(1.0));
+    skillTo.setMaxCost(Optional.of(10.0));
+    skillTo.setTimeToComplete(Optional.of(10));
+    Response<String> updated = template.exchange(vaultUrl + "skill", PUT,
+            createHttpEntity(skillTo, createBearerHeader(getMockAccessToken(createUserProfile())))
+            , new ParameterizedTypeReference<Response<String>>() {
+            }).getBody();
+    assertThat(updated.getEntity(), nullValue());
+    assertThat(updated.getError(), notNullValue());
+    assertThat(updated.getError().getType(), is(INVALID_REQUEST_ERROR));
+    assertThat(updated.getError().getCode(), is(INVALID_SKILL_ID));
+    assertThat(updated.getError().getMessage(), is("Invalid skill id"));
+    assertThat(updated.getError().getParam(), is("skill_id"));
+  }
+
+  @Test
   public void testUpdateWithInvalidTTC() {
     SkillTo skillTo = new SkillTo();
     skillTo.setTimeToComplete(Optional.of(5));
