@@ -19,6 +19,7 @@ import java.util.Optional;
  * Created by rengasu on 5/24/16.
  */
 //TODO: Send user action by mail
+//TODO: add logback to all module
 @SpringBootApplication
 @ComponentScan("com.roundrobin")
 public class RoundRobin {

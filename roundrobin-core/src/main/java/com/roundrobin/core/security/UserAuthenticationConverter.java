@@ -1,7 +1,7 @@
-package com.roundrobin.vault.security;
+package com.roundrobin.core.security;
 
-import java.util.Collection;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.roundrobin.core.api.User;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,8 +11,8 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.util.StringUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.roundrobin.core.api.User;
+import java.util.Collection;
+import java.util.Map;
 
 @Configuration
 public class UserAuthenticationConverter extends DefaultUserAuthenticationConverter {

@@ -21,6 +21,5 @@ include 'roundrobin-core'
 include 'roundrobin-test'
 include 'roundrobin-auth'
 include 'roundrobin-vault'
-include 'roundrobin-api'
-include 'roundrobin-vault'
+include 'roundrobin-gate'
 
