@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.roundrobin.core.common.ErrorCodes.INVALID_REQUEST;
+import static com.roundrobin.core.common.ErrorCodes.INVALID_USER_ID;
 import static com.roundrobin.core.common.Preconditions.badRequest;
-import static com.roundrobin.vault.common.ErrorCodes.INVALID_REQUEST;
-import static com.roundrobin.vault.common.ErrorCodes.INVALID_USER_ID;
 
 @Service
 public class UserProfileService {
@@ -46,7 +46,6 @@ public class UserProfileService {
     userProfile.setHomeNumber(userProfileTo.getHomeNumber().orElse(null));
     userProfile.setSex(userProfileTo.getSex().orElse(null));
     userProfile.setVendor(userProfileTo.getVendor().get());
-    userProfile.setFlags(0);
     userProfile.setActive(false);
     userProfile.setCreated(DateTime.now());
     return convert(save(userProfile));

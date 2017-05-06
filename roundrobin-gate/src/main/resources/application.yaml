@@ -2,8 +2,8 @@ spring:
   profiles:
     active: local
 server:
-  port: 9090
-  contextPath:  '/vault'
+  port: 7070
+  contextPath:  '/gate'
   tomcat:
     accesslog:
       enabled: true
@@ -13,10 +13,10 @@ server:
 
 security:
   user:
-    name: web
+    name: gate
     password: ENC(riWbPS6SKyRuHrRxtilnsVe2ob/sHthMGgGMoHaDjSo=)
   basic:
-      realm: 'vault'
+      realm: 'gate'
   oauth2:
       resource:
         id: web

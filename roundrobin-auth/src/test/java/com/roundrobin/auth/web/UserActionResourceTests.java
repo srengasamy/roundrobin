@@ -1,5 +1,6 @@
 package com.roundrobin.auth.web;
 
+import com.roundrobin.auth.ResourceTests;
 import com.roundrobin.auth.api.UserActionTo;
 import com.roundrobin.auth.api.UserTo;
 import com.roundrobin.auth.domain.User;

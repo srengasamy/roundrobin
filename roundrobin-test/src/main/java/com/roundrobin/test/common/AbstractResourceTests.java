@@ -52,6 +52,7 @@ public abstract class AbstractResourceTests {
 
   protected final String authUrl = "http://localhost:8080/auth/";
   protected final String vaultUrl = "http://localhost:9090/vault/";
+  protected final String gateUrl = "http://localhost:7070/gate/";
   protected final String tokenUrl = authUrl + "oauth/token?grant_type=password&username={username}&password={password}";
 
   protected String createUsername() {
@@ -183,7 +184,7 @@ public abstract class AbstractResourceTests {
 
   protected List<String> getValidResources() {
     List<String> resources = new ArrayList<>();
-    resources.add("vault");
+    resources.add("web");
     resources.add("auth");
     resources.add("api");
     return resources;
@@ -193,7 +194,7 @@ public abstract class AbstractResourceTests {
     List<String> scopes = new ArrayList<>();
     scopes.add("profile");
     scopes.add("location");
-    scopes.add("vault");
+    scopes.add("web");
     scopes.add("api");
     scopes.add("skill");
     return scopes;

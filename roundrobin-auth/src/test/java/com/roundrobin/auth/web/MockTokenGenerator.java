@@ -25,12 +25,12 @@ public class MockTokenGenerator {
     List<String> scopes = new ArrayList<>();
     scopes.add("profile");
     scopes.add("location");
-    scopes.add("vault");
+    scopes.add("web");
     scopes.add("api");
     scopes.add("skill");
 
     List<String> resources= new ArrayList<>();
-    resources.add("vault");
+    resources.add("web");
     resources.add("auth");
     resources.add("api");
     Map<String, Object> token = new HashMap<>();
@@ -51,7 +51,7 @@ public class MockTokenGenerator {
     KeyPair pair = keyStoreKeyFactory.getKeyPair("roundrobin-auth");
 
     String compactJws = Jwts.builder()
-            .setPayload("{\"aud\": [\"auth\",\"vault\"],\"user_name\": \"5902dcfe78f6150c85d9b873\",\"scope\": [\"profile\",\"location\",\"api\",\"vault\"],\"verified\": false,\"exp\": 1493403070,\"authorities\": [\"USER\"],\"jti\": \"e0b5b767-3a5e-48a2-8e68-0e9227e94177\",\"client_id\": \"web\"}")
+            .setPayload("{\"aud\": [\"auth\",\"web\"],\"user_name\": \"5902dcfe78f6150c85d9b873\",\"scope\": [\"profile\",\"location\",\"api\",\"web\"],\"verified\": false,\"exp\": 1493403070,\"authorities\": [\"USER\"],\"jti\": \"e0b5b767-3a5e-48a2-8e68-0e9227e94177\",\"client_id\": \"web\"}")
             .signWith(SignatureAlgorithm.RS256, pair.getPrivate())
             .compact();
     System.out.println(compactJws);

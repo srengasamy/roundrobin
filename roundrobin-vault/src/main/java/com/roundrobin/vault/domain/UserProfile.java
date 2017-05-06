@@ -2,10 +2,8 @@ package com.roundrobin.vault.domain;
 
 import com.roundrobin.vault.enums.SexType;
 
-import org.apache.tomcat.jni.Address;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -29,7 +27,6 @@ public class UserProfile {
   private Boolean vendor;
   private LocalDate dob;
   private SexType sex;
-  private Integer flags;
   private Boolean active;
   private DateTime created;
 
@@ -38,8 +35,5 @@ public class UserProfile {
 
   @DBRef
   private List<BankAccount> bankAccounts = new ArrayList<>();
-
-  @DBRef
-  private List<Skill> skills = new ArrayList<>();
 
 }

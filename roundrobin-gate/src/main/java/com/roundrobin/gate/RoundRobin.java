@@ -12,7 +12,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
-
+//TODO: Handle incomplete profile
+//TODO: Create separate db for each module
 @SpringBootApplication
 @EnableResourceServer
 @ComponentScan("com.roundrobin")
