@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 
 //TODO: Handle incomplete profile
 //TODO: Create separate db for each module
+//TODO: Revisit all index parameters
 @SpringBootApplication
 @EnableResourceServer
 @ComponentScan("com.roundrobin")

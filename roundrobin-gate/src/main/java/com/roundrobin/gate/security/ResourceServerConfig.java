@@ -29,6 +29,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     http.authorizeRequests().
             antMatchers("/user-profile/**").access("#oauth2.hasScope('profile')").
             antMatchers("/skill/**").access("#oauth2.hasScope('skill')").
+            antMatchers("/job/**").access("#oauth2.hasScope('skill')").//TODO: change to job
             antMatchers("/admin/**").hasAnyRole("ADMIN").
             antMatchers("/**").denyAll();
     http.csrf().disable();

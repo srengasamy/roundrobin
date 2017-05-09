@@ -1,12 +1,14 @@
 package com.roundrobin.gate;
 
 import com.roundrobin.core.api.Response;
+import com.roundrobin.gate.api.JobTo;
 import com.roundrobin.gate.api.SkillDetailTo;
 import com.roundrobin.gate.api.SkillGroupTo;
 import com.roundrobin.gate.api.UserProfileTo;
 import com.roundrobin.gate.enums.DeliveryType;
 import com.roundrobin.test.common.AbstractResourceTests;
 
+import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +18,12 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.roundrobin.gate.enums.VendorPreference.URGENT;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -88,6 +92,24 @@ public class ResourceTests extends AbstractResourceTests {
             new ParameterizedTypeReference<Response<SkillDetailTo>>() {
             }).getBody();
     return createdSkill.getEntity();
+  }
+
+  public String createJob(String userId) {
+    JobTo jobTo = new JobTo();
+    jobTo.setPreferredStart(DateTime.now());
+    jobTo.setPreferredEnd(DateTime.now().plusDays(1));
+    jobTo.setDesc("Sample desc");
+    jobTo.setSkillDetailId(createSkillDetail().getId());
+    jobTo.setLocation(new GeoJsonPoint(0, 0));
+    jobTo.setVendorPref(URGENT);
+    Response<JobTo> created = template.exchange(gateUrl + "job",
+            HttpMethod.POST,
+            createHttpEntity(jobTo, createBearerHeader(getMockAccessToken(userId))),
+            new ParameterizedTypeReference<Response<JobTo>>() {
+            }).getBody();
+    assertThat(created.getEntity(), notNullValue());
+    assertThat(created.getError(), nullValue());
+    return created.getEntity().getId();
   }
 
   protected HttpHeaders createAdminHeader() {
