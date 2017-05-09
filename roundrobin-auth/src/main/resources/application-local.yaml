@@ -1,8 +1,8 @@
 spring:
   data:
     mongodb:
-      username: roundrobin-auth
-      password: ENC(aqPvQem0wL63P7Tjtt3hc4uCzsiTDgCe)
+      username: auth
+      password: ENC(N2ZxJE7XvUttjledfxdRMLA5sBg3G8hBtctcXm6z9/U=)
       host: 10.211.55.5
       port: 27017
-      database: roundrobin-auth
+      database: auth

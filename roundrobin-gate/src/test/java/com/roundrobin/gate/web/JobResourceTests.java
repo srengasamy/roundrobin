@@ -272,7 +272,7 @@ public class JobResourceTests extends ResourceTests {
             createHttpEntity(userProfileTo, createBearerHeader(token)),
             UnauthorizedError.class).getBody();
     assertThat(created.getError(), is("access_denied"));
-    assertThat(created.getDescription(), is("Invalid token does not contain resource id (web)"));
+    assertThat(created.getDescription(), is("Invalid token does not contain resource id (gate)"));
   }
 
   @Test

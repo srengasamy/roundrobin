@@ -184,9 +184,9 @@ public abstract class AbstractResourceTests {
 
   protected List<String> getValidResources() {
     List<String> resources = new ArrayList<>();
-    resources.add("web");
     resources.add("auth");
-    resources.add("api");
+    resources.add("vault");
+    resources.add("gate");
     return resources;
   }
 
@@ -194,8 +194,8 @@ public abstract class AbstractResourceTests {
     List<String> scopes = new ArrayList<>();
     scopes.add("profile");
     scopes.add("location");
-    scopes.add("web");
-    scopes.add("api");
+    scopes.add("job");
+    scopes.add("vault");
     scopes.add("skill");
     return scopes;
   }

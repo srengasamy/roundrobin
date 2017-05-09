@@ -29,7 +29,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     http.httpBasic().realmName(realmName);
     http.authorizeRequests().
             antMatchers("/user-profile/**").access("#oauth2.hasScope('profile')").
-            antMatchers("/bank-account/**", "/credit-card/**").access("#oauth2.hasScope('web')").
+            antMatchers("/bank-account/**", "/credit-card/**").access("#oauth2.hasScope('vault')").
             antMatchers("/admin/**").hasAnyRole("ADMIN").
             antMatchers("/**").denyAll();
     http.csrf().disable();

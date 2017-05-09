@@ -15,7 +15,7 @@ import lombok.Data;
  * Created by rengasu on 5/1/17.
  */
 @Data
-@Document(collection = "user_profile_1")
+@Document(collection = "user_profile")
 public class UserProfile {
   @Id
   private String id;

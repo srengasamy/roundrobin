@@ -19,7 +19,7 @@ security:
       realm: 'gate'
   oauth2:
       resource:
-        id: web
+        id: gate
         jwt:
           key-value: |
             -----BEGIN PUBLIC KEY-----
